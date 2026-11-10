@@ -88,7 +88,7 @@ def search_categories(frame, columns=None, *, asof=DEFAULT_ASOF, n_splits=3, min
         with threadpool_limits(limits=1):
             result = GridSearchCV(
                 pipeline, grid, scoring=scoring, cv=splitter, refit=True,
-                n_jobs=1, error_score="raise", return_train_score=False,
+                n_jobs=1, error_score="raise", return_train_score=False, verbose=1,
             )
             result.fit(search[columns], y_search)
         seconds = time.perf_counter() - started

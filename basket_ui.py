@@ -32,45 +32,69 @@ DISPLAY_ORDER = (
 )
 
 
+def _research_study(studies, method):
+    candidates = [item for item in studies if item["metadata"].get("grouping_method", "kmeans") == method]
+    if not candidates:
+        return None
+    labels = {_study_label(item): item for item in candidates}
+    lead_label = next((label for label, item in labels.items()
+        if item["metadata"].get("directional_adjustment")
+        and BASKET_DOWNSIDE_VERSION in item["metadata"].get("versions", [])), next(iter(labels)))
+    key = f"basket_study_{method}"
+    chosen = labels[_select(f"Saved {METHOD_NAMES[method]} study", list(labels), key, list(labels).index(lead_label))]
+    from research.basket_momentum import _digest
+    cache_key = (str(chosen["directory"]), _digest(chosen["directory"] / "study.json"))
+    state_key = f"loaded_basket_study_{method}"
+    cached = st.session_state.get(state_key)
+    if cached is None or cached[0] != cache_key:
+        cached = (cache_key, _normalize(load_basket_study(chosen["directory"])))
+        st.session_state[state_key] = cached
+    return cached[1]
+
+
+METHOD_NAMES = {"kmeans": "K-means", "ward": "Hierarchical (Ward)"}
+
+
 def render_basket_strategy(store=None, published=None):
-    st.header("Advanced ML strategy")
-    st.write("Build the grouped portfolio first, then examine what separate up/down prediction models change.")
-    st.info("**Training data only.** This section uses saved training-validation results; test-period results belong in Final test.")
-    if published is not None:
-        study = published.study()
-    else:
-        studies = list_basket_studies(store.root)
-        if not studies:
-            st.info("No correlation-basket study is saved yet. Run python3 run_basket_momentum.py explicitly in research mode.")
-            return
-        labels = {_study_label(item): item for item in studies}
-        lead_label = next((label for label, item in labels.items()
-            if item["metadata"].get("directional_adjustment")
-            and BASKET_DOWNSIDE_VERSION in item["metadata"].get("versions", [])), next(iter(labels)))
-        if st.session_state.get("basket_lead_label") != lead_label:
-            st.session_state["basket_lead_label"] = lead_label
-            st.session_state["basket_study"] = lead_label
-        if st.session_state.get("basket_study") not in labels:
-            st.session_state["basket_study"] = lead_label
-        chosen = labels[st.selectbox("Saved basket study", list(labels), key="basket_study")]
-        from research.basket_momentum import _digest
-        cache_key = (str(chosen["directory"]), _digest(chosen["directory"] / "study.json"))
-        cached = st.session_state.get("loaded_basket_study")
-        if cached is None or cached[0] != cache_key:
-            cached = (cache_key, _normalize(load_basket_study(chosen["directory"])))
-            st.session_state["loaded_basket_study"] = cached
-        study = cached[1]
-    require_basket_training(study)
-    meta = study["metadata"]
-    st.caption(f"TRAINING VALIDATION · {meta['first_return_month']} to {meta['last_return_month']} · "
-               f"{meta['months']} earned months. Decisions use information known at the preceding snapshot. "
-               "Gross of costs; cash earns 0%. Browsing reuses saved results.")
-    st.markdown("**Trailing return paths → K-means groups → optional top-10 screen → positive momentum + cash → optional up/down adjustment**")
-    build, predictions = st.tabs(["Build the grouped strategy", "Add up/down predictions"])
-    with build:
-        _render_grouped_strategy(study)
+    st.header("Grouping With ML")
+    st.write("Compare two ways of grouping stocks, apply the same investment rules, then add separate up/down predictions.")
+    st.info("**Training data only.** These saved training-validation results use no test-period data. Test results belong in Final test.")
+    st.caption("These grouping studies keep their original model inputs and evaluation period. Feature engineering separately "
+               "trains and tunes new input recipes on both K-means/Ward starting portfolios, with its own Final test section.")
+    available = {}
+    studies = [] if published is not None else list_basket_studies(store.root)
+    if published is None and not studies:
+        st.info("No grouped-strategy study is saved yet. Run python3 run_basket_momentum.py explicitly in research mode.")
+        return
+    kmeans, ward, predictions = st.tabs(["K-means", "Hierarchical clustering", "Adding a direction"])
+    for method, tab in (("kmeans", kmeans), ("ward", ward)):
+        with tab:
+            reader = published.for_method(method) if published is not None else None
+            study = reader.study() if reader is not None else _research_study(studies, method) if published is None else None
+            if study is None:
+                st.info(f"No saved {METHOD_NAMES[method]} result is included. In research mode run: python3 run_basket_momentum.py --grouping {method}.")
+                continue
+            require_basket_training(study)
+            available[method] = study
+            meta = study["metadata"]
+            st.caption(f"TRAINING VALIDATION · {meta['first_return_month']} to {meta['last_return_month']} · "
+                       f"{meta['months']} earned months. Decisions precede returns. Gross of costs; cash earns 0%. Saved results only.")
+            st.markdown("**Trailing return paths → learned groups → optional top-10 screen → positive momentum + cash**")
+            _render_grouped_strategy(study, prefix="basket" if method == "kmeans" else "ward")
     with predictions:
-        _render_prediction_adjustments(study)
+        if not available:
+            st.info("No saved grouped strategy is available yet.")
+            return
+        options = {METHOD_NAMES[key]: key for key in available}
+        method = options[_select("Grouping method for directional adjustments", list(options), "basket_direction_grouping")]
+        _render_prediction_adjustments(available[method])
+        if len(available) == 2:
+            with st.expander("Compare grouping methods under the same trading rules"):
+                st.caption("Original portfolios only; identical earned months, momentum windows and cash rules. Group numbers are unrelated across methods.")
+                rows = []
+                for key, saved in available.items():
+                    rows.append(_overview_table(_originals(saved)["metrics"]).assign(Grouping=METHOD_NAMES[key]))
+                st.dataframe(pd.concat(rows, ignore_index=True), hide_index=True, use_container_width=True)
 
 
 def _select(label, options, key, default=0):
@@ -84,14 +108,27 @@ def _originals(study):
                        for name in ("metrics", "monthly")}}
 
 
-def _grouping_view(study):
+def _grouping_view(study, prefix="basket"):
     meta = study["metadata"]
     lookback = meta.get("correlation_lookback_months", meta["lookback_months"])
     st.markdown("### 1. How the groups are learned")
-    st.write(f"K-means is unsupervised ML. At each month-end it takes each stock's last {lookback} "
-             f"earned monthly returns and assigns stocks to {meta['n_clusters']} groups with similar return patterns. "
-             "Each stock's path is centered around its own mean and divided by its own standard deviation. "
-             "This lets the model compare the shape of their movements.")
+    method = meta.get("grouping_method", "kmeans")
+    st.write(f"Each stock becomes a row of {lookback} already-earned monthly returns. We subtract that stock's own mean "
+             "and divide by its own standard deviation. Two stocks with similar up/down timing therefore look close, "
+             "even if one usually has larger moves. Neither next-month returns nor the supplied factor ranks enter this fit.")
+    if method == "ward":
+        st.write(f"Hierarchical clustering starts with each stock in its own group. Ward's rule repeatedly merges the pair "
+                 f"that adds the least within-group squared variation. Cut this merge tree when {meta['n_clusters']} groups remain. "
+                 "Unlike K-means, it builds a nested hierarchy rather than repeatedly moving stocks between centroids.")
+        st.caption("The tree below is the actual saved fit, not a newly fitted illustration. Larger merge heights mean more dissimilar groups were joined.")
+        st.markdown("[Method reference: SciPy Ward linkage](https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.linkage.html)")
+    else:
+        st.write(f"K-means starts with {meta['n_clusters']} representative paths called centroids. Assign each stock to its closest centroid, "
+                 "replace each centroid by its members' mean path, and repeat until the assignments settle. "
+                 "We use ten seeded starts and keep the fit with the smallest total squared distance to the centroids.")
+        st.caption("The heatmap below shows each group's mean standardized return path: it helps explain what 'similar' means. "
+                   "Grouping is unsupervised: it receives no up/down labels and does not itself predict an investment return.")
+        st.markdown("[Method reference: scikit-learn K-means](https://scikit-learn.org/stable/modules/clustering.html#k-means)")
     st.write("Only complete, non-constant histories enter the grouping. Membership is fitted again each month. "
              "Group numbers are temporary labels: Group 2 next month can contain different stocks. "
              "The supplied factor ranks and next-month outcomes are not clustering inputs.")
@@ -107,13 +144,19 @@ def _grouping_view(study):
         st.info("No saved group membership is available.")
         return
     choices = {pd.Timestamp(date).strftime("%Y-%m-%d"): pd.Timestamp(date) for date in dates}
-    snapshot = choices[_select("Grouping decision snapshot", list(choices), "basket_group_snapshot", len(choices) - 1)]
+    snapshot = choices[_select("Grouping decision snapshot", list(choices), f"{prefix}_group_snapshot", len(choices) - 1)]
+    if method == "ward" and "hierarchy" in study:
+        from research.grouping_charts import hierarchy_figure
+        st.plotly_chart(hierarchy_figure(study["hierarchy"], snapshot, meta["n_clusters"]),
+                        use_container_width=True, key=f"{prefix}_tree")
+        st.caption("The tree is shortened to its final 25 branches. Parenthesized numbers count stocks inside a collapsed branch; "
+                   "the dashed line marks the cut used for the saved groups. Horizontal order carries no return ranking.")
     members = assigned.loc[pd.to_datetime(assigned.date).eq(snapshot)].dropna(subset=[FEATURE])
     counts = members.groupby(FEATURE).size().rename("Stocks")
     st.plotly_chart(go.Figure(go.Bar(x=[f"Group {int(group)}" for group in counts.index], y=counts,
         marker_color="#287d68", hovertemplate="%{x}<br>%{y} members<extra></extra>")).update_layout(
         template="plotly_white", height=300, margin=dict(l=10,r=10,t=15,b=10), yaxis_title="Stocks in the learned group"),
-        use_container_width=True, key="basket_group_counts")
+        use_container_width=True, key=f"{prefix}_group_counts")
     profiles, coverage = grouping_profiles(assigned, snapshot, lookback)
     if profiles.empty:
         st.info("The saved evaluation window does not contain a complete earlier input path for this snapshot. "
@@ -126,14 +169,14 @@ def _grouping_view(study):
             hovertemplate="%{y}<br>%{x}<br>Mean standardized return %{z:.2f}<extra></extra>"))
         figure.update_layout(template="plotly_white", height=320, margin=dict(l=10,r=10,t=15,b=10),
                              xaxis_title="Already-earned input month")
-        st.plotly_chart(figure, use_container_width=True, key="basket_group_profiles")
+        st.plotly_chart(figure, use_container_width=True, key=f"{prefix}_group_profiles")
         st.caption(f"Return-pattern illustration: mean standardized path of {coverage['illustrated']} of "
                    f"{coverage['members']} current members with complete paths in the saved archive. "
                    "These are dimensionless scores, not percentage returns. Current membership is applied to the past paths; "
                    "older group numbers are not linked. No clustering model is fitted to draw this chart.")
     groups = {f"Group {int(group)}": group for group in counts.index}
     if groups:
-        group = groups[_select("Group members to inspect", list(groups), "basket_group_members")]
+        group = groups[_select("Group members to inspect", list(groups), f"{prefix}_group_members")]
         st.dataframe(members.loc[members[FEATURE].eq(group), ["stock_id", FEATURE]].rename(
             columns={"stock_id":"Stock ID", FEATURE:"Saved group"}), hide_index=True, use_container_width=True)
 
@@ -149,13 +192,13 @@ def _performance(study, months, versions, key):
     st.caption("CAGR compounds portfolio returns. Annual log growth = log(1 + CAGR). Cash earns 0%; no trading costs are deducted.")
 
 
-def _render_grouped_strategy(study):
+def _render_grouped_strategy(study, prefix="basket"):
     base = _originals(study)
-    _grouping_view(base)
+    _grouping_view(base, prefix)
     st.markdown("### 2. Apply positive momentum and leave the rest in cash")
     horizons = _horizons(base)
     names = {f"{month}-month momentum": month for month in horizons}
-    selected = names[_select("Momentum window for the grouped strategy", list(names), "basket_base_horizon")]
+    selected = names[_select("Momentum window for the grouped strategy", list(names), f"{prefix}_base_horizon")]
     st.write(f"At each snapshot, compound the last {selected} earned monthly return{'s' if selected != 1 else ''}. "
              "Compute group momentum from an equal-weight return path of its current members. "
              "A group with zero or negative momentum gets zero stock allocation. "
@@ -166,7 +209,7 @@ def _render_grouped_strategy(study):
              "in a positive group give weights 12.5% and 37.5%, leaving 50% cash.")
     st.caption("The 12-month grouping window describes co-movement; the separate 1/2/3-month momentum window decides holdings. "
                "The comparison below adds grouping to the same momentum-and-cash idea.")
-    _performance(base, selected, ["Equal weight", "Momentum + cash", FULL_GROUP], "basket_base_curves")
+    _performance(base, selected, ["Equal weight", "Momentum + cash", FULL_GROUP], f"{prefix}_base_curves")
     st.markdown("### 3. Keep the top 10 by positive-side volatility in each group")
     st.write("After learning the groups, rank stocks inside each group by positive volatility over the same trailing 12 months. "
              "Keep up to 10 per group, then recompute group momentum on those retained names and apply the same positive-only/cash rule. "
@@ -176,12 +219,12 @@ def _render_grouped_strategy(study):
                "Stocks with no up months are excluded; tied scores use lower stock ID. "
                "This measures the size of past upside moves, not a prediction of next month's return.")
     if _has_top_vol(base, selected):
-        _performance(base, selected, ["Equal weight", FULL_GROUP, TOP_VOL_VERSION], "basket_top_curves")
+        _performance(base, selected, ["Equal weight", FULL_GROUP, TOP_VOL_VERSION], f"{prefix}_top_curves")
     else:
         st.info("No top-10 result is saved for this momentum window. Choose 1 or 2 months for that comparison.")
-    if st.checkbox("Inspect group cash and selected-stock weights", key="basket_base_inspect"):
+    if st.checkbox("Inspect group cash and selected-stock weights", key=f"{prefix}_base_inspect"):
         details = detail_frames(base, selected, [FULL_GROUP, TOP_VOL_VERSION])
-        _baskets({**base, **details}, selected, key_prefix="basket_base")
+        _baskets({**base, **details}, selected, key_prefix=f"{prefix}_base")
 
 
 def _render_prediction_adjustments(study):
@@ -213,7 +256,9 @@ def _render_prediction_adjustments(study):
     recipe = meta["forecast_sources"]["loss"]["feature_spec"]
     st.caption(f"{model_label} · {len(recipe['columns'])} supplied factors · {meta['feature_selection']} feature selection. "
                "Fixed settings, no tuning; pooled stock-month training with annual expanding historical fits. "
-               "K-means group formation and the later directional classifiers are separate ML tasks.")
+               f"{METHOD_NAMES[meta.get('grouping_method', 'kmeans')]} group formation and the later directional classifiers are separate ML tasks.")
+    st.caption("The grouping choice changes the starting portfolio. Both grouping methods reuse the same saved directional forecasts, "
+               "so full-universe prediction scores are identical; portfolio results can differ.")
     scores = study["predictive"].loc[study["predictive"].model_key.eq(model)]
     with st.expander("Does the directional model predict usefully?", expanded=False):
         st.caption("Scores cover the full training-validation forecast universe, not just grouped or screened stocks. "
@@ -452,7 +497,7 @@ def _baskets(study, months, key_prefix="basket"):
             "Upside tilt rescales qualifying names inside the original stock budget.")
     else:
         st.caption(
-            f"`{FEATURE}` is the K-means group from the 12-month path. The number is reused next month for a different set of stocks. "
+            f"`{FEATURE}` is the saved learned group from the 12-month path. The number is reused next month for a different set of stocks. "
             f"The bars are {months}-month group momentum. Green groups can hold positive members. Gray groups are cash.")
     baskets = baskets.copy()
     baskets["date"] = pd.to_datetime(baskets.date)

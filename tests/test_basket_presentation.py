@@ -110,20 +110,20 @@ class PublishedBasketPresentationTests(unittest.TestCase):
             app = AppTest.from_file(str(ROOT / 'app.py'), default_timeout=60).run()
             self.assertFalse(app.exception)
             advanced = app.tabs[2]
-            subtabs = [tab for tab in advanced.tabs if tab.label != 'Advanced ML strategy']
-            self.assertEqual([tab.label for tab in subtabs], ['Build the grouped strategy', 'Add up/down predictions'])
-            build, overlay = subtabs
+            subtabs = [tab for tab in advanced.tabs if tab.label != 'Grouping With ML']
+            self.assertEqual([tab.label for tab in subtabs], ['K-means', 'Hierarchical clustering', 'Adding a direction'])
+            build, hierarchy, overlay = subtabs
             self.assertFalse(any('Brier score' in f.value or 'Predicted loss probability' in f.value for f in build.dataframe))
             self.assertFalse(any('Prediction model' in w.label for w in build.selectbox))
             self.assertTrue(any('non-constant' in text.value for text in build.markdown))
             app.selectbox(key='basket_base_horizon').select('3-month momentum').run()
             self.assertFalse(app.exception)
-            build = next(tab for tab in app.tabs if tab.label == 'Build the grouped strategy')
+            build = next(tab for tab in app.tabs if tab.label == 'K-means')
             self.assertTrue(any('No top-10 result' in x.value for x in build.info))
             app.checkbox(key='basket_overlay_inspect').check().run()
             app.selectbox(key='basket_screen_1').select(DOWNSIDE_VERSION).run()
             self.assertFalse(app.exception)
-            overlay = next(tab for tab in app.tabs if tab.label == 'Add up/down predictions')
+            overlay = next(tab for tab in app.tabs if tab.label == 'Adding a direction')
             self.assertTrue(any('Predicted loss probability' in f.value for f in overlay.dataframe))
             app.selectbox(key='basket_overlay_book').select('Full correlation groups').run()
             app.selectbox(key='basket_screen_1').select(BASKET_DOWNSIDE_VERSION).run()

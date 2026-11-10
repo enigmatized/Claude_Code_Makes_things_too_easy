@@ -1,6 +1,6 @@
 ---
-title: "MLFactor: Comparing model adjustments"
-subtitle: "Training feature study complete — final choice and evaluation pending"
+title: "A long-only book, and what the models did not forecast"
+subtitle: "Annual log growth first. The momentum screen carries the return."
 jupyter: python3
 format:
   revealjs:
@@ -14,109 +14,90 @@ execute:
 
 ```{python}
 #| include: false
-from pathlib import Path
+import os
 import sys
-sys.path.insert(0, str(Path.cwd().parent))
+from pathlib import Path
+os.environ["MLFACTOR_READ_ONLY"] = "1"
+here = Path.cwd().resolve()
+for candidate in (here, *here.parents):
+    if (candidate / "research" / "notebook_views.py").is_file():
+        sys.path.insert(0, str(candidate))
+        break
 from IPython.display import display
-from research.reporting import load_release, predictive_table, portfolio_table, portfolio_figure
-import matplotlib.pyplot as plt
-summary = load_release()
+from research.notebook_views import (
+    choice_text, engineering_note, equal_weight_benchmark, equal_weight_sentence,
+    non_ml_figure, non_ml_table, style_table, tuning_note,
+)
 ```
 
-## Current finding
-
-- No classifier beats the historical loss-rate control on probability scores.
-- Portfolio effects depend on the original trading rule.
-- Four feature recipes are compared; final choice and evaluation remain pending.
-
-## A controlled comparison
-
-- Same stock-month inputs and validation window.
-- Same trading rules and loss-probability weight adjustment.
-- Four fixed classifiers; one original per strategy.
-- Thirteen originals plus fifty-two adjusted portfolios.
-
-## Predictive quality
+## Official test, equal weight
 
 ```{python}
-display(predictive_table(summary).style.format({"Brier score": "{:.4f}", "Log loss": "{:.4f}", "ROC AUC": "{:.3f}"}))
+#| echo: false
+frame = equal_weight_benchmark()
+official = frame.loc[frame["Period"].eq("Official test")]
+display(style_table(official))
+print(equal_weight_sentence())
 ```
 
-## Portfolio growth
+Annual log growth on the 108 test months is 12.31%. CAGR on the same path is 13.10%. That CAGR is the graded annualized return. The combined January 2000–December 2018 path keeps the 2008 drawdown, −49.51%.
+
+## How the books invest
+
+Equal weight holds every name at the same weight and stays fully invested.
+
+Top 10 positive-vol and full baskets invest only in positive one-month momentum. One month is the last return already earned. Weight is proportional to that return. The rest is cash, and cash earns nothing.
+
+Each month, five K-means groups are fit on the trailing 12-month return path. A group that was not up gets no capital. Inside a group that was up, only members that were up are held.
+
+Top 10 first keeps, in each group, the ten names with the largest positive volatility, then applies that rule. Full baskets skip that cut.
 
 ```{python}
-display(portfolio_table(summary).style.format("{:.2%}"))
+#| echo: false
+display(style_table(non_ml_table("test")))
+display(non_ml_figure("test"))
 ```
 
-## Momentum: paths and risk
+Top-10 positive-vol has higher annual log growth than equal weight on the official test, and a lower Sharpe. Full baskets land below equal weight.
 
-```{python}
-slide_summary = {**summary, "release": {**summary["release"], "focus_strategies": ["momentum_weighted"]}}
-figure = portfolio_figure(slide_summary)
-display(figure)
-plt.close(figure)
-```
+## The forecast
 
-## Random forest selects ten inputs {.smaller}
-
-:::: {.columns}
-::: {.column width="30%"}
-
-- Fit using then-known training outcomes.
-- Keep ten inputs and retrain each predictor.
-- Error bars show tree variation, not confidence intervals.
-- Training importance does not establish future returns.
-
+::: {.incremental}
+- Four factory classifiers, plus K nearest neighbors on return quintiles.
+- Downside multiplies a held weight by (1 − 0.5 × P(down)) and leaves the cut in cash. Upside boosts a held name by 50% when P(up) is at least 0.60, then returns to the original stock budget.
+- Loss probabilities do not beat the historical loss rate. Quintile accuracy is about 22.6% against a 20% guess. The KNN book equal-weights its predicted top quintile.
+- A ten-factor cut moves the training books by about 0.2 percentage point.
+- GridSearchCV on log loss barely moves the equal-weight holdout book.
 :::
-::: {.column width="70%"}
 
 ```{python}
-from research.feature_reporting import importance_figure, prediction_summary, forest_findings
-feature_study = summary.get("feature_study")
-if feature_study is not None:
-    figure = importance_figure(feature_study)
-    figure.set_size_inches(9, 6)
-    figure.axes[0].tick_params(axis="y", labelsize=7)
-    figure.tight_layout()
-    display(figure)
-    plt.close(figure)
+#| echo: false
+print(tuning_note())
 ```
 
-:::
-::::
+The 2010–2018 books stay on factory settings. The search is a 2007–2009 training holdout.
 
-## Does forest selection help? {.smaller}
-
-All 20, ANOVA, pruning and forest recipes use the same months and trading rules.
-Compare prediction quality before interpreting portfolio gains.
+## Feature engineering
 
 ```{python}
-from IPython.display import Markdown
-if feature_study is not None:
-    display(Markdown(forest_findings(feature_study, brief=True)))
-    scores = prediction_summary(feature_study)
-    table = scores.loc[scores.recipe.eq("forest_10"), [
-        "model_id", "brier_score", "log_loss", "Brier change vs all 20",
-    ]].rename(columns={"model_id": "Model", "brier_score": "Brier", "log_loss": "Log loss",
-                       "Brier change vs all 20": "Brier change"})
-    table["Model"] = table["Model"].map({"logistic": "Logistic", "naive_bayes": "Naive Bayes",
-                                      "random_forest": "Forest", "hist_gradient_boosting": "Boosting"})
-    display(table.style.hide(axis="index").format({"Brier": "{:.6f}", "Log loss": "{:.6f}",
-        "Brier change": "{:+.6f}"}).set_table_styles([
-            {"selector": "th, td", "props": [("padding", "0.3em 0.7em"), ("text-align", "right")]},
-            {"selector": "th:first-child, td:first-child", "props": [("text-align", "left")]},
-        ]))
+#| echo: false
+print(engineering_note())
 ```
 
-## Remaining analysis
+The lesson from `0_7_Feature_Engineering`: test AUC stays about 0.50 after the new columns. That comparison equal-weights the highest-scoring fifth of names. Its higher CAGR lines up with high recent volatility, and a model-free top fifth by 6-month volatility is in the same neighborhood. Tuning the engineered recipes does not move the 2007–2009 top-10 book.
 
-- Review the four-recipe study and choose the final feature specification.
-- Integrate the separate training-holdout tuning evidence into the final release.
-- Choose specifications using training evidence.
-- Complete the frozen-training test comparison and final recommendation.
+## The book to trade
 
-::: notes
-This is a draft presentation generated from the pinned saved experiment. Expand
-and revise after tuning and final evaluation to meet the approximately
-15-minute final presentation requirement. No code snippets appear on slides.
+```{python}
+#| echo: false
+print(choice_text())
+```
+
+## What this result can support
+
+::: {.incremental}
+- One market path, gross of costs, cash at zero.
+- The official test was already viewed before the engineering notebook comparison.
+- Ten constructed inputs can still combine all twenty source factors.
+- The engineered runner has no completed 2010–2018 portfolio in this submission.
 :::

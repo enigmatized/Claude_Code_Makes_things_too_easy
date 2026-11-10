@@ -50,7 +50,7 @@ def main():
     previous = os.environ.get("MLFACTOR_READ_ONLY")
     os.environ["MLFACTOR_READ_ONLY"] = "1"
     try:
-        NotebookClient(notebook, timeout=120, kernel_name="python3",
+        NotebookClient(notebook, timeout=300, kernel_name="python3",
                        resources={"metadata": {"path": str(SUBMISSION)}}).execute()
         nbformat.write(notebook, notebook_path)
         environment = dict(os.environ, QUARTO_PYTHON=sys.executable)

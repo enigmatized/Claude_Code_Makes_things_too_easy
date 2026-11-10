@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-10",
+  "saved_strategy_comparisons_verified": 112,
+  "strategies": 14,
+  "models": 4,
+  "targets": 2,
+  "new_fits": 0,
+  "new_backtests": 0,
+  "published_data_unchanged": "0dc4d709f54634430e060273bfe013f60fdcd5a3f6b424948504d533f3d8c895",
+  "standalone_deploy": "passed without CSVs or research archive; read/fit/runner guards active",
+  "gitignore": "raw CSVs, artifacts, old releases, secrets and caches ignored; current release/source included; no already tracked ignored files",
+  "new_research_pending": "Ward/tuned classifier final evaluations and clustering tuning were not run.",
+  "full_suite": {
+    "tests": 214,
+    "seconds": 190.292,
+    "status": "passed"
+  },
+  "browser": "passed and screenshots reviewed: all-strategy tuning controls, cumulative portfolio log returns and joined model-protocol labeling",
+  "formal_release_sha256": "3d73f0be9dbb7c8caf6b83bf84241049e5c6785800037449981a89dee78c7d62"
+}

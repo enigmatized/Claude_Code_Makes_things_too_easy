@@ -1,5 +1,55 @@
 # Architecture
 
+Final presentation now names the original K-means top-ten momentum/cash book
+explicitly. `_final_book_sections` labels its first subtab K-means strategies;
+`final_book_ui` formats book names with their actual horizons. Feature-engineered
+final controls default to the same starting book without overriding a user's
+existing selection. This changes labels/defaults only, not saved identities,
+portfolio calculations or publication data. See [basket guide](BASKET_MOMENTUM.md).
+
+The feature-engineering study and frozen final phase are now completed and
+published. The app has seven main tabs; Final test composes two independently
+labeled saved studies. `_final_book_sections` preserves the old reader while
+adding the new engineered variants without relabeling old factory/ANOVA results.
+Current publication: 470 files / 172,577,499 bytes; all 457 earlier frame hashes
+remain exact. Construction/trials/folds are exported, models/raw forecasts are
+local only. Research uses the same renderer with completed-stage readers. See
+[verified current handoff](FEATURE_ENGINEERING.md).
+
+The new feature-engineering stage is an independent optional extension, sharing
+existing model factories, chronological month splitter, adjustments, stock-group
+weights and accounting. `engineering.py` owns causal technical inputs and a
+cloneable fit/predict estimator with training-fitted maps. `engineering_study.py`
+records/resumes declared training cases and separately frozen final cases.
+`engineering_ui.py` reads either checksummed local aggregates or a published
+reader. `engineering_publication.py` extends schema 1 with `tabs.engineering`
+training/test windows; existing release frames remain exact. The seventh main
+tab follows Tuned model, with a separate final section for the new variants.
+See [protocol and construction](FEATURE_ENGINEERING.md).
+
+The latest tuning/final presentation uses the existing saved studies without
+new publication data. `tuning_ui.py` derives strategy coverage from metadata and
+exposes every saved basic rule, removing only its former portfolio-family focus.
+`_wide_metric` pivots exact saved values. Clustering search is documented as a
+separate, unrun experiment. `final_book_ui` reuses `app_charts.return_curve` over
+saved portfolio returns and pairs overlay metrics by original book/model/horizon.
+It labels the fixed K-means protocol and joined training/test model transition.
+Local app status distinguishes test evidence from formal release signoff. See
+[scope and handoff](TUNING_AND_FINAL_REVIEW.md).
+
+Grouping now parameterizes `research/basket_momentum.py` with `kmeans` (legacy
+default) or `ward`, preserving shared eligibility, history, momentum, screening
+and accounting. Ward saves the actual linkage matrix; the saved-forecast replay
+preserves it. `research/grouping_charts.py` renders that matrix without fitting.
+The shared `basket_ui.py` composes three subtabs and method-specific widget keys.
+
+`export_grouping_comparison` extends an existing immutable publication after
+checking common rules/forecast provenance/controls and old file integrity.
+Schema-1 `advanced_ml.grouping_methods.ward` is optional; the root record stays
+K-means. `PublishedBasketStudy.for_method` exposes the same saved-study/detail
+interface for either method. All prior tab exports remain exact. See
+[scope, sources and report reuse](GROUPING_WITH_ML.md).
+
 All-six-tab publication adds `published_analysis.py` and optional schema-1
 `features`, `tuning`, `final` sections. Explicit export reads completed artifacts,
 serializes feature summaries/audits and method notes, tuning frames/trials, and

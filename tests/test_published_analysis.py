@@ -95,8 +95,7 @@ class PublishedAnalysisTests(unittest.TestCase):
                 'research.final_books.window_books', side_effect=AssertionError('windows must be precomputed')):
             app = AppTest.from_file(str(ROOT / 'app.py'), default_timeout=60).run()
             self.assertFalse(app.exception)
-            self.assertEqual(app.selectbox(key='tuning_holdout_strategy').options, ['Equal-weight universe'])
-            app.checkbox(key='tuning_main_families_only').uncheck().run()
+            self.assertEqual(app.selectbox(key='tuning_holdout_strategy').options, ['Equal-weight universe', 'Positive momentum, score weights'])
             app.selectbox(key='tuning_holdout_strategy').select('Positive momentum, score weights').run()
             self.assertFalse(app.exception)
             app.selectbox(key='tuning_holdout_target').select('Next up — positive next-month return').run()

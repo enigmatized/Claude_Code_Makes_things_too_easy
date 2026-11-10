@@ -1,5 +1,125 @@
 # Project state — 2026-11-09
 
+## Latest: make the original K-means top-ten cash book recognizable (2026-11-10)
+
+The requested K-means → top-ten positive-volatility → one-month positive-momentum
+→ residual-cash strategy was already evaluated and published. It was displayed
+as “Top 10 positive-vol” under “Earlier grouped portfolios”, obscuring its identity.
+The Final subtab is now **K-means strategies**. Its explanation, original table row
+and curve explicitly name K-means, the momentum window and cash. Expanded tables
+label two-month variants correctly too. The feature-engineered final comparison
+now defaults to the same K-means top-ten starting book in fresh sessions.
+
+Saved original CAGR: 24.6807% on 2005–2009 training validation; 19.6133% on
+2010–2018 test, with average test cash 51.5556%. These are the existing original
+book, independent of the chosen directional classifier. No new fits/backtests or
+publication changes. Twelve focused tests and a source-free deploy AppTest verify
+visibility/defaults/labels and the original return value. See
+`docs/verification/kmeans_final_visibility_20261110.json`. Next: push UI/docs;
+all numerical evidence and the formal release remain unchanged.
+
+## Latest: feature engineering, tuning and frozen final variants (2026-11-10)
+
+Reviewed `0_7_Feature_Engineering/01_feature_engineering.ipynb`, preserved the
+original under ignored notebook-review artifacts, and annotated its exploratory
+scope. Corrected future-rerun exports for PCA/scaler/full-precision IC state,
+missing-IC denominators and the claim that unsupervised construction cannot
+involve overfitting. Existing exploratory outputs/CSVs remain intact.
+
+Seven main tabs now include **Feature engineering** after Tuned model. Its
+methods/results/tuning subtabs compare six recipes, four classifiers, separate
+up/down targets and fixed/tuned settings on six unchanged one-month books,
+including both K-means and Ward stock groups. Every learned feature is fitted
+inside its chronological CV fold. The input budget is at most ten, but some
+composites aggregate twenty source factors; rubric interpretation is not assumed.
+
+Study `engineering_20261110T171255_825ffa99` is complete: training labels through
+2006-12-31, frozen January 2007–December 2009 validation; separately frozen
+2010–2018 final evaluation fitted once on all 140,739 training rows. Parameters
+come from the earlier training CV, with no test retuning. Each stage has 96 fitted
+recipe/classifier/direction/settings variants, 582 portfolio cases including six
+originals; 20,952 training and 62,856 final monthly rows. There are 144 CV candidate
+rows. Later stock-group/technical updates use only already-earned returns.
+
+Final test now separates earlier grouped portfolios from feature-engineered
+variants. The older ANOVA/factory final study and formal submission pin remain
+unchanged. The extension has its own fixed/tuned protocol; old tuning filters or
+statements do not imply those new results are absent. Shared plotted results
+include CAGR/log growth, drawdown, cash and actual fitted input lists/counts.
+
+Default `published/project` now contains **470 files / 172,577,499 bytes**, adding
+about 2.6 MB while preserving all 457 earlier frame hashes. Prior default preserved
+at `published/project_before_engineering_20261110`. The app needs no raw extended
+CSV, forecast panel, fitted estimator or research catalog to review any new model.
+New `.gitignore` comments describe these existing exclusions; all current release
+files remain included and no ignored files are already tracked.
+
+Verification: **221 full-suite tests pass** (219.838 s, one native thread), plus
+exact training/final frame parity, every saved growth/cash identity, four old final
+reference books, 288 fitted/prediction artifact checksums, source-free seven-tab
+deployment under failing raw/archive/object/fit guards, and browser method/tuning/
+Ward-final charts. Saved-result notebook and standalone QMD/HTML supplement are
+built using the same published reader; formal notebook/QMD/slides/release remain
+separate. See [full protocol/handoff](FEATURE_ENGINEERING.md) and
+[evidence](verification/feature_engineering_20261110.json).
+
+Next: review and push the code/docs/current publication. Do not automatically
+choose a test winner or claim composites satisfy a limit on raw source factors.
+Keep the original default models/results, earlier experiments and other LLM edits.
+
+## Latest: tuning choices, final comparisons and Git ignore review (2026-11-10)
+
+Tuned model now shows all fourteen saved basic strategies by default; the old
+four-family focus had hidden thirteen. Keep four classifier choices and separate
+up/down targets, frozen feature/search audits and metric tooltips. Added clear
+classifier-versus-portfolio/clustering explanations and an all-strategy metric
+comparison. Equal weight remains the untouched benchmark; ML produces a separate
+weighted portfolio. Neither classifier settings nor grouping searches are fitted
+by viewing the tab.
+
+Final test now shows CAGR and annual log growth, wealth/cumulative-log/monthly-log
+curves, and each overlay's change relative to its own original and horizon.
+Coverage explicitly distinguishes fixed K-means test portfolios from untuned Ward
+training results and separate classifier tuning holdouts. The joined path is
+labeled as two protocols; local submission-release pending no longer implies
+saved test results are absent. No new model, backtest or published data was made.
+
+Git's actual ignore/tracked checks confirm raw CSVs, artifacts, old releases,
+secrets and caches are excluded, current publication/source retained, and no
+already-tracked ignored files. No `.gitignore` edits or Git history removal needed.
+**214 tests passed** (190.292 s). See [handoff](TUNING_AND_FINAL_REVIEW.md) and
+[verification](verification/tuning_final_review_20261110.json) for source-free
+and browser verification. Next: push reviewed UI/docs. Clustering search,
+grouped portfolios with tuned forecasts and new Ward/tuned official-test passes
+remain distinct research work; do not label current final evidence as those.
+
+## Latest: Grouping With ML — two unsupervised methods (2026-11-10)
+
+The user confirms successful website deployment. The third main tab is now
+**Grouping With ML**, with **K-means**, **Hierarchical clustering**, and **Adding
+a direction**. K-means has clearer centroid/input explanations. Ward hierarchical
+clustering uses the same standardized twelve-month histories and five groups;
+an interactive actual saved merge tree explains its nested groups. Both feed the
+same full-group/top-ten positive-momentum/cash rule, then the same four saved
+up/down classifier overlays. A selector chooses grouping in the directional view.
+
+New training-only Ward base `baskets_20261110T122422_88c2cc4a`; adjusted study
+`baskets_20261110T122521_a62c9b0c`: 49 books / 2,940 monthly rows, zero new
+classifier fits. One-month top-ten CAGR is 21.24% versus K-means 24.68%; this is
+comparison evidence, not a declared improvement. Later feature/tuning/final
+studies remain K-means and are labeled independently.
+
+Default `published/project` now has 458 files / 169,973,507 bytes, preserving
+all 362 prior frame checksums and adding lazy Ward partitions/tree data. Old
+release preserved locally at `published/project_before_grouping_20261110`.
+**210 tests pass**, plus exact real-data partition parity, a source-free six-tab
+standalone deploy check for both methods/four classifiers/two starting books,
+and real-browser tree/method-switch checks. No source CSV, earlier experiment,
+formal submission pin or report source was changed. Other LLM edits remain intact.
+See [grouping handoff](GROUPING_WITH_ML.md) and
+[verification](verification/grouping_20261110.json). Next: review/push this hosted
+presentation; decide separately whether to extend downstream research to Ward.
+
 ## Latest: GitHub ignore rules
 
 The root `.gitignore` excludes CSV datasets/reports, the full experiment archive,

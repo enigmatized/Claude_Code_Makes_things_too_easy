@@ -1,16 +1,26 @@
 # Project handoff and maintenance
 
-All six tabs now support the
-self-contained published-results mode. See `docs/DEPLOYMENT.md` before extending
-another tab. Keep local research available, deployment strictly read-only, and
-first five tabs strictly training-only. Final test has separately labeled frozen
-test/training/entire-path windows. Advanced ML has two subtabs: build the grouped
-strategy, then add directional predictions. Deployment must never open research
-archives or source/result CSVs; extend the explicit manifest exports instead.
-Feature selection, Tuned Model and Final test default to four portfolio families;
-turn their focus filter off to review additional saved comparisons. Classifier
-algorithms and portfolio families are separate concepts. Advanced tuning has
-not been run; the focused tuning view honestly has equal-weight evidence only.
+All seven main tabs now support the self-contained published-results mode.
+See `docs/DEPLOYMENT.md` before extending another tab. Keep local research
+available, deployment strictly read-only, and the first six tabs training-only.
+Final test separates earlier grouped portfolios and feature-engineered variants;
+legacy test/training/entire-path windows remain separately labeled.
+
+Grouping With ML has K-means, Ward and directional-adjustment subtabs. It clusters
+stocks. The new Feature engineering tab follows Tuned model and clusters/combines
+factor columns, with methods/results/hyperparameter-tuning subtabs. Its complete
+study `engineering_20261110T171255_825ffa99` includes six recipes, four classifiers,
+up/down and fixed/tuned variants, plus separately frozen final results on both
+K-means/Ward starting books. Read `docs/FEATURE_ENGINEERING.md` and its verification
+before changing this stage. Ten constructed inputs can aggregate twenty source
+factors; do not claim rubric compliance on raw sources without clarification.
+
+Deployment must never open research archives, source/result CSVs or fitted
+estimator objects, or fit/replay models. Extend the explicit manifest exports.
+Feature selection and the earlier Final view retain portfolio-family filters.
+Tuned model shows fourteen basic strategies by default; its older holdout is
+separate from the new feature-engineering tuning and final fits. Stock-cluster
+count/window tuning has not been run; factor-group/classifier tuning has.
 
 Current advanced-stage authority: the user subsequently defined correlation
 groups, top-positive-volatility screening and momentum, then requested separate

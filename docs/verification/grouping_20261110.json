@@ -1,0 +1,29 @@
+{
+  "ward_base_study": "baskets_20261110T122422_88c2cc4a",
+  "ward_adjusted_study": "baskets_20261110T122521_a62c9b0c",
+  "publication_sha256": "0dc4d709f54634430e060273bfe013f60fdcd5a3f6b424948504d533f3d8c895",
+  "publication_bytes": 169973507,
+  "files": 458,
+  "prior_frames_preserved": 362,
+  "ward_books": 49,
+  "ward_monthly_rows": 2940,
+  "ward_assignment_rows": 1988037,
+  "ward_tree_rows": 71448,
+  "detail_partitions_exact": 90,
+  "first_return_month": "2005-01-31",
+  "last_return_month": "2009-12-31",
+  "new_directional_fits": 0,
+  "future_label_and_tree_cut_tests": "tests/test_hierarchical_grouping.py",
+  "standalone_deploy": "pass: no CSVs, archives, catalog, grouping or classifier fits, replay",
+  "scope": "Training-only grouping and directional overlays. Later feature/tuning/final stages remain K-means.",
+  "full_suite": {
+    "tests": 210,
+    "seconds": 118.679,
+    "result": "pass"
+  },
+  "browser": "pass: three subtabs, explanations, actual merge tree, Ward directional choice; screenshot reviewed",
+  "default_publication": "published/project",
+  "previous_publication": "published/project_before_grouping_20261110",
+  "publication_git_eligible": true,
+  "formal_release_sha256": "3d73f0be9dbb7c8caf6b83bf84241049e5c6785800037449981a89dee78c7d62"
+}

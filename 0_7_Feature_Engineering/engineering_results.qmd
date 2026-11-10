@@ -1,0 +1,67 @@
+---
+title: "Feature engineering: from factors to portfolio comparisons"
+format:
+  html:
+    embed-resources: true
+    code-fold: true
+jupyter: python3
+execute:
+  warning: false
+---
+
+This supplement uses the same saved evidence as the app and does not fit models.
+The official test was previously viewed. At most ten constructed inputs can still
+aggregate twenty source factors; the formal rubric interpretation needs review.
+
+```{python}
+import os, sys
+from pathlib import Path
+os.environ['MLFACTOR_READ_ONLY'] = '1'
+ROOT = Path.cwd()
+if not (ROOT / 'published').is_dir(): ROOT = ROOT.parent
+sys.path.insert(0, str(ROOT))
+from published_results import PublishedStrategies
+from engineering_ui import METHOD_NOTES, _curves
+import pandas as pd
+reader = PublishedStrategies(ROOT / 'published/project').analysis_section('engineering')
+training, final = reader.study('training'), reader.study('test')
+pd.DataFrame([{'Recipe': k, 'Construction': v} for k, v in METHOD_NOTES.items()])
+```
+
+## Training, search and final evaluation
+
+Each learned transformation is fitted inside its chronological training fold.
+The early-training search minimizes binary event log loss. Fixed and tuned models
+are scored on January 2007–December 2009, then separately refitted once at the
+December 2009 final origin using training data only. Stock groups and technical
+signals subsequently use only returns already earned. Trading rules are fixed;
+residual cash earns zero and results are gross of trading costs.
+
+```{python}
+training['trials'][['recipe', 'model_key', 'target', 'params', 'mean_cv_log_loss', 'rank']].head(12)
+```
+
+## An example: logistic downside adjustment on the K-means top-ten book
+
+The app allows all four classifiers, both directions, six starting portfolios and
+all six recipes. This report shows one declared example, rather than selecting a
+winner from test results.
+
+```{python}
+final['metrics'].query("book == 'K-means top 10' and model_key == 'logistic' and target == 'loss'")[[
+    'recipe', 'status', 'cagr', 'annualized_log_growth', 'sharpe', 'max_drawdown', 'avg_cash_weight']]
+```
+
+```{python}
+rows = final['monthly']
+rows = rows.loc[rows.book.eq('K-means top 10') & (rows.recipe.eq('original') | (
+    rows.model_key.eq('logistic') & rows.target.eq('loss') & rows.status.eq('Tuned')))]
+from IPython.display import HTML, display
+from research.engineering_reporting import standalone_figure_html
+display(HTML(standalone_figure_html(_curves(rows, 'Cumulative log return'))))
+```
+
+Unsupervised feature construction does not guarantee useful forecasts. Differences
+in validation/test performance, risk and cash exposure should be examined without
+reselecting the recipe on the official test. This supplement does not replace
+formal project release/signoff.

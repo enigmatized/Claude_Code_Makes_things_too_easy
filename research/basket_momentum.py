@@ -1,7 +1,7 @@
 """Correlation baskets, then positive momentum, with the residual left in cash.
 
 Each month, stocks with a complete trailing return path are grouped by a
-K-means model. The inputs are the z-scored simple returns earned through that
+K-means model (default) or Ward hierarchical clustering. The inputs are the z-scored simple returns earned through that
 snapshot, not the twenty factor ranks and not the still-unrealized forward
 return. Euclidean distance on those paths groups stocks whose recent returns
 moved together. The cluster id is a new within-month feature,
@@ -40,6 +40,7 @@ import uuid
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
+from scipy.cluster.hierarchy import linkage, cut_tree
 
 from .accounting import portfolio_with_cash
 from .legacy import KEYS, PROJECT_ROOT, TARGET, load_panel, performance, portfolio_returns, return_month
@@ -54,6 +55,7 @@ TOP_VOL_MOMENTUM = (1, 2)
 TOP_VOL_VERSION = "Top 10 positive-vol baskets"
 VERSIONS = ("Equal weight", "Momentum + cash", "Basket momentum + cash", TOP_VOL_VERSION)
 RANDOM_STATE = 0
+GROUPING_METHODS = {"kmeans": "K-means", "ward": "Hierarchical (Ward)"}
 
 
 def realized_returns(history):
@@ -79,8 +81,10 @@ def realized_returns(history):
     return wide.reindex(calendar)
 
 
-def _cluster_window(window, n_clusters, random_state):
-    """Fit one K-means model on the stocks with a complete, non-constant path."""
+def _cluster_window(window, n_clusters, random_state, grouping_method="kmeans", tree_out=None):
+    """Group complete, non-constant paths; preserve the original K-means default."""
+    if grouping_method not in GROUPING_METHODS:
+        raise ValueError(f"Unknown grouping method: {grouping_method}")
     labels = pd.Series(pd.NA, index=window.columns, dtype="Int64")
     stock_momentum = pd.Series(np.nan, index=window.columns, dtype=float)
     basket_momentum = pd.Series(np.nan, index=window.columns, dtype=float)
@@ -97,6 +101,11 @@ def _cluster_window(window, n_clusters, random_state):
     centered = block[usable] - block[usable].mean(axis=0)
     if k == 1:
         fitted = pd.Series(0, index=usable, dtype="int64")
+    elif grouping_method == "ward":
+        tree = linkage(np.asarray(centered / scale[usable]).T, method="ward", metric="euclidean")
+        fitted = pd.Series(cut_tree(tree, n_clusters=[k]).ravel(), index=usable)
+        if tree_out is not None:
+            tree_out.append(pd.DataFrame(tree, columns=["left", "right", "distance", "count"]))
     else:
         model = KMeans(n_clusters=k, n_init=10, random_state=random_state, algorithm="lloyd")
         fitted = pd.Series(model.fit_predict(np.asarray(centered / scale[usable]).T), index=usable)
@@ -108,13 +117,18 @@ def _cluster_window(window, n_clusters, random_state):
 
 
 def assign_correlation_baskets(history, decision_dates, n_clusters=N_CLUSTERS,
-                               lookback=LOOKBACK, random_state=RANDOM_STATE, progress=None):
+                               lookback=LOOKBACK, random_state=RANDOM_STATE, progress=None,
+                               grouping_method="kmeans", hierarchy=None):
     """Attach the within-month basket feature at each decision snapshot.
 
     ``decision_dates`` are snapshot dates. A stock is eligible only when all
     ``lookback`` earned months through that snapshot are present and its path
     is not constant. Cluster numbers are meaningful inside that month only.
     """
+    if os.environ.get("MLFACTOR_READ_ONLY") == "1":
+        raise RuntimeError("Grouping fits are disabled during artifact-only rendering.")
+    if grouping_method not in GROUPING_METHODS:
+        raise ValueError(f"Unknown grouping method: {grouping_method}")
     if not isinstance(n_clusters, int) or n_clusters < 2:
         raise ValueError("Use at least two correlation baskets.")
     if not isinstance(lookback, int) or lookback < 2:
@@ -131,8 +145,11 @@ def assign_correlation_baskets(history, decision_dates, n_clusters=N_CLUSTERS,
         expected = pd.date_range(end=date, periods=lookback, freq="ME")
         if date not in wide.index:
             raise ValueError(f"{date.date()} is outside the realized-return calendar.")
+        tree_out = []
         labels, stock_momentum, basket_momentum = _cluster_window(
-            wide.reindex(expected), n_clusters, random_state)
+            wide.reindex(expected), n_clusters, random_state, grouping_method, tree_out)
+        if hierarchy is not None and tree_out:
+            hierarchy.append(tree_out[0].assign(date=date))
         frames.append(pd.DataFrame({
             "date": date,
             "stock_id": labels.index.to_numpy(),
@@ -375,7 +392,7 @@ def _prepare_signals(momentum):
 
 def create_basket_study(root, n_clusters=N_CLUSTERS, lookback=LOOKBACK,
                         momentum_months=MOMENTUM_MONTHS, validation_history_months=60,
-                        random_state=RANDOM_STATE):
+                        random_state=RANDOM_STATE, grouping_method="kmeans"):
     """Score equal weight, each short momentum window, and the reduced baskets.
 
     The first ``validation_history_months`` snapshots are history only. The
@@ -400,7 +417,9 @@ def create_basket_study(root, n_clusters=N_CLUSTERS, lookback=LOOKBACK,
         raise ValueError("Need at least two evaluation months after the initial history.")
     decision_dates = dates[validation_history_months:]
     panel = train.loc[train.date.isin(decision_dates), KEYS + [TARGET]].copy()
-    assigned = assign_correlation_baskets(train, decision_dates, n_clusters, lookback, random_state)
+    hierarchy = []
+    assigned = assign_correlation_baskets(train, decision_dates, n_clusters, lookback, random_state,
+        grouping_method=grouping_method, hierarchy=hierarchy)
     groups = panel[KEYS].merge(assigned[KEYS + [FEATURE]], on=KEYS, how="left", validate="one_to_one")
     volatility = positive_volatility(train, decision_dates, lookback)
     selected = select_top_positive_vol(groups, volatility, TOP_VOL_COUNT)
@@ -465,14 +484,20 @@ def create_basket_study(root, n_clusters=N_CLUSTERS, lookback=LOOKBACK,
                 assignments.append(screened)
     top_months = [month for month in horizons if month in TOP_VOL_MOMENTUM]
     versions = list(VERSIONS[:3]) + ([TOP_VOL_VERSION] if top_months else [])
-    return {
+    result = {
         "monthly": pd.concat(monthly, ignore_index=True),
         "metrics": pd.DataFrame(metrics),
         "baskets": pd.concat(basket_tables, ignore_index=True),
         "assignments": pd.concat(assignments, ignore_index=True),
         "metadata": {
             "protocol": "correlation_basket_momentum",
-            "model": "KMeans",
+            "model": "KMeans" if grouping_method == "kmeans" else "Ward hierarchical",
+            "grouping_method": grouping_method,
+            "source_sha256": {"mlfactor_long_only_train.csv": _digest(root / "mlfactor_long_only_train.csv")},
+            "grouping_code_sha256": _digest(Path(__file__)),
+            "grouping_parameters": {"n_clusters": n_clusters, "lookback": lookback,
+                "standardization": "per-stock mean and population standard deviation",
+                "method": "lloyd, n_init=10" if grouping_method == "kmeans" else "Ward linkage, Euclidean, exact cluster-count cut"},
             "feature_name": FEATURE,
             "model_inputs": "z-scored trailing simple returns; one column per month in the correlation window",
             "n_clusters": n_clusters,
@@ -500,6 +525,10 @@ def create_basket_study(root, n_clusters=N_CLUSTERS, lookback=LOOKBACK,
         },
     }
 
+    if hierarchy:
+        result["hierarchy"] = pd.concat(hierarchy, ignore_index=True)
+    return result
+
 
 def _digest(path):
     digest = hashlib.sha256()
@@ -514,7 +543,7 @@ def save_basket_study(result, root=None):
     directory = base / ("baskets_" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S") + "_" + uuid.uuid4().hex[:8])
     directory.mkdir(parents=True)
     frames = {}
-    for name in ["metrics", "monthly", "baskets", "assignments", "predictive", "fits"]:
+    for name in ["metrics", "monthly", "baskets", "assignments", "predictive", "fits", "hierarchy"]:
         if name not in result:
             continue
         path = directory / f"{name}.parquet"

@@ -197,6 +197,9 @@ class PublishedStrategies:
     def analysis_section(self, name):
         if name not in self.metadata['tabs']:
             return None
+        if name == 'engineering':
+            from engineering_publication import PublishedEngineering
+            return PublishedEngineering(self)
         from published_analysis import PublishedFeatures, PublishedTuning, PublishedFinal
         return {'features': PublishedFeatures, 'tuning': PublishedTuning, 'final': PublishedFinal}[name](self)
 
@@ -307,9 +310,15 @@ class PublishedBasicStore:
 class PublishedBasketStudy:
     """Advanced summaries plus on-demand saved membership/weight partitions."""
 
-    def __init__(self, publication):
+    def __init__(self, publication, record=None):
         self.publication = publication
-        self.record = publication.metadata["tabs"]["advanced_ml"]
+        self.record = record if record is not None else publication.metadata["tabs"]["advanced_ml"]
+
+    def for_method(self, method):
+        if method == "kmeans":
+            return self
+        record = self.record.get("grouping_methods", {}).get(method)
+        return PublishedBasketStudy(self.publication, record) if record else None
 
     def study(self):
         from research.basket_reporting import require_basket_training
@@ -330,3 +339,67 @@ class PublishedBasketStudy:
             result[name] = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(
                 columns=["date", "stock_id", "momentum_months", "model_key", "version"])
         return result
+
+
+def export_grouping_comparison(source_publication, basket_study, destination):
+    """Extend an immutable publication with a saved Ward study; preserve other tabs.
+
+    This is a publication operation only: no data loading, clustering or replay.
+    """
+    from research.basket_momentum import load_basket_study
+    from research.basket_reporting import normalize_study, require_basket_training
+    source = PublishedStrategies(source_publication)
+    advanced = normalize_study(load_basket_study(basket_study))
+    require_basket_training(advanced)
+    if advanced['metadata'].get('grouping_method') != 'ward':
+        raise ValueError('The additional grouping comparison must be a Ward study.')
+    reference = source.baskets().study()
+    for key in ('n_clusters', 'lookback_months', 'momentum_months', 'first_return_month',
+                'last_return_month', 'top_positive_vol_count', 'top_positive_vol_months',
+                'directional_adjustment', 'adjustment_strength', 'upside_threshold', 'forecast_sources'):
+        if reference['metadata'][key] != advanced['metadata'][key]:
+            raise ValueError(f'Grouping comparisons must share {key}.')
+    # Shared controls must be numerically identical before comparing learned memberships.
+    for name in ('monthly', 'metrics'):
+        control = reference[name].loc[lambda f: f.version.isin(['Equal weight', 'Momentum + cash'])]
+        new = advanced[name].loc[lambda f: f.version.isin(['Equal weight', 'Momentum + cash'])]
+        pd.testing.assert_frame_equal(control.reset_index(drop=True), new.reset_index(drop=True))
+    destination = Path(destination).resolve()
+    if destination.exists():
+        raise FileExistsError(f'Choose a new publication directory: {destination}')
+    temporary = destination.parent / ('.publishing_' + uuid.uuid4().hex)
+    metadata = json.loads(json.dumps(source.metadata))
+    try:
+        # Validate all prior exported evidence before preserving it in the new release.
+        for relative, expected in metadata['file_sha256'].items():
+            if digest_file(source.root / relative) != expected:
+                raise ValueError(f'Damaged source publication: {relative}')
+        shutil.copytree(source.root, temporary)
+        def write(name, frame):
+            path = temporary / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            frame.to_parquet(path, compression='zstd', index=True)
+            metadata['file_sha256'][name] = digest_file(path)
+            return name
+        frames = {name: write(f'grouping/ward/{name}.parquet', advanced[name])
+                  for name in ('metrics', 'monthly', 'predictive', 'fits', 'hierarchy') if name in advanced}
+        details = {}
+        for name in ('baskets', 'assignments'):
+            details[name] = {}
+            for (months, model, version), frame in advanced[name].groupby(
+                    ['momentum_months', 'model_key', 'version'], sort=False):
+                key = json.dumps([int(months), model, version])
+                token = hashlib.sha256(key.encode()).hexdigest()[:24]
+                details[name][key] = write(f'grouping/ward/{name}/{token}.parquet', frame)
+        metadata['tabs']['advanced_ml'].setdefault('grouping_methods', {})['ward'] = {
+            'source_study_id': Path(basket_study).name,
+            'source_metadata_sha256': digest_file(Path(basket_study) / 'study.json'),
+            'metadata': advanced['metadata'], 'frames': frames, 'details': details}
+        metadata['created_utc'] = datetime.now(timezone.utc).isoformat()
+        metadata['parent_manifest_sha256'] = digest_file(source.root / 'manifest.json')
+        (temporary / 'manifest.json').write_text(json.dumps(metadata, indent=2, default=str, allow_nan=False) + '\n')
+        temporary.rename(destination)
+    except Exception:
+        shutil.rmtree(temporary, ignore_errors=True)
+        raise
+    return destination

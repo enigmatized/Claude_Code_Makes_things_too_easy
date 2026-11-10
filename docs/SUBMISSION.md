@@ -1,5 +1,28 @@
 # Submission requirements and build pipeline
 
+The user authorized a feature-engineering extension and its separate final
+variants. A new review notebook and standalone QMD supplement use published
+saved evidence; formal report/slides/release pins are not automatically replaced.
+Each engineered estimator has at most ten model inputs, but some aggregate twenty
+source factors. This is not asserted to satisfy an instructor limit on underlying
+sources. Original-factor ANOVA-10 remains an explicit reference. Both previously
+viewed training/test evidence and the recipe-selection limitation must be disclosed.
+See [notebook review and full experiment protocol](FEATURE_ENGINEERING.md).
+
+The latest tuning/final UI clarifies that fourteen basic-rule classifier holdouts
+are separate from the existing fixed K-means official-test portfolios. Added log
+views/original-relative changes reuse saved evidence. Unsupervised tuning and
+Ward/tuned-classifier official-test variants are not claimed complete. This
+presentation review changes no formal notebook/QMD/HTML/slides or release pin;
+see [handoff](TUNING_AND_FINAL_REVIEW.md).
+
+The third app tab now compares K-means and Ward hierarchical grouping before
+separate directional predictions. Shared published readers and
+`research/grouping_charts.py` support later notebook/QMD integration; see
+[Grouping With ML](GROUPING_WITH_ML.md). Ward evidence is training-only. Existing
+feature/tuning/final sources stay K-means, and this change does not update the
+formal submission pin, notebook, QMD/HTML or slide deck.
+
 The hosting presentation now exports all six tabs, including registry/advanced
 feature results, tuning trials and frozen final windows. These are saved-evidence
 readers, reusable by reports; no new experiment or formal release is inferred.

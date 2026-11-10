@@ -1,5 +1,27 @@
 # App tab refactor — implementation plan and LLM handoff
 
+Feature-engineering addition authorized 2026-11-10: seven main stages, with
+**Feature engineering** between Tuned model and Final test. Its methods, model/
+portfolio comparisons and hyperparameter tuning are subtabs; it clusters factor
+columns, while Grouping With ML clusters stocks. The extension's fixed/tuned
+frozen variants have a separate Final test section. Earlier six-tab/no-Ward-final
+statements refer to the earlier publication. See [current protocol](FEATURE_ENGINEERING.md).
+
+Current tuning/final authority (2026-11-10): Tuned model no longer uses the
+four-portfolio-family focus; all fourteen saved basic rules are available by
+default. Features and Final retain their own display filters. The current final
+study is explicitly fixed K-means/ANOVA-10, separate from tuning and Ward training.
+See [latest review](TUNING_AND_FINAL_REVIEW.md). Older focused-equal-weight-only
+statements below record the prior UI.
+
+Latest authority (2026-11-10): the user requested and authorized a second
+unsupervised grouping method. Tab 3 is now **Grouping With ML**, with K-means,
+Hierarchical clustering (Ward) and Adding a direction. Both grouping methods
+feed the same fixed strategies/overlays. The current hosted publication includes
+both, with later feature/tuning/final sources still K-means. This supersedes
+older two-subtab/advanced-placeholder instructions below. See
+[handoff](GROUPING_WITH_ML.md).
+
 Current: **all six main tabs are deploy-ready** via `published/project`.
 Features includes both registry and advanced-book studies, descriptive factor-bar
 and recipe-curve hovers. Tuning reads all saved model/target trials and holdout

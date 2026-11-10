@@ -1,4 +1,5 @@
 """Research or published-results UI. Portfolio calculations live in research/."""
+from pathlib import Path
 import os
 from dataclasses import replace
 import pandas as pd
@@ -6,6 +7,7 @@ import plotly.graph_objects as go
 from plotly.colors import qualitative
 from plotly.subplots import make_subplots
 import streamlit as st
+from engineering_ui import render_engineering
 from research import FeatureSpec, RunConfig, default_model_registry, default_registry
 from research.models import event_fields
 from basic_ml_ui import saved_basic_source, render_scope_comparison
@@ -504,6 +506,21 @@ def render_features(strategies, published=None):
     render_feature_studies(selected_strategies=strategies, key_prefix="features", published=published)
 
 
+def _final_book_sections(store=None, published=None, engineering=None):
+    ready = (engineering is not None and engineering.has_window('test')) if published is not None else bool(
+        list((Path(store.root) / 'engineering_studies').glob('*/test/complete.json')))
+    if ready:
+        earlier, engineered = st.tabs(['K-means strategies', 'Feature-engineered variants'])
+        with earlier:
+            saved = render_final_books(store, published=published)
+            st.caption('Earlier saved study: frozen ANOVA-10, fixed classifiers and K-means stock groups. '
+                       'The new engineered variants have their own separately labeled protocol.')
+        with engineered:
+            render_engineering(store, published=engineering, window='test')
+        return True
+    return render_final_books(store, published=published)
+
+
 def render_final_test(store):
     st.header("Final test")
     st.caption("Test-period earned returns: Jan 2010–Dec 2018. This period was inspected in earlier research.")
@@ -512,20 +529,22 @@ def render_final_test(store):
         "short-term momentum weights. That momentum book with an up-or-down model on the weights. "
         "The correlation-basket book with the same up-or-down model. "
         "The other strategies and classifiers stay one control away.")
-    has_books = render_final_books(store)
+    has_books = _final_book_sections(store)
     final = pinned_final_summary(store)
     if final is None:
-        st.info("Final frozen-model test evaluation is pending. The Tuned model tab scores a holdout inside the training years. This tab is the 2010–2018 test, after that choice is recorded.")
         if has_books:
+            st.info("Saved 2010–2018 evaluation is available above. Formal submission release approval is pending; "
+                    "this does not mean the displayed test results are missing.")
             st.caption(
-                "The table above is the frozen 2010–2018 score of the four books. "
-                "The pending note is the submission release, which is a different saved run and is still unmarked. "
+                "The sections above contain saved 2010–2018 portfolio evaluations. "
+                "The formal submission release is a separate saved run and has not been signed off. "
                 "The other saved mixtures stay behind the control below.")
         else:
+            st.info("Final frozen-model test evaluation is pending. The Tuned model tab scores a holdout inside the training years.")
             st.caption(
                 "Equal weight already has an archived 2010–2018 number in the saved mixtures below. "
                 "The high positive-vol momentum book, the correlation-basket book, and the "
-                "up-or-down overlays on both are saved on the training window, in Advanced ML. "
+                "up-or-down overlays on both are saved on the training window, in Grouping With ML. "
                 "This page has no 2010–2018 row for those books.")
     else:
         final_id = final["run_id"]
@@ -556,6 +575,7 @@ def render_final_test(store):
                 render_comparison(test, include_ml=bool(test.prediction_batches), key_prefix="exploratory_test")
 
 
+
 def _training_sidebar(store):
     records = [row for row in store.list_runs() if row["evaluation"] == "training_validation"]
     # Migrate an old browser session safely; a legacy test selection cannot enter training.
@@ -577,7 +597,7 @@ def _training_sidebar(store):
         source = st.session_state["training_result"]
     with st.sidebar:
         st.subheader("Training research")
-        st.caption("These selections apply to Strategies and Basic ML. Advanced ML, Tuned model, and Final test read their own saved results.")
+        st.caption("These selections apply to Strategies and Basic ML. Grouping With ML, Tuned model, and Final test read their own saved results.")
         if records:
             options = {f"{row['case_count'] // (row['model_count'] + 1)} strategy rules · {row['created_utc'][:16]} · {row['run_id']}": row["run_id"] for row in records}
             active_id = getattr(source, "cache_info", {}).get("run_id")
@@ -626,7 +646,7 @@ def main():
         render_deployment()
         return
     st.caption("Research mode · Load saved experiments or explicitly run new comparisons locally.")
-    st.write("Portfolio rules → downside prediction → correlation-basket momentum → feature evidence → tuned model → final evaluation.")
+    st.write("Portfolio rules → downside prediction → correlation-basket momentum → feature evidence → tuned model → engineered inputs → final evaluation.")
     store = ExperimentStore()
     try:
         source, strategies = _training_sidebar(store)
@@ -635,13 +655,14 @@ def main():
         source, strategies = None, list(REGISTRY)
     if st.session_state.get("training_error"):
         st.error(st.session_state["training_error"])
-    tabs = st.tabs(["Strategies", "Basic ML", "Advanced ML strategy", "Feature selection", "Tuned model", "Final test"])
+    tabs = st.tabs(["Strategies", "Basic ML", "Grouping With ML", "Feature selection", "Tuned model", "Feature engineering", "Final test"])
     with tabs[0]: render_strategies(source, strategies, store)
     with tabs[1]: render_basic_ml(source, strategies, store)
     with tabs[2]: render_advanced(store)
     with tabs[3]: render_features(strategies)
     with tabs[4]: render_tuning_holdout(store)
-    with tabs[5]: render_final_test(store)
+    with tabs[5]: render_engineering(store)
+    with tabs[6]: render_final_test(store)
 
 
 def render_deployment():
@@ -674,9 +695,11 @@ def render_deployment():
                 st.session_state.pop(selection_key, None)
             else:
                 st.session_state[selection_key] = filtered
-        chosen = st.multiselect("Strategies to compare", list(names), default=list(names), key="published_strategy_selection")
+        if selection_key not in st.session_state:
+            st.session_state[selection_key] = list(names)
+        chosen = st.multiselect("Strategies to compare", list(names), key=selection_key)
         strategies = [names[label] for label in chosen]
-    tabs = st.tabs(["Strategies", "Basic ML", "Advanced ML strategy", "Feature selection", "Tuned model", "Final test"])
+    tabs = st.tabs(["Strategies", "Basic ML", "Grouping With ML", "Feature selection", "Tuned model", "Feature engineering", "Final test"])
     with tabs[0]:
         try:
             render_strategies(source, strategies, published=publication)
@@ -699,8 +722,8 @@ def render_deployment():
             else:
                 render_basket_strategy(published=baskets)
         except (ValueError, FileNotFoundError, KeyError) as error:
-            st.error(f"Published Advanced ML results are unavailable: {error}")
-    for tab, section in zip(tabs[3:], ['features', 'tuning', 'final']):
+            st.error(f"Published grouping results are unavailable: {error}")
+    for tab, section in zip(tabs[3:], ['features', 'tuning', 'engineering', 'final']):
         with tab:
             try:
                 analysis = publication.analysis_section(section)
@@ -710,12 +733,15 @@ def render_deployment():
                     render_features(strategies, published=analysis)
                 elif section == 'tuning':
                     render_tuning_holdout(published=analysis)
+                elif section == 'engineering':
+                    render_engineering(published=analysis)
                 else:
                     st.header('Final test')
                     st.info('**Official test: Jan 2010–Dec 2018.** This period was inspected previously. Training-only and entire-path views are separately labeled below.')
-                    render_final_books(published=analysis)
-                    st.caption('This saved final study uses a frozen ANOVA-10 fit with fixed classifier settings. '
-                        'It is separate from the Tuned model training holdout; formal report/release sign-off remains a local project step.')
+                    engineering = publication.analysis_section('engineering')
+                    _final_book_sections(published=analysis, engineering=engineering)
+                    st.caption('Each saved evaluation records its own input recipe, fit origin and model settings. '
+                               'Formal report/release sign-off remains a local project step.')
                     if not st.session_state.get('final_main_families_only', False) and st.checkbox('Show every saved test mixture', key='show_test_history'):
                         render_test_results(published=analysis)
             except (ValueError, FileNotFoundError, KeyError) as error:

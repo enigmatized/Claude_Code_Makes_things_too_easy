@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-10",
+  "cause": "Existing book obscured by abbreviated names; data was present.",
+  "changes": [
+    "K-means strategies final subtab",
+    "explicit original K-means/top-10/actual momentum/cash labels",
+    "fresh engineered-final default K-means top 10"
+  ],
+  "original_training_cagr": 0.24680703649346214,
+  "original_test_cagr": 0.19613336703857717,
+  "original_test_average_cash": 0.5155555555555555,
+  "tests": {
+    "final_books": 7,
+    "tuning_final_presentation": 5,
+    "saved_only_app": "passed under CSV/archive/fit guards"
+  },
+  "new_fits": 0,
+  "new_backtests": 0,
+  "publication_unchanged_sha256": "4df420855fe8e06be10ecf8cf52011fb6eae4e1147d9150fbab2737b04b65e1d"
+}

@@ -1,5 +1,56 @@
 # Design decisions
 
+## 2026-11-10 — Name the full K-means momentum/cash rule in Final
+
+The original strategy was included but hidden behind abbreviated book and subtab
+names. Make K-means, top-ten positive-volatility screening, actual momentum window
+and cash explicit. Feature-engineered final comparisons start from K-means top ten
+by default in new sessions. Preserve saved book/version keys and all values; do
+not rerun models or relabel a training CAGR as a test CAGR.
+
+## 2026-11-10 — Feature-engineering methods get their own end-to-end stage
+
+The user authorized integrating the 0_7 notebook, new input/model variants,
+hyperparameter searches, frozen final results and deploy/local publication.
+Use a new Feature engineering main tab after Tuned model, with methods/results/
+tuning subtabs. Factor-column clustering differs from stock grouping, so keep
+those concepts in separate teaching stages. Reuse the existing four classifier
+factories, weight adjustments and accounting; do not fork the older model runner.
+Declare six input recipes and small classifier/recipe grids before computation.
+Refit every learned feature inside chronological folds, then freeze features and
+classifiers at each evaluation origin. Carry fixed and trained-CV-selected settings
+separately to final evaluation, without test retuning. Publish only display frames
+and audits; keep estimator/probability panels local. Preserve original notebook/
+CSV evidence and record review corrections. Ten model inputs can use twenty source
+factors; disclose that distinction instead of claiming automatic rubric compliance.
+See [design, review and handoff](FEATURE_ENGINEERING.md).
+
+## 2026-11-10 — Expose saved tuning rules and distinguish final evidence
+
+Remove the four-family filter from Tuned model: show all fourteen saved basic
+strategies, not only equal weight. Retain feature/search protocol and separate
+up/down targets. Explain that the search optimizes predictive log loss and the
+ML overlay creates a different portfolio from its original equal-weight reference.
+Do not silently run clustering tuning, advanced tuned-forecast replay or new
+final tests. Label those as separate missing experiments. Final displays fixed
+K-means evidence, log-return views and changes from correct originals; local
+formal-release pending is separate from available test results. Keep published
+results and earlier calculations exact. Existing Git ignore rules need no changes.
+See [handoff](TUNING_AND_FINAL_REVIEW.md).
+
+## 2026-11-10 — Compare grouping methods with fixed trading rules
+
+Rename Advanced ML to Grouping With ML and use three subtabs: K-means,
+hierarchical clustering, directional adjustments. Choose Ward as a second
+unsupervised method, using identical standardized return paths and five groups.
+Save the actual tree rather than refitting to draw it. Preserve the K-means
+numerical default and all shared momentum/positive-volatility/cash math.
+Reuse existing separate up/down forecasts for both starting universes; prediction
+scores stay the same while portfolio weights can differ. Publish Ward as an
+optional lazy method record, preserving every prior exported frame. Keep feature,
+tuning and frozen test sources K-means until new experiments are explicitly run.
+See [implementation/handoff](GROUPING_WITH_ML.md).
+
 ## 2026-11-09 — Track source and the current hosted release
 
 Use the project-root `.gitignore` to omit datasets/CSV research reports, the full

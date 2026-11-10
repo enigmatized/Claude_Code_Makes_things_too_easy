@@ -117,7 +117,7 @@ class DirectionalBasketTests(unittest.TestCase):
             app = AppTest.from_string(script).run(timeout=30)
             self.assertFalse(app.exception)
             self.assertEqual(app.selectbox(key="basket_prediction_model").value, "Logistic regression")
-            self.assertEqual([tab.label for tab in app.tabs], ["Build the grouped strategy", "Add up/down predictions"])
+            self.assertEqual([tab.label for tab in app.tabs], ["K-means", "Hierarchical clustering", "Adding a direction"])
             app.checkbox(key="basket_overlay_inspect").check().run()
             app.selectbox(key="basket_screen_1").select(DOWNSIDE_VERSION).run()
             self.assertFalse(app.exception)

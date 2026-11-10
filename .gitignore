@@ -15,7 +15,7 @@ outputs/
 *.pkl
 *.pickle
 
-# Publish only the current self-contained six-tab release and its guide.
+# Publish only the current self-contained app release and its guide.
 # Keep Parquet files inside project/: they are required by deploy_app.py.
 /published/*
 !/published/README.md
@@ -69,3 +69,6 @@ Thumbs.db
 *.swo
 *.tmp
 *~
+
+# Feature-engineering extended datasets are covered by *.csv above.
+# New fitted recipes, predictions, models and search caches live under /artifacts/.

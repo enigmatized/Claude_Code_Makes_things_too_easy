@@ -4,7 +4,11 @@ Rough-draft plan for the 175-point analysis notebook. Written 2026-11-10.
 The draft notebook is `context/analysis_rough_draft.ipynb`. It calls
 `research/notebook_views.py`, which reads the newest saved study of each
 kind. Books to lead with are `STORY`, `DISPLAY_MODEL`, and `CHOICE` at the
-top of that module. This plan does not touch the deploy package,
+top of that module. Re-executed 2026-11-10 with annual log growth beside
+CAGR on the training window, the official test, and the combined path, and
+with all four factory classifiers as rows. K nearest neighbors is an extra
+model type from `artifacts/grouping_studies/grouping_20261110T044153_b86c80c0`
+(training holdout only). This plan does not touch the deploy package,
 `submission/analysis.ipynb`, or `03_mlfactor_long_only_project.ipynb`.
 
 ## Where the draft will live

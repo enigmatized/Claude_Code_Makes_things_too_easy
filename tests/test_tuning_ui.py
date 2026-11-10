@@ -52,8 +52,9 @@ class TuningUI(unittest.TestCase):
             app = AppTest.from_string(script).run(timeout=30)
             self.assertFalse(app.exception)
             self.assertEqual([box.label for box in app.selectbox[:3]],
-                             ["1. Model", "2. Basic strategy", "3. Prediction target"])
-            app.checkbox(key='tuning_main_families_only').uncheck().run()
+                             ["1. Model", "2. Starting strategy", "3. Prediction target"])
+            self.assertEqual(len(app.selectbox(key="tuning_holdout_strategy").options), 2)
+            self.assertFalse(any(box.key == "tuning_main_families_only" for box in app.checkbox))
             for label, target in TARGETS.items():
                 app.selectbox(key="tuning_holdout_target").select(label).run()
                 self.assertFalse(app.exception)

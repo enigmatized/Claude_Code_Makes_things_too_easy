@@ -1,6 +1,6 @@
 # Submission workspace
 
-This is a reproducible draft pipeline, not a completed final submission.
+The notebook, report, and slides read the saved four-book studies and the feature-engineering holdout. `release.json` still pins the older catalog run, so `build_submission.py --final` keeps failing those catalog checks.
 
 - `analysis.ipynb`: readable coding/analysis notebook using the shared library and saved evidence.
 - `project_report.qmd`: professional report source; code folded in its HTML output.
@@ -32,11 +32,11 @@ python3 build_submission.py --pin-run RUN_ID
 Do not automatically use the newest run: that would change a report silently.
 The release also pins the independent benchmark CSV's hash; update that reference
 deliberately if its source experiment is regenerated.
-`--final` rejects a build whose pinned run lacks recorded final evidence. At
-present, the completed four-recipe forest study is pinned and rendered alongside
-the older main experiment, with independent scopes stated. Final feature/model
-choice, integration of the separate tuning holdout and the official frozen test
-result remain pending.
+`--final` rejects a build whose pinned catalog run lacks recorded final evidence.
+The narrative in the notebook and the Quarto files is ahead of that pin: it reads
+the saved four-book pass, the training GridSearchCV holdout, and the engineering
+holdout directly. Do not point `--final` at a run until `release.json` records
+that choice.
 
 To pin feature evidence explicitly, use
 `python3 build_submission.py --pin-feature-study STUDY_ID`. The optional release
@@ -46,8 +46,8 @@ Old releases without this field remain readable. Shared read-only helpers in
 notebook, report and slides; changing chart controls never refits models.
 The earlier sources and HTML are preserved under `archives/pre_forest_20261109/`.
 
-The exact LMS upload packaging is not stated in the assignment notebook. Plan to
-provide readable source/notebooks, the QMD sources and rendered HTML documents,
-plus the final presentation. Keep report/slides figures tied to the same saved
-experiments. Revise the draft slides to about 15 minutes after the remaining
-analysis; do not present the current short research draft as the final deck.
+The exact LMS upload packaging is not stated in the assignment notebook. Upload
+this folder's `analysis.ipynb`, the QMD sources, and the rendered HTML documents.
+Annual log growth is the lead return. CAGR stays beside it. The feature-engineering
+section uses the completed 2007–2009 study and the previously viewed comparison
+in `0_7_Feature_Engineering`.

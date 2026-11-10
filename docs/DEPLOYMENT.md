@@ -1,10 +1,42 @@
 # Research and published view modes
 
+Latest visibility fix: the first Final subtab is **K-means strategies**, with
+explicit original top-ten / one-month momentum / cash labels. Engineered final
+comparisons default to the same starting book. This is a code/docs-only update;
+`published/project` and its 470 files remain unchanged. No dependency or hosting
+setting change is required.
+
+Current release (2026-11-10): **seven main tabs**, including Feature engineering
+and its new final variants, are published in `published/project` (470 files /
+172,577,499 bytes). Only about 2.6 MB is added for the new training/final model
+summaries, construction audits and search/fold tables. No raw technical dataset,
+forecast panel or fitted model object is uploaded. `deploy_app.py`, Python 3.12 and
+existing dependency pins stay the same. Push code, docs/review sources and the
+updated current release. Older publications/backups and all new scientific
+artifacts stay ignored. See [extension protocol](FEATURE_ENGINEERING.md).
+
+Latest UI review (2026-11-10): Tuned model exposes all fourteen saved rules;
+Final test adds log-return views, original-relative changes and explicit fixed
+K-means protocol coverage. No publication update or raw data is required for
+this UI change: the 458-file `published/project` remains exact. Git ignore rules
+already include that release and code while excluding raw/research/old/local
+files; no ignored files are already tracked. See
+[review and push handoff](TUNING_AND_FINAL_REVIEW.md).
+
+Current (2026-11-10): the user confirms the site deployed successfully.
+The updated `published/project` has **169,973,507 bytes / 458 files**, including
+K-means and Ward hierarchical grouping in the renamed **Grouping With ML** tab.
+Its three subtabs share research/deploy renderers. Push the updated code,
+`requirements-app.txt` (SciPy 1.13.1) and `published/project` to update the site.
+No hosting setting or entry-point change is needed. Preserve deployment's
+read-only boundary; no raw CSV/catalog/fitting/replay is introduced. See
+[new export command, provenance and next steps](GROUPING_WITH_ML.md).
+
 All **six main tabs** now support deployment.
 Local research retains all six tabs and its explicit compute buttons. Deployment
 reuses the same renderers against a self-contained publication. Older publications
 still show honest pending states for sections they do not contain.
-No website has been published.
+The user reports successful website deployment.
 
 ## GitHub staging scope
 
@@ -30,7 +62,7 @@ python3 run_app.py --mode deploy --port 8502
 
 `MLFACTOR_APP_MODE=research|deploy` is the equivalent setting for a direct
 `streamlit run app.py` launch. Do not infer mode from hostname or current folder.
-`deploy_app.py` is the future Community Cloud entry point: it explicitly sets
+`deploy_app.py` is the Community Cloud entry point: it explicitly sets
 deploy mode and `MLFACTOR_READ_ONLY=1` before opening the app. Research mode is
 the default; the website cannot switch itself into research mode through a UI
 control. The first-tab and Basic ML compute callbacks also reject deploy mode.

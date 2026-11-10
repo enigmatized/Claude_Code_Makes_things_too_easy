@@ -152,6 +152,8 @@ def create_adjusted_basket_study(store, basket_directory, loss_run_id, upside_ru
                 fits.append(batches[key]["fits"].assign(model_key=key, prediction_target=target))
         result["predictive"] = pd.concat(predictive, ignore_index=True)
         result["fits"] = pd.concat(fits, ignore_index=True)
+    if "hierarchy" in base:
+        result["hierarchy"] = base["hierarchy"].copy()
     result["metadata"] = {**base["metadata"],
         "directional_adjustment": True, "model_keys": models,
         "adjustment_strength": strength, "upside_threshold": upside_threshold,

@@ -1,5 +1,61 @@
 # Change log
 
+## 2026-11-10 — Recognizable K-means top-ten strategy in Final test
+
+- Rename the earlier-final subtab to K-means strategies; spell out grouping,
+  top-ten positive-vol screening, one-month positive momentum and residual cash.
+- Label original table/curve explicitly and retain actual two-month labels when
+  showing all horizons. Default engineered final comparisons to K-means top ten.
+- Confirm existing training/test CAGR 24.6807% / 19.6133%, test cash 51.5556%.
+  Twelve focused tests and source-free AppTest pass; no experiments/publication
+  data or formal release changed.
+
+## 2026-11-10 — Feature-engineering notebook to deployed model pipeline
+
+- Review/annotate the source notebook, preserve its original, correct full-precision
+  PCA/IC export and missing-IC denominator/overfitting claims for future reruns.
+- Add causal technical inputs and training-fitted cluster averages, cluster PCA,
+  IC blends and economic composites; compare six recipes with all four classifiers.
+- Run chronological classifier/recipe GridSearchCV and a separately frozen final
+  phase. Save 96 variants / 582 portfolios per phase, with full local fitted state
+  and resumable checksummed research cases; preserve original numerical modules.
+- Add Feature engineering after Tuned model, with methods/results/tuning subtabs;
+  add separately labeled earlier/new final sections including Ward-based books.
+- Publish 470 files / 172,577,499 bytes, preserving all 457 previous frame hashes;
+  verify a source-free deploy and raw/object/fitting guards. Ignore raw/model
+  artifacts while keeping current published frames and review/report sources.
+- Build the saved-results notebook and QMD/HTML supplement. Verify 221 tests,
+  exact parity and browser charts. Formal submission pin remains unchanged.
+  See `docs/verification/feature_engineering_20261110.json`.
+
+## 2026-11-10 — Clearer tuning strategies and final-test comparisons
+
+- Expose all fourteen saved basic-strategy holdouts by default in Tuned model;
+  explain classifier tuning, equal-weight overlays and separate clustering search.
+- Compare all saved rules on six metrics; retain model/target/feature/search audits
+  and predictive metric-header help. No search or fitting on interaction.
+- Add final annual log growth and two log-return chart views, original-relative
+  changes, explicit fixed-K-means/untuned-Ward/tuning coverage and joined-path
+  protocol notes. Separate available evaluation from pending formal release.
+- Verify 214 tests. Git ignore/tracked checks pass with no ignore edits required;
+  source datasets, experiments, current publication and formal release unchanged.
+  See `docs/verification/tuning_final_review_20261110.json`.
+
+## 2026-11-10 — Grouping With ML and saved Ward comparison
+
+- Rename the third tab and split it into K-means, Hierarchical clustering and
+  Adding a direction. Explain input scaling, centroids, merge trees, membership,
+  momentum, screening, cash and separate directional forecasts.
+- Add Ward clustering using the original strategy pipeline; save actual monthly
+  linkage trees and render a shared interactive dendrogram without fitting.
+- Save a training-only 49-book Ward study with four reused directional models;
+  no new classifier fits, feature search, tuning or test evaluation.
+- Extend `published/project` to 169,973,507 bytes / 458 files, keeping all prior
+  frame hashes and adding method-specific lazy details. Preserve the old release.
+- Verify 210 tests, real-data partitions, standalone deploy with datasets/archive
+  absent and fitting/replay blocked, and browser tree/method switching. Update
+  handoff/docs. Existing formal submission and other LLM changes are preserved.
+
 ## 2026-11-09 — Add GitHub ignore rules
 
 - Add root `.gitignore` for CSV inputs/reports, experiment archives, older

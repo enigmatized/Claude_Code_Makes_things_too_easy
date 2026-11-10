@@ -1,0 +1,54 @@
+{
+  "study_id": "engineering_20261110T171255_825ffa99",
+  "counts": {
+    "training": {
+      "books": 582,
+      "months": 36,
+      "monthly_rows": 20952,
+      "fit_variants": 96,
+      "trial_rows": 144
+    },
+    "test": {
+      "books": 582,
+      "months": 108,
+      "monthly_rows": 62856,
+      "fit_variants": 96,
+      "trial_rows": 0
+    }
+  },
+  "maximum_model_inputs": 10,
+  "source_factors_available": 20,
+  "prior_frames_preserved": 457,
+  "publication_sha256": "4df420855fe8e06be10ecf8cf52011fb6eae4e1147d9150fbab2737b04b65e1d",
+  "publication_bytes": 172577499,
+  "publication_files": 470,
+  "old_final_controls": "equal weight, ungrouped momentum, K-means full/top-10 match",
+  "standalone": "passed without source CSVs, research archive or fitted objects; fitting/read guards active",
+  "fit_artifact_checksums": 288,
+  "formal_release_sha256": "3d73f0be9dbb7c8caf6b83bf84241049e5c6785800037449981a89dee78c7d62",
+  "full_suite": {
+    "tests": 221,
+    "seconds": 219.838,
+    "native_threads": 1,
+    "result": "pass",
+    "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -m unittest discover -s tests -v"
+  },
+  "browser": "passed: factor tree, PCA variance/loadings, IC weights, RF/recipe tuning, Ward/HGB final log/cash/drawdown; sidebar state warning removed",
+  "default_publication": "published/project",
+  "previous_publication": "published/project_before_engineering_20261110",
+  "notebook": "0_7_Feature_Engineering/02_saved_model_results.ipynb executed",
+  "quarto": "0_7_Feature_Engineering/engineering_results.qmd rendered with inline Plotly",
+  "gitignore": "all 470 current publication files included; extended CSVs, scientific artifacts, old releases and secrets excluded; no tracked ignored files",
+  "report_sha256": {
+    "0_7_Feature_Engineering/02_saved_model_results.ipynb": "af0aea3c2f53b091db83d8e9897cf168cd6e7a0b6bf80f8814ba5cc685eaf846",
+    "0_7_Feature_Engineering/engineering_results.qmd": "cf40ce102441d38b8a4f1f194d8c837b09cf78f504e7100687b53f890dc18108",
+    "0_7_Feature_Engineering/engineering_results.html": "c8fe09d625b346c7f788bb75779d71e0c714824afffa0c1113ee7c541ca0e914"
+  },
+  "offline_quarto": "passed: 21 Plotly traces inside self-contained srcdoc frame; report title precedes chart; all HTTP/HTTPS blocked",
+  "focused_release_checks": {
+    "engineering": 7,
+    "published_results": 6,
+    "status": "passed after final UI refinements"
+  },
+  "report_helper": "research/engineering_reporting.py; encoded srcdoc bootstrap avoids AMD/head extraction and large data-URL navigation issues"
+}

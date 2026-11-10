@@ -1,13 +1,14 @@
 {
   "publication_schema": 1,
-  "created_utc": "2026-11-10T04:16:00.609461+00:00",
+  "created_utc": "2026-11-10T17:42:47.632948+00:00",
   "published_tabs": [
     "strategies",
     "basic_ml",
     "advanced_ml",
     "features",
     "tuning",
-    "final"
+    "final",
+    "engineering"
   ],
   "tabs": {
     "strategies": {
@@ -9771,6 +9772,477 @@
           "[3, \"hist_gradient_boosting\", \"Baskets + downside to cash\"]": "advanced_ml/assignments/4b1a670396522b2bef03e26e.parquet",
           "[3, \"hist_gradient_boosting\", \"Baskets + upside tilt\"]": "advanced_ml/assignments/a3a6cfc0a4f8d1c0ed79eeb2.parquet"
         }
+      },
+      "grouping_methods": {
+        "ward": {
+          "source_study_id": "baskets_20261110T122521_a62c9b0c",
+          "source_metadata_sha256": "6bf836719fb973d779ef50f54256bd6028b54cfdf25285ed7660c2706af6984e",
+          "metadata": {
+            "protocol": "correlation_basket_momentum",
+            "model": "Ward hierarchical",
+            "grouping_method": "ward",
+            "source_sha256": {
+              "mlfactor_long_only_train.csv": "5689c609809ab73d412807ae466709f444af0e0f00b8895caae762836ce62591"
+            },
+            "grouping_code_sha256": "179b57ef32208ebf19dfdaf1666fee2a3cdbf456cbcad69a027999f9f70fe46a",
+            "grouping_parameters": {
+              "n_clusters": 5,
+              "lookback": 12,
+              "standardization": "per-stock mean and population standard deviation",
+              "method": "Ward linkage, Euclidean, exact cluster-count cut"
+            },
+            "feature_name": "correlation_basket",
+            "model_inputs": "z-scored trailing simple returns; one column per month in the correlation window",
+            "n_clusters": 5,
+            "lookback_months": 12,
+            "correlation_lookback_months": 12,
+            "momentum_months": [
+              1,
+              2,
+              3
+            ],
+            "top_positive_vol_count": 10,
+            "top_positive_vol_months": [
+              1,
+              2
+            ],
+            "positive_volatility": "sqrt(mean(max(earned simple return, 0)**2)) over the correlation window; down months contribute zero",
+            "random_state": 0,
+            "validation_history_months": 60,
+            "first_snapshot": "2004-12-31",
+            "last_snapshot": "2009-11-30",
+            "first_return_month": "2005-01-31",
+            "last_return_month": "2009-12-31",
+            "months": 60,
+            "versions": [
+              "Equal weight",
+              "Momentum + cash",
+              "Basket momentum + cash",
+              "Top 10 positive-vol baskets",
+              "Top 10 + downside to cash",
+              "Top 10 + upside tilt",
+              "Baskets + downside to cash",
+              "Baskets + upside tilt"
+            ],
+            "cash_return": 0.0,
+            "test_csv_loaded": false,
+            "official_test_period": "Jan 2010\u2013Dec 2018, reserved for the final tab",
+            "rule": "Groups use the 12-month correlation path. Holding uses 1-, 2-, and 3-month momentum. Positive group momentum only; inside those groups, positive stock momentum only. Cash earns zero. A second book keeps the 10 highest positive-vol names in each group and applies the same rule at 1 and 2 months. That book is scaled to the names that remain.",
+            "created_utc": "2026-11-10T12:25:22.547719+00:00",
+            "frame_sha256": {
+              "metrics": "b73019b66acc72eba8dec0a6c54459526c29db0b886e8bbfe61ca31273d7010b",
+              "monthly": "b9d0a21648f216ea320977d24bb033755b3b917e68156d850af1cf93fbfe08fe",
+              "baskets": "a368f87ff733e9debaca16f634a0b13159b5afecc21ebaa2c6f78f214d146547",
+              "assignments": "7fb82e6e89fa5f67efda6fb52c97cec4aec2541872d6e764ebd8a801f39c2cb7",
+              "predictive": "603a1c7a3d486ab5c0336565f1cfe60d37560bd4d3741899643f15b5d70808df",
+              "fits": "ee75b3ec204115d877025ee2d0d30eaa17e9933ab71b78b8144a83f6d49e2a6e",
+              "hierarchy": "5a7086e71323a0a947a38c9480c4574aaac2ea6993d7b36664bf30abc93c4ff8"
+            },
+            "directory": "/home/sweethoney/Documents/MFM/Semester5_Sept_Dec_2026/DataScience/11_mlfactor_long_only_project_2026/artifacts/basket_studies/baskets_20261110T122521_a62c9b0c",
+            "directional_adjustment": true,
+            "model_keys": [
+              "logistic",
+              "naive_bayes",
+              "random_forest",
+              "hist_gradient_boosting"
+            ],
+            "adjustment_strength": 0.5,
+            "upside_threshold": 0.6,
+            "basket_source": {
+              "directory": "artifacts/basket_studies/baskets_20261110T122422_88c2cc4a",
+              "study_sha256": "988d0c20b97bc7abaedeecaa26d4f9e3c424afc229d09ff1d257990c426b2ab2"
+            },
+            "forecast_sources": {
+              "loss": {
+                "run_id": "20261109T185402_0722a7ec725c",
+                "artifact_sha256": "ecad8fcb8c06273e331b0923d4e5392ae2ccd7212ae03579f4bf854fd5211098",
+                "feature_spec": {
+                  "columns": [
+                    "Ocf_Toa",
+                    "Tot_Debt_Rev",
+                    "Net_Debt",
+                    "Total_Liabilities_Total_Assets",
+                    "Share_Turn_3M",
+                    "Fcf_Tbv",
+                    "Debtequity",
+                    "Ocf_Ce",
+                    "Fcf_Yld",
+                    "Ocf_Tbv",
+                    "Div_Yld",
+                    "Netdebtyield",
+                    "Share_Turn_12M",
+                    "Tev_Less_Mktcap",
+                    "Bb_Yld",
+                    "Ev_Ebitda",
+                    "Total_Debt_Capital",
+                    "Share_Turn_6M",
+                    "Capex_Sales",
+                    "Ocf_Ta"
+                  ],
+                  "selection": "none",
+                  "k": 10,
+                  "correlation_threshold": 0.9
+                },
+                "model_scope": "pooled",
+                "fit_policy": "expanding",
+                "refit_months": 12,
+                "models": [
+                  {
+                    "model_id": "logistic",
+                    "label": "Logistic regression",
+                    "description": "A linear relationship between factors and the log-odds of a loss.",
+                    "estimator": "LogisticRegression",
+                    "parameters": {
+                      "C": 1.0,
+                      "class_weight": null,
+                      "dual": false,
+                      "fit_intercept": true,
+                      "intercept_scaling": 1,
+                      "l1_ratio": null,
+                      "max_iter": 1000,
+                      "multi_class": "auto",
+                      "n_jobs": null,
+                      "penalty": "l2",
+                      "random_state": 0,
+                      "solver": "lbfgs",
+                      "tol": 0.0001,
+                      "verbose": 0,
+                      "warm_start": false
+                    },
+                    "preprocessing": "training-fitted StandardScaler",
+                    "feature_selection": "none",
+                    "tuning": "none"
+                  },
+                  {
+                    "model_id": "naive_bayes",
+                    "label": "Gaussian naive Bayes",
+                    "description": "A simple probabilistic model treating factors as conditionally independent within each class.",
+                    "estimator": "GaussianNB",
+                    "parameters": {
+                      "priors": null,
+                      "var_smoothing": 1e-09
+                    },
+                    "preprocessing": "none",
+                    "feature_selection": "none",
+                    "tuning": "none"
+                  },
+                  {
+                    "model_id": "random_forest",
+                    "label": "Random forest",
+                    "description": "Average loss predictions from 100 shallow trees with fixed leaf-size limits.",
+                    "estimator": "RandomForestClassifier",
+                    "parameters": {
+                      "bootstrap": true,
+                      "ccp_alpha": 0.0,
+                      "class_weight": null,
+                      "criterion": "gini",
+                      "max_depth": 6,
+                      "max_features": "sqrt",
+                      "max_leaf_nodes": null,
+                      "max_samples": null,
+                      "min_impurity_decrease": 0.0,
+                      "min_samples_leaf": 50,
+                      "min_samples_split": 2,
+                      "min_weight_fraction_leaf": 0.0,
+                      "monotonic_cst": null,
+                      "n_estimators": 100,
+                      "n_jobs": 1,
+                      "oob_score": false,
+                      "random_state": 0,
+                      "verbose": 0,
+                      "warm_start": false
+                    },
+                    "preprocessing": "none",
+                    "feature_selection": "none",
+                    "tuning": "none"
+                  },
+                  {
+                    "model_id": "hist_gradient_boosting",
+                    "label": "Histogram gradient boosting",
+                    "description": "Build 100 small trees sequentially. Random early stopping is disabled.",
+                    "estimator": "HistGradientBoostingClassifier",
+                    "parameters": {
+                      "categorical_features": "warn",
+                      "class_weight": null,
+                      "early_stopping": false,
+                      "interaction_cst": null,
+                      "l2_regularization": 1.0,
+                      "learning_rate": 0.05,
+                      "loss": "log_loss",
+                      "max_bins": 255,
+                      "max_depth": null,
+                      "max_features": 1.0,
+                      "max_iter": 100,
+                      "max_leaf_nodes": 15,
+                      "min_samples_leaf": 50,
+                      "monotonic_cst": null,
+                      "n_iter_no_change": 10,
+                      "random_state": 0,
+                      "scoring": "loss",
+                      "tol": 1e-07,
+                      "validation_fraction": 0.1,
+                      "verbose": 0,
+                      "warm_start": false
+                    },
+                    "preprocessing": "none",
+                    "feature_selection": "none",
+                    "tuning": "none"
+                  }
+                ]
+              },
+              "upside": {
+                "run_id": "20261109T185621_fe4017faa327",
+                "artifact_sha256": "fc6d9793311e0eb004e73f74bcdcfc525ec951c88df5e28af28ad58720ec9a14",
+                "feature_spec": {
+                  "columns": [
+                    "Ocf_Toa",
+                    "Tot_Debt_Rev",
+                    "Net_Debt",
+                    "Total_Liabilities_Total_Assets",
+                    "Share_Turn_3M",
+                    "Fcf_Tbv",
+                    "Debtequity",
+                    "Ocf_Ce",
+                    "Fcf_Yld",
+                    "Ocf_Tbv",
+                    "Div_Yld",
+                    "Netdebtyield",
+                    "Share_Turn_12M",
+                    "Tev_Less_Mktcap",
+                    "Bb_Yld",
+                    "Ev_Ebitda",
+                    "Total_Debt_Capital",
+                    "Share_Turn_6M",
+                    "Capex_Sales",
+                    "Ocf_Ta"
+                  ],
+                  "selection": "none",
+                  "k": 10,
+                  "correlation_threshold": 0.9
+                },
+                "model_scope": "pooled",
+                "fit_policy": "expanding",
+                "refit_months": 12,
+                "models": [
+                  {
+                    "model_id": "logistic",
+                    "label": "Logistic regression",
+                    "description": "A linear relationship between factors and the log-odds of a positive-return.",
+                    "estimator": "LogisticRegression",
+                    "parameters": {
+                      "C": 1.0,
+                      "class_weight": null,
+                      "dual": false,
+                      "fit_intercept": true,
+                      "intercept_scaling": 1,
+                      "l1_ratio": null,
+                      "max_iter": 1000,
+                      "multi_class": "auto",
+                      "n_jobs": null,
+                      "penalty": "l2",
+                      "random_state": 0,
+                      "solver": "lbfgs",
+                      "tol": 0.0001,
+                      "verbose": 0,
+                      "warm_start": false
+                    },
+                    "preprocessing": "training-fitted StandardScaler",
+                    "feature_selection": "none",
+                    "tuning": "none"
+                  },
+                  {
+                    "model_id": "naive_bayes",
+                    "label": "Gaussian naive Bayes",
+                    "description": "A simple probabilistic model treating factors as conditionally independent within each class.",
+                    "estimator": "GaussianNB",
+                    "parameters": {
+                      "priors": null,
+                      "var_smoothing": 1e-09
+                    },
+                    "preprocessing": "none",
+                    "feature_selection": "none",
+                    "tuning": "none"
+                  },
+                  {
+                    "model_id": "random_forest",
+                    "label": "Random forest",
+                    "description": "Average positive-return predictions from 100 shallow trees with fixed leaf-size limits.",
+                    "estimator": "RandomForestClassifier",
+                    "parameters": {
+                      "bootstrap": true,
+                      "ccp_alpha": 0.0,
+                      "class_weight": null,
+                      "criterion": "gini",
+                      "max_depth": 6,
+                      "max_features": "sqrt",
+                      "max_leaf_nodes": null,
+                      "max_samples": null,
+                      "min_impurity_decrease": 0.0,
+                      "min_samples_leaf": 50,
+                      "min_samples_split": 2,
+                      "min_weight_fraction_leaf": 0.0,
+                      "monotonic_cst": null,
+                      "n_estimators": 100,
+                      "n_jobs": 1,
+                      "oob_score": false,
+                      "random_state": 0,
+                      "verbose": 0,
+                      "warm_start": false
+                    },
+                    "preprocessing": "none",
+                    "feature_selection": "none",
+                    "tuning": "none"
+                  },
+                  {
+                    "model_id": "hist_gradient_boosting",
+                    "label": "Histogram gradient boosting",
+                    "description": "Build 100 small trees sequentially. Random early stopping is disabled.",
+                    "estimator": "HistGradientBoostingClassifier",
+                    "parameters": {
+                      "categorical_features": "warn",
+                      "class_weight": null,
+                      "early_stopping": false,
+                      "interaction_cst": null,
+                      "l2_regularization": 1.0,
+                      "learning_rate": 0.05,
+                      "loss": "log_loss",
+                      "max_bins": 255,
+                      "max_depth": null,
+                      "max_features": 1.0,
+                      "max_iter": 100,
+                      "max_leaf_nodes": 15,
+                      "min_samples_leaf": 50,
+                      "monotonic_cst": null,
+                      "n_iter_no_change": 10,
+                      "random_state": 0,
+                      "scoring": "loss",
+                      "tol": 1e-07,
+                      "validation_fraction": 0.1,
+                      "verbose": 0,
+                      "warm_start": false
+                    },
+                    "preprocessing": "none",
+                    "feature_selection": "none",
+                    "tuning": "none"
+                  }
+                ]
+              }
+            },
+            "adjustment_code_sha256": {
+              "basket_adjustments.py": "8453bda0f0ecb5563818df9c2fc262a8783bd69f2ac8cf2e3645ee379e6fd7b5",
+              "adjustments.py": "4756b50c626fbcf682577bfbeb65a7798a08152838d27ef993a0dd094da3191b",
+              "accounting.py": "5d803f6cfaf3649231b118756d8e2eeb711eeac0caeaa7a1cea96aa97f20a8f6"
+            },
+            "adjustment_rule": "Downside: w*(1-strength*p_loss), haircut to cash. Upside: w*(1+strength*I(p_up>=threshold)), rescaled to original equity budget. Separate fitted targets, same momentum baseline; no combined overlay.",
+            "prediction_fits_reused": true,
+            "new_prediction_fits": 0,
+            "feature_selection": "none",
+            "tuning": "none; fixed Basic ML classifiers"
+          },
+          "frames": {
+            "metrics": "grouping/ward/metrics.parquet",
+            "monthly": "grouping/ward/monthly.parquet",
+            "predictive": "grouping/ward/predictive.parquet",
+            "fits": "grouping/ward/fits.parquet",
+            "hierarchy": "grouping/ward/hierarchy.parquet"
+          },
+          "details": {
+            "baskets": {
+              "[1, \"none\", \"Basket momentum + cash\"]": "grouping/ward/baskets/404c0898a85adeca27d9b3b6.parquet",
+              "[1, \"none\", \"Top 10 positive-vol baskets\"]": "grouping/ward/baskets/7d3c3be2918c958fb67c32d3.parquet",
+              "[2, \"none\", \"Basket momentum + cash\"]": "grouping/ward/baskets/e1d104e05d15b029ac24b61f.parquet",
+              "[2, \"none\", \"Top 10 positive-vol baskets\"]": "grouping/ward/baskets/b0a476158f89b9dcd96bc900.parquet",
+              "[3, \"none\", \"Basket momentum + cash\"]": "grouping/ward/baskets/0f46a279d7fb8b3c816358f3.parquet",
+              "[1, \"logistic\", \"Top 10 + downside to cash\"]": "grouping/ward/baskets/12ceb5a1eff299c3881a86cb.parquet",
+              "[1, \"logistic\", \"Top 10 + upside tilt\"]": "grouping/ward/baskets/cc06ef9ca431cdc32af28ae9.parquet",
+              "[1, \"naive_bayes\", \"Top 10 + downside to cash\"]": "grouping/ward/baskets/0fcb05ce567276d8cb8f0fee.parquet",
+              "[1, \"naive_bayes\", \"Top 10 + upside tilt\"]": "grouping/ward/baskets/b02f4e489b9690c98d96913e.parquet",
+              "[1, \"random_forest\", \"Top 10 + downside to cash\"]": "grouping/ward/baskets/fcb4431cc780dff72ae2b574.parquet",
+              "[1, \"random_forest\", \"Top 10 + upside tilt\"]": "grouping/ward/baskets/9e95abdca24b261d1bcdd609.parquet",
+              "[1, \"hist_gradient_boosting\", \"Top 10 + downside to cash\"]": "grouping/ward/baskets/55d666ef63c4c686d8265c5b.parquet",
+              "[1, \"hist_gradient_boosting\", \"Top 10 + upside tilt\"]": "grouping/ward/baskets/4223113fc90f7966fcef94db.parquet",
+              "[2, \"logistic\", \"Top 10 + downside to cash\"]": "grouping/ward/baskets/f8c5f5abbc65f72be3a5a8e0.parquet",
+              "[2, \"logistic\", \"Top 10 + upside tilt\"]": "grouping/ward/baskets/046e5d9f9be93512d0c153d8.parquet",
+              "[2, \"naive_bayes\", \"Top 10 + downside to cash\"]": "grouping/ward/baskets/a6c5c6a3fb061b79cf59328c.parquet",
+              "[2, \"naive_bayes\", \"Top 10 + upside tilt\"]": "grouping/ward/baskets/1059d232edcbb7f8ac9cbd2f.parquet",
+              "[2, \"random_forest\", \"Top 10 + downside to cash\"]": "grouping/ward/baskets/00bbb99d73567873c9188402.parquet",
+              "[2, \"random_forest\", \"Top 10 + upside tilt\"]": "grouping/ward/baskets/3ffd110c240121e0979e8843.parquet",
+              "[2, \"hist_gradient_boosting\", \"Top 10 + downside to cash\"]": "grouping/ward/baskets/b42dd63e3a83e83914eb96aa.parquet",
+              "[2, \"hist_gradient_boosting\", \"Top 10 + upside tilt\"]": "grouping/ward/baskets/fe4182f71c88c817aca45269.parquet",
+              "[1, \"logistic\", \"Baskets + downside to cash\"]": "grouping/ward/baskets/c72ed2028a7a5cc25c201c4c.parquet",
+              "[1, \"logistic\", \"Baskets + upside tilt\"]": "grouping/ward/baskets/d82adecf37f065870962ad9b.parquet",
+              "[1, \"naive_bayes\", \"Baskets + downside to cash\"]": "grouping/ward/baskets/e9b301f41fb38c7b25b69248.parquet",
+              "[1, \"naive_bayes\", \"Baskets + upside tilt\"]": "grouping/ward/baskets/f0fc0d95e2d6aa41ae59dc69.parquet",
+              "[1, \"random_forest\", \"Baskets + downside to cash\"]": "grouping/ward/baskets/c7e22101a3e95c92cab9bd77.parquet",
+              "[1, \"random_forest\", \"Baskets + upside tilt\"]": "grouping/ward/baskets/130cf0b6d0d5aac2d825405d.parquet",
+              "[1, \"hist_gradient_boosting\", \"Baskets + downside to cash\"]": "grouping/ward/baskets/15c54157144436d2adc04da6.parquet",
+              "[1, \"hist_gradient_boosting\", \"Baskets + upside tilt\"]": "grouping/ward/baskets/f009c95aca659cdc0aa69438.parquet",
+              "[2, \"logistic\", \"Baskets + downside to cash\"]": "grouping/ward/baskets/6e3f166e47e42d77db2d116e.parquet",
+              "[2, \"logistic\", \"Baskets + upside tilt\"]": "grouping/ward/baskets/a020fe1cf3dfbc560885eca9.parquet",
+              "[2, \"naive_bayes\", \"Baskets + downside to cash\"]": "grouping/ward/baskets/de35f986300d98a78bbafe78.parquet",
+              "[2, \"naive_bayes\", \"Baskets + upside tilt\"]": "grouping/ward/baskets/ebf97ec337e5a75c57fe6c25.parquet",
+              "[2, \"random_forest\", \"Baskets + downside to cash\"]": "grouping/ward/baskets/e4f69b869f5ba4e4ac9187b6.parquet",
+              "[2, \"random_forest\", \"Baskets + upside tilt\"]": "grouping/ward/baskets/8932cc1b2e839b9faf617701.parquet",
+              "[2, \"hist_gradient_boosting\", \"Baskets + downside to cash\"]": "grouping/ward/baskets/ff003f841bd206128e40dd9f.parquet",
+              "[2, \"hist_gradient_boosting\", \"Baskets + upside tilt\"]": "grouping/ward/baskets/0d827c83f2d69c9a90c82482.parquet",
+              "[3, \"logistic\", \"Baskets + downside to cash\"]": "grouping/ward/baskets/918a9b6b2c20cb2cbb7bac3e.parquet",
+              "[3, \"logistic\", \"Baskets + upside tilt\"]": "grouping/ward/baskets/bace40f98f7ac11ea0618630.parquet",
+              "[3, \"naive_bayes\", \"Baskets + downside to cash\"]": "grouping/ward/baskets/c565863d3ad78aab57c33361.parquet",
+              "[3, \"naive_bayes\", \"Baskets + upside tilt\"]": "grouping/ward/baskets/863fcd87d55538d169f0c997.parquet",
+              "[3, \"random_forest\", \"Baskets + downside to cash\"]": "grouping/ward/baskets/7b1b64a18b853d871f3bd2f5.parquet",
+              "[3, \"random_forest\", \"Baskets + upside tilt\"]": "grouping/ward/baskets/aeabe51594b0dd2b309da7a0.parquet",
+              "[3, \"hist_gradient_boosting\", \"Baskets + downside to cash\"]": "grouping/ward/baskets/4b1a670396522b2bef03e26e.parquet",
+              "[3, \"hist_gradient_boosting\", \"Baskets + upside tilt\"]": "grouping/ward/baskets/a3a6cfc0a4f8d1c0ed79eeb2.parquet"
+            },
+            "assignments": {
+              "[1, \"none\", \"Basket momentum + cash\"]": "grouping/ward/assignments/404c0898a85adeca27d9b3b6.parquet",
+              "[1, \"none\", \"Top 10 positive-vol baskets\"]": "grouping/ward/assignments/7d3c3be2918c958fb67c32d3.parquet",
+              "[2, \"none\", \"Basket momentum + cash\"]": "grouping/ward/assignments/e1d104e05d15b029ac24b61f.parquet",
+              "[2, \"none\", \"Top 10 positive-vol baskets\"]": "grouping/ward/assignments/b0a476158f89b9dcd96bc900.parquet",
+              "[3, \"none\", \"Basket momentum + cash\"]": "grouping/ward/assignments/0f46a279d7fb8b3c816358f3.parquet",
+              "[1, \"logistic\", \"Top 10 + downside to cash\"]": "grouping/ward/assignments/12ceb5a1eff299c3881a86cb.parquet",
+              "[1, \"logistic\", \"Top 10 + upside tilt\"]": "grouping/ward/assignments/cc06ef9ca431cdc32af28ae9.parquet",
+              "[1, \"naive_bayes\", \"Top 10 + downside to cash\"]": "grouping/ward/assignments/0fcb05ce567276d8cb8f0fee.parquet",
+              "[1, \"naive_bayes\", \"Top 10 + upside tilt\"]": "grouping/ward/assignments/b02f4e489b9690c98d96913e.parquet",
+              "[1, \"random_forest\", \"Top 10 + downside to cash\"]": "grouping/ward/assignments/fcb4431cc780dff72ae2b574.parquet",
+              "[1, \"random_forest\", \"Top 10 + upside tilt\"]": "grouping/ward/assignments/9e95abdca24b261d1bcdd609.parquet",
+              "[1, \"hist_gradient_boosting\", \"Top 10 + downside to cash\"]": "grouping/ward/assignments/55d666ef63c4c686d8265c5b.parquet",
+              "[1, \"hist_gradient_boosting\", \"Top 10 + upside tilt\"]": "grouping/ward/assignments/4223113fc90f7966fcef94db.parquet",
+              "[2, \"logistic\", \"Top 10 + downside to cash\"]": "grouping/ward/assignments/f8c5f5abbc65f72be3a5a8e0.parquet",
+              "[2, \"logistic\", \"Top 10 + upside tilt\"]": "grouping/ward/assignments/046e5d9f9be93512d0c153d8.parquet",
+              "[2, \"naive_bayes\", \"Top 10 + downside to cash\"]": "grouping/ward/assignments/a6c5c6a3fb061b79cf59328c.parquet",
+              "[2, \"naive_bayes\", \"Top 10 + upside tilt\"]": "grouping/ward/assignments/1059d232edcbb7f8ac9cbd2f.parquet",
+              "[2, \"random_forest\", \"Top 10 + downside to cash\"]": "grouping/ward/assignments/00bbb99d73567873c9188402.parquet",
+              "[2, \"random_forest\", \"Top 10 + upside tilt\"]": "grouping/ward/assignments/3ffd110c240121e0979e8843.parquet",
+              "[2, \"hist_gradient_boosting\", \"Top 10 + downside to cash\"]": "grouping/ward/assignments/b42dd63e3a83e83914eb96aa.parquet",
+              "[2, \"hist_gradient_boosting\", \"Top 10 + upside tilt\"]": "grouping/ward/assignments/fe4182f71c88c817aca45269.parquet",
+              "[1, \"logistic\", \"Baskets + downside to cash\"]": "grouping/ward/assignments/c72ed2028a7a5cc25c201c4c.parquet",
+              "[1, \"logistic\", \"Baskets + upside tilt\"]": "grouping/ward/assignments/d82adecf37f065870962ad9b.parquet",
+              "[1, \"naive_bayes\", \"Baskets + downside to cash\"]": "grouping/ward/assignments/e9b301f41fb38c7b25b69248.parquet",
+              "[1, \"naive_bayes\", \"Baskets + upside tilt\"]": "grouping/ward/assignments/f0fc0d95e2d6aa41ae59dc69.parquet",
+              "[1, \"random_forest\", \"Baskets + downside to cash\"]": "grouping/ward/assignments/c7e22101a3e95c92cab9bd77.parquet",
+              "[1, \"random_forest\", \"Baskets + upside tilt\"]": "grouping/ward/assignments/130cf0b6d0d5aac2d825405d.parquet",
+              "[1, \"hist_gradient_boosting\", \"Baskets + downside to cash\"]": "grouping/ward/assignments/15c54157144436d2adc04da6.parquet",
+              "[1, \"hist_gradient_boosting\", \"Baskets + upside tilt\"]": "grouping/ward/assignments/f009c95aca659cdc0aa69438.parquet",
+              "[2, \"logistic\", \"Baskets + downside to cash\"]": "grouping/ward/assignments/6e3f166e47e42d77db2d116e.parquet",
+              "[2, \"logistic\", \"Baskets + upside tilt\"]": "grouping/ward/assignments/a020fe1cf3dfbc560885eca9.parquet",
+              "[2, \"naive_bayes\", \"Baskets + downside to cash\"]": "grouping/ward/assignments/de35f986300d98a78bbafe78.parquet",
+              "[2, \"naive_bayes\", \"Baskets + upside tilt\"]": "grouping/ward/assignments/ebf97ec337e5a75c57fe6c25.parquet",
+              "[2, \"random_forest\", \"Baskets + downside to cash\"]": "grouping/ward/assignments/e4f69b869f5ba4e4ac9187b6.parquet",
+              "[2, \"random_forest\", \"Baskets + upside tilt\"]": "grouping/ward/assignments/8932cc1b2e839b9faf617701.parquet",
+              "[2, \"hist_gradient_boosting\", \"Baskets + downside to cash\"]": "grouping/ward/assignments/ff003f841bd206128e40dd9f.parquet",
+              "[2, \"hist_gradient_boosting\", \"Baskets + upside tilt\"]": "grouping/ward/assignments/0d827c83f2d69c9a90c82482.parquet",
+              "[3, \"logistic\", \"Baskets + downside to cash\"]": "grouping/ward/assignments/918a9b6b2c20cb2cbb7bac3e.parquet",
+              "[3, \"logistic\", \"Baskets + upside tilt\"]": "grouping/ward/assignments/bace40f98f7ac11ea0618630.parquet",
+              "[3, \"naive_bayes\", \"Baskets + downside to cash\"]": "grouping/ward/assignments/c565863d3ad78aab57c33361.parquet",
+              "[3, \"naive_bayes\", \"Baskets + upside tilt\"]": "grouping/ward/assignments/863fcd87d55538d169f0c997.parquet",
+              "[3, \"random_forest\", \"Baskets + downside to cash\"]": "grouping/ward/assignments/7b1b64a18b853d871f3bd2f5.parquet",
+              "[3, \"random_forest\", \"Baskets + upside tilt\"]": "grouping/ward/assignments/aeabe51594b0dd2b309da7a0.parquet",
+              "[3, \"hist_gradient_boosting\", \"Baskets + downside to cash\"]": "grouping/ward/assignments/4b1a670396522b2bef03e26e.parquet",
+              "[3, \"hist_gradient_boosting\", \"Baskets + upside tilt\"]": "grouping/ward/assignments/a3a6cfc0a4f8d1c0ed79eeb2.parquet"
+            }
+          }
+        }
       }
     },
     "features": {
@@ -18273,6 +18745,152 @@
           }
         }
       }
+    },
+    "engineering": {
+      "study_id": "engineering_20261110T171255_825ffa99",
+      "metadata": {
+        "protocol": "point_in_time_feature_engineering",
+        "created_utc": "2026-11-10T17:12:55.036056+00:00",
+        "origin": "2006-12-31",
+        "recipes": [
+          "anova_10",
+          "technical_10",
+          "cluster_average",
+          "cluster_pca",
+          "ic_blends",
+          "economic"
+        ],
+        "models": [
+          "logistic",
+          "naive_bayes",
+          "random_forest",
+          "hist_gradient_boosting"
+        ],
+        "targets": [
+          "loss",
+          "upside"
+        ],
+        "books": [
+          "Equal weight",
+          "Momentum + cash",
+          "K-means full groups",
+          "K-means top 10",
+          "Ward full groups",
+          "Ward top 10"
+        ],
+        "model_grids": {
+          "logistic": [
+            {
+              "C": 1.0
+            },
+            {
+              "C": 0.1
+            }
+          ],
+          "naive_bayes": [
+            {
+              "var_smoothing": 1e-09
+            },
+            {
+              "var_smoothing": 1e-05
+            }
+          ],
+          "random_forest": [
+            {
+              "max_depth": 6,
+              "min_samples_leaf": 50
+            },
+            {
+              "max_depth": 4,
+              "min_samples_leaf": 200
+            }
+          ],
+          "hist_gradient_boosting": [
+            {
+              "learning_rate": 0.05
+            },
+            {
+              "learning_rate": 0.1
+            }
+          ]
+        },
+        "group_grid": [
+          4,
+          6
+        ],
+        "ic_correlation_grid": [
+          0.4,
+          0.6
+        ],
+        "default_groups": 6,
+        "cv_splits": 3,
+        "cv_min_train_months": 24,
+        "scoring": "negative binary event log loss (sklearn.metrics.log_loss)",
+        "feature_limit": 10,
+        "source_factor_count": 20,
+        "technical_missing_policy": "neutral current-month rank 0.5; same rows for every recipe",
+        "final_policy": "Refit fixed and chosen training-CV parameters once at the test origin; no test-label fits or retuning.",
+        "source_train_sha256": "5689c609809ab73d412807ae466709f444af0e0f00b8895caae762836ce62591",
+        "code_sha256": {
+          "engineering.py": "88c01de1494fcd9e22b24a43998f4331f5f59f468cb9222001aa327594480403",
+          "engineering_study.py": "8275a94b21b0f9cd4d63abb85691c6980dfd77d26c94c3d6c9d5a70fc956a596"
+        },
+        "runtime": {
+          "numpy": "1.26.4",
+          "pandas": "2.2.2",
+          "sklearn": "1.4.2",
+          "scipy": "1.13.1"
+        },
+        "test_previously_viewed": true,
+        "formal_feature_limit_note": "Ten model inputs may aggregate twenty source factors; instructor interpretation must be checked."
+      },
+      "windows": {
+        "training": {
+          "scope": {
+            "window": "training",
+            "fit_origin": "2006-12-31",
+            "trained_through_return_month": "2006-12-31",
+            "fit_rows": 97788,
+            "first_return_month": "2007-01-31",
+            "last_return_month": "2009-12-31",
+            "months": 36,
+            "test_csv_loaded": false,
+            "technical_missing_rows": 14589,
+            "test_source_sha256": null
+          },
+          "frames": {
+            "metrics": "engineering/training/metrics.parquet",
+            "monthly": "engineering/training/monthly.parquet",
+            "predictive": "engineering/training/predictive.parquet",
+            "audits": "engineering/training/audits.parquet",
+            "trials": "engineering/training/trials.parquet",
+            "folds": "engineering/training/folds.parquet"
+          }
+        },
+        "test": {
+          "scope": {
+            "window": "test",
+            "fit_origin": "2009-12-31",
+            "trained_through_return_month": "2009-12-31",
+            "fit_rows": 140739,
+            "first_return_month": "2010-01-31",
+            "last_return_month": "2018-12-31",
+            "months": 108,
+            "test_csv_loaded": true,
+            "technical_missing_rows": 14673,
+            "test_source_sha256": "7291a8c3008b4c7e04509ad28b0a0bebf20433c1c75a845b3672ffa60e5a8a94"
+          },
+          "frames": {
+            "metrics": "engineering/test/metrics.parquet",
+            "monthly": "engineering/test/monthly.parquet",
+            "predictive": "engineering/test/predictive.parquet",
+            "audits": "engineering/test/audits.parquet",
+            "trials": "engineering/test/trials.parquet",
+            "folds": "engineering/test/folds.parquet"
+          }
+        }
+      },
+      "source_study_sha256": "8cd255c3f6bc4e7db474619c2aaf239aa0614baa0e0a7565017781c5a33b722d"
     }
   },
   "file_sha256": {
@@ -18637,6 +19255,114 @@
     "final/windows/entire/metrics.parquet": "0a63467cb1d93758edfe52feb8a7266655d54f800437cf63972101bdb1aad911",
     "final/windows/entire/monthly.parquet": "d0bd3e3f2b71be1b55c65d50847af29ed489777f079ddd85ebca6e286d07fd74",
     "final/archive/metrics.parquet": "51381efb7e559a094b900448eed5d9888afbbf0d6230e136b44f6177de1346ad",
-    "final/archive/monthly.parquet": "11922b4dd77dc3f8c38c0bd0f2f5d394285d56e353e22fb6d0ca8361fbe83cb0"
-  }
+    "final/archive/monthly.parquet": "11922b4dd77dc3f8c38c0bd0f2f5d394285d56e353e22fb6d0ca8361fbe83cb0",
+    "grouping/ward/metrics.parquet": "74720fd686d7d807ab14baa438d20dd678e809679d98f5f91bab1c5744410167",
+    "grouping/ward/monthly.parquet": "c44f338351a1ec605b6fa52624ae012d29d8b8b05b80a3724759f099c9d0f036",
+    "grouping/ward/predictive.parquet": "7f2f0fc55f68f3aa5b75bafe361a7ebad19a4ba3b42463ad68e98a7cce749745",
+    "grouping/ward/fits.parquet": "b306c66ded7cbfba0a3f46cd5c42119b41164e3af28e9b04575a47c069100ce8",
+    "grouping/ward/hierarchy.parquet": "74d8e3c1035837fc0749754abb1eb02880e2d4581047f6767dbd6721f2f99743",
+    "grouping/ward/baskets/404c0898a85adeca27d9b3b6.parquet": "d575c28e8efa31804d53637b00b99d57a8901cfb31ef21ff0cf2103551907818",
+    "grouping/ward/baskets/7d3c3be2918c958fb67c32d3.parquet": "f859d0c92e35b7d1bb6b0bc5748d22df0a00ca86fb421d81665bab901119b88d",
+    "grouping/ward/baskets/e1d104e05d15b029ac24b61f.parquet": "31cf5d62418a67945e199fb37aa368aab99feed3e786e7834675fbb90bd61d95",
+    "grouping/ward/baskets/b0a476158f89b9dcd96bc900.parquet": "fbc5d74d2d7e12b0db630bf5aae5c58d7af15b724db0f03fab08dc92af550b55",
+    "grouping/ward/baskets/0f46a279d7fb8b3c816358f3.parquet": "1199a655e5674f52c1720dce3b45c937ae31c711181d099e3b16641ddc1b7e4e",
+    "grouping/ward/baskets/12ceb5a1eff299c3881a86cb.parquet": "5e33498baa9abab6842f4b5bae53e278d31d8113842ef8ba6b6c8725530fde90",
+    "grouping/ward/baskets/cc06ef9ca431cdc32af28ae9.parquet": "85dd5d921ae17935843e44067fd3fde1419bfe406f366c6ec3f06e4e3c820b74",
+    "grouping/ward/baskets/0fcb05ce567276d8cb8f0fee.parquet": "a5f2717442ad34bbe44fb491a7e56fdeabbba4316d40af0d66154346184ececb",
+    "grouping/ward/baskets/b02f4e489b9690c98d96913e.parquet": "9b5173e035564e800cc5256269d045a2f634b2ffe8e993b5ff8b970ace76c215",
+    "grouping/ward/baskets/fcb4431cc780dff72ae2b574.parquet": "e6b651af34e9473aa6568c22d6c6aa08162be3803eb186fcf7a06aef9094db6c",
+    "grouping/ward/baskets/9e95abdca24b261d1bcdd609.parquet": "0c5caf5612244822acb1676385e33ada16ec7cf3ca14875a2a4a53400e4a4324",
+    "grouping/ward/baskets/55d666ef63c4c686d8265c5b.parquet": "773c59c12acc8c177c0dddff7d0167248d2f7b18c4565021b11ed7626def210c",
+    "grouping/ward/baskets/4223113fc90f7966fcef94db.parquet": "b210234508462e15de265e55c4e243dac02b63d4cda379df1b3d76532fe9d332",
+    "grouping/ward/baskets/f8c5f5abbc65f72be3a5a8e0.parquet": "6baf65280d91114bbce31de7330cbead684dbf46e9bc7ae2c2c73ec6a5c2d5f8",
+    "grouping/ward/baskets/046e5d9f9be93512d0c153d8.parquet": "53c773d3d905de7a730ca7686ead768acd45cf0dfb7fff93283c402782ccf796",
+    "grouping/ward/baskets/a6c5c6a3fb061b79cf59328c.parquet": "0cfb5514d96f738d13da6aafb25962142c19939b8087a4afd8eadb50f9e843ad",
+    "grouping/ward/baskets/1059d232edcbb7f8ac9cbd2f.parquet": "afe7fb1b4f885848df04c6657a9b392eaaecf702927e6581a3f1136bdb0772c7",
+    "grouping/ward/baskets/00bbb99d73567873c9188402.parquet": "7fe4aee9fe3c2cd676007f4795fa24ca54ce95343a5e20f69b13e7636cfd0cc9",
+    "grouping/ward/baskets/3ffd110c240121e0979e8843.parquet": "f9bf300c9e6c92bebb4357b03045bc8a3a6a89d5a72a40a424fd978d485534f8",
+    "grouping/ward/baskets/b42dd63e3a83e83914eb96aa.parquet": "cfdb5775c75671ad999e23e3bef169aae73592f56996521af219650ba77dea15",
+    "grouping/ward/baskets/fe4182f71c88c817aca45269.parquet": "bad5675bfcf528800e204e5af640d8022abaf8772b12f6cb4de092a4a9e004ff",
+    "grouping/ward/baskets/c72ed2028a7a5cc25c201c4c.parquet": "b57d5d00a76e806e410981d2050df89ba6ec6700444a43ac010f51f8f44a2b74",
+    "grouping/ward/baskets/d82adecf37f065870962ad9b.parquet": "6c8e96dabf11dba884ce34f85707a2c30d86f114b03b2333aabe1ce9eb32fd8b",
+    "grouping/ward/baskets/e9b301f41fb38c7b25b69248.parquet": "d460157a379075b01bbf353a3c50255fad69032e8b683e48ad78002bc956952b",
+    "grouping/ward/baskets/f0fc0d95e2d6aa41ae59dc69.parquet": "c683c8815c8d809b15be8dba0d6484fd4814800e0dac5b03648d67cc9a2042c8",
+    "grouping/ward/baskets/c7e22101a3e95c92cab9bd77.parquet": "ba9cd548e9385a73e9915b7c05b3217f5ca2dfe9293337c8e15f4f812ada78e6",
+    "grouping/ward/baskets/130cf0b6d0d5aac2d825405d.parquet": "40b2771a7b710cfc255ecde1035d68561549e2edae4f2a6d01ec92d201db515f",
+    "grouping/ward/baskets/15c54157144436d2adc04da6.parquet": "040b454b2271d2f9b5afa3791c60aac9c5c976b8eeb7da80dfb8fb54682ffc78",
+    "grouping/ward/baskets/f009c95aca659cdc0aa69438.parquet": "98fdcbe04b6ead4b3d498db7651859835fb4eec36ab37f47c6d36303c9b73fb1",
+    "grouping/ward/baskets/6e3f166e47e42d77db2d116e.parquet": "502892eabf8f35bf85dfb50cbc4e14133c98a30420476fe681bc4e438ea5dc53",
+    "grouping/ward/baskets/a020fe1cf3dfbc560885eca9.parquet": "da5fcc6e6a1e5348ea1fc6c420a5dd94fe4448f3c44f790ed66a127e528b1974",
+    "grouping/ward/baskets/de35f986300d98a78bbafe78.parquet": "2e18ff2c00adae19deca6875c2cc30ea7a1250c0cc264d44c892e4a38b4581f6",
+    "grouping/ward/baskets/ebf97ec337e5a75c57fe6c25.parquet": "5a9e440c0d5db3b79b4f4986aff2f63653f003e5619a6a0db9183fc3966a42a6",
+    "grouping/ward/baskets/e4f69b869f5ba4e4ac9187b6.parquet": "4eb8b4646700236a6579c51382af72c3044b2fae689c9b3f2229ce602f9b8e45",
+    "grouping/ward/baskets/8932cc1b2e839b9faf617701.parquet": "00d9291b5ef5a2909bdf4c5bcee776b641ee765f34e1bb9e8886b4e341e951d6",
+    "grouping/ward/baskets/ff003f841bd206128e40dd9f.parquet": "1e8f5e2f66b3ebec3aabf2dfefb68baaa42d05db785f6f975bdb7afdbe163eb9",
+    "grouping/ward/baskets/0d827c83f2d69c9a90c82482.parquet": "7fda0efc289ceef6b302d8706664a94537008392d248c99ee5ff12778e401369",
+    "grouping/ward/baskets/918a9b6b2c20cb2cbb7bac3e.parquet": "384126bfdb1ff676b53511aaf5ce651c3ca85999e1bdd20bb656c4258e8ee35c",
+    "grouping/ward/baskets/bace40f98f7ac11ea0618630.parquet": "ea2a3cc0873b0d7ab683d1421b1d7a026b9856c2200dc9760059b60daf361d82",
+    "grouping/ward/baskets/c565863d3ad78aab57c33361.parquet": "60c7c5cdead2b196384abb136de5ab5260ce4d3761ed112bc0f4bdefbccb2ed6",
+    "grouping/ward/baskets/863fcd87d55538d169f0c997.parquet": "845770352a6a557f1def2a30c713b11939e21371f50b3723b7c07ab51df5cc51",
+    "grouping/ward/baskets/7b1b64a18b853d871f3bd2f5.parquet": "ffcc4c0267d2b7a4a16ed77e7b595ccd23cd3a66537e70dec3187c30a2e6a26a",
+    "grouping/ward/baskets/aeabe51594b0dd2b309da7a0.parquet": "0010faa32e0a02941b62174b7e3ff1e8dc2f6f9642f524a373ab41edce0cfd7c",
+    "grouping/ward/baskets/4b1a670396522b2bef03e26e.parquet": "d7016e819981b1fc44fe7b1a4183ff789b8d8e99a00c77e25793ea6a1f144ba9",
+    "grouping/ward/baskets/a3a6cfc0a4f8d1c0ed79eeb2.parquet": "87eead2e063fc33c4402c5b14cb5c71aeacc449d436d3a46580b4fb9bd87dcc5",
+    "grouping/ward/assignments/404c0898a85adeca27d9b3b6.parquet": "fbfe8157f2bce4cc79355b31ef8eec789ce29cdcf5063c3f01771a88c0e18231",
+    "grouping/ward/assignments/7d3c3be2918c958fb67c32d3.parquet": "0caabe91d08783069b5907ceb370687a4a98e20c29c604879a636ef59a1e4d46",
+    "grouping/ward/assignments/e1d104e05d15b029ac24b61f.parquet": "e85043613d7235b827e0f3e96e834072aaa2854aa2a1faa5d78d125590278b9c",
+    "grouping/ward/assignments/b0a476158f89b9dcd96bc900.parquet": "17d0d7623fce5a69656c766151ed260fe5453dd9ba359d7650537df83a1aa9cb",
+    "grouping/ward/assignments/0f46a279d7fb8b3c816358f3.parquet": "ce1b655757ef848fdbcb361678521e9a5f23cde6e2534de2039f223c67720700",
+    "grouping/ward/assignments/12ceb5a1eff299c3881a86cb.parquet": "75a684488008ac4cfe7f524b1e7719f64f69aec36d4a610fbb11d8e6c07bb04d",
+    "grouping/ward/assignments/cc06ef9ca431cdc32af28ae9.parquet": "9e979a85d09857baa409bcd9ac0a773a1e87aa45f5c9a7af1722ef99dcae0fc4",
+    "grouping/ward/assignments/0fcb05ce567276d8cb8f0fee.parquet": "ee3ffc1227c51eb2a762ec4dcbf51fab32f14b23471d47388dd101202dbe0de9",
+    "grouping/ward/assignments/b02f4e489b9690c98d96913e.parquet": "d1fea83fd91635e5ad0e94ced5856fcbd7d8c1c55a1a41099ac246ac5b6ee66a",
+    "grouping/ward/assignments/fcb4431cc780dff72ae2b574.parquet": "a2a2e102e40e50017ae26ee28e379cfd6fc6bc365c1c472720f08c3b3f2a9c70",
+    "grouping/ward/assignments/9e95abdca24b261d1bcdd609.parquet": "fd79c59df74c467d63ed8b96c44f0c801638204d62b32eb986d6c0790b975c3d",
+    "grouping/ward/assignments/55d666ef63c4c686d8265c5b.parquet": "6b25a4904e906d5d6385c2b1bee9f4f576afc08a77efa3328a146e5b68f4ba42",
+    "grouping/ward/assignments/4223113fc90f7966fcef94db.parquet": "5a02972712e4b0cc67ca3e7f0fe234d24d28243d9ecab33756df420c87b0e094",
+    "grouping/ward/assignments/f8c5f5abbc65f72be3a5a8e0.parquet": "34e96a25eceebeb5b5f04e24b44f00da2168583e042d06d38ebc054446504f2d",
+    "grouping/ward/assignments/046e5d9f9be93512d0c153d8.parquet": "cbb05056a362aab4386305cb822725898ae4f744c81c755bf722fc1541e01bf1",
+    "grouping/ward/assignments/a6c5c6a3fb061b79cf59328c.parquet": "8d0faca482ce659ec7d1d0a2f03034cffb5820df5098de9159f314671d77c46f",
+    "grouping/ward/assignments/1059d232edcbb7f8ac9cbd2f.parquet": "81172273a9cc30adaee6a61a73674e4e59d91489539e34e9ffe66aa808f9a738",
+    "grouping/ward/assignments/00bbb99d73567873c9188402.parquet": "af4e204b7afb86ec1e8e19e456eed41a3c8edae6710e46e2a5114753a0cb47cb",
+    "grouping/ward/assignments/3ffd110c240121e0979e8843.parquet": "2270f37e52e011b83c342df5a559b471aea4c3969f9f4867eb5f83a6eadbccdc",
+    "grouping/ward/assignments/b42dd63e3a83e83914eb96aa.parquet": "2b3afda56d5e77c23fa195d677f329e66dbe361bd9771643efbb1ddfe65f1a9e",
+    "grouping/ward/assignments/fe4182f71c88c817aca45269.parquet": "74d405a9d4090ff581280008a9ef3c38720089124caa5c5a82f423eb372ecb50",
+    "grouping/ward/assignments/c72ed2028a7a5cc25c201c4c.parquet": "cf888c437ce66ea0f35ac3dfcf39f200be7347863f114a1ec8cb4cab1d75fafc",
+    "grouping/ward/assignments/d82adecf37f065870962ad9b.parquet": "a73d209e4730921bb390c8231f9aeee2ae609d24d57b9f9827cda2585f953805",
+    "grouping/ward/assignments/e9b301f41fb38c7b25b69248.parquet": "7110f76b778ea633d7cde478e32ec5cbec5173edeb3899bd601057770f86df5e",
+    "grouping/ward/assignments/f0fc0d95e2d6aa41ae59dc69.parquet": "65835e4e3968c29c5696122bdeb9423364395d1be08a77b8c53c1f40c71d8f7a",
+    "grouping/ward/assignments/c7e22101a3e95c92cab9bd77.parquet": "d85a7379b4c55a816266ccc1553f6a3458d31f1e0bbdc5cb35c7ade8e5fa37a7",
+    "grouping/ward/assignments/130cf0b6d0d5aac2d825405d.parquet": "dc6738e0971957cb8cb3a02b0a71b73a9fd3869e8f335409c2a1cd315383548a",
+    "grouping/ward/assignments/15c54157144436d2adc04da6.parquet": "7471ccacedc817b42c0d88a12c54f287a63c7fea7cb609cce5c10968321fb83d",
+    "grouping/ward/assignments/f009c95aca659cdc0aa69438.parquet": "0711e33323d4810743c36d3f15d7c5fcbb371181292d2465688be08af9657370",
+    "grouping/ward/assignments/6e3f166e47e42d77db2d116e.parquet": "35af04bb8bb1fbe876c64cf3e10fb7ac6b41ec3e6e199d085efeb51d6bcb3b4f",
+    "grouping/ward/assignments/a020fe1cf3dfbc560885eca9.parquet": "5270aec292bd1d22c32ea20f91e480333b6bf6c8c98ce792f7165e6fee6b0259",
+    "grouping/ward/assignments/de35f986300d98a78bbafe78.parquet": "f56e0178859919b702f25cc78b94a455462b3fb46b35354c1eda26083b261236",
+    "grouping/ward/assignments/ebf97ec337e5a75c57fe6c25.parquet": "d46ba5ab0a2f11356939ba15587a4e5a4db59366c5cc128460b9438bbc58ab82",
+    "grouping/ward/assignments/e4f69b869f5ba4e4ac9187b6.parquet": "d7f296fe1bcfa62410f4c928ecfb551a2ce3a154f01c0d620c6b41daa9360d65",
+    "grouping/ward/assignments/8932cc1b2e839b9faf617701.parquet": "c42134fde0d703a522d334ca0df08663e11622f3941c2596ddcb09e6e5999b59",
+    "grouping/ward/assignments/ff003f841bd206128e40dd9f.parquet": "ef0514be87dcf5eab93d7d9bef2e755645f55e55089ca2c731d59db23d6bc3b2",
+    "grouping/ward/assignments/0d827c83f2d69c9a90c82482.parquet": "6ab865923b4f85bcc92b523f51937a385ac71d3dfaf1d11089139c7b567c309b",
+    "grouping/ward/assignments/918a9b6b2c20cb2cbb7bac3e.parquet": "7416f6ac126b4108c9088eee97fbf58e93d92f2efad43042ef4a1a71c40cfb03",
+    "grouping/ward/assignments/bace40f98f7ac11ea0618630.parquet": "02a90fb434bf3c1a91e34ad69f7394e7ed67164b2f434d33d4ff8443ddc391c0",
+    "grouping/ward/assignments/c565863d3ad78aab57c33361.parquet": "ce472d3ff0ce240fcba0094da79e1efdb0a26db50ca8284ada3e17243f71ca1b",
+    "grouping/ward/assignments/863fcd87d55538d169f0c997.parquet": "a7bfa8a4d95d35d3c8f0b3acabaa13551cd08b671960aa8f15dc2aed05d69909",
+    "grouping/ward/assignments/7b1b64a18b853d871f3bd2f5.parquet": "3c47ec50c4457180eaff62cbb2981bacffde9ea1664334c58f277f91d12fe7b8",
+    "grouping/ward/assignments/aeabe51594b0dd2b309da7a0.parquet": "7644da1088e772e5963894c5b0d0f174d228ef3cb3f890f065d652aab6969d3b",
+    "grouping/ward/assignments/4b1a670396522b2bef03e26e.parquet": "0a52f2bba6079c9760dbe32061eb394ad759ba3b7c39f52f1b538cf212704a35",
+    "grouping/ward/assignments/a3a6cfc0a4f8d1c0ed79eeb2.parquet": "953830de54135e80577326745a33d666030869ee4166fe60b123a5e6bcd71af5",
+    "engineering/training/metrics.parquet": "022ac2bbe81c0c2a3b63df1f88fae6c8a0760c8b3d349545933da3e63c0db7f6",
+    "engineering/training/monthly.parquet": "da8caa2d30eaf3f0d98365f0136d05cbbfa96ee6da197f3ef2a8eca60fd807ac",
+    "engineering/training/predictive.parquet": "9b1ee687bb91cc0113c0211c6d1088e670cc73adc6ca8cf608ca2e7c59fc79ee",
+    "engineering/training/audits.parquet": "30e9222aacb64d6d546ecde775ff99b27953ea3050101375772e475dfb347fc5",
+    "engineering/training/trials.parquet": "8ca90159bf918f55e1dc416dcdff3108596033cf8826d932c783cd27926d8e81",
+    "engineering/training/folds.parquet": "05537d7de487fb166202e089aa3b231670f5dfd1222236c2c72558a64319c5b4",
+    "engineering/test/metrics.parquet": "a5ded83a6500a67062e4a3b2d218122af1ffff92c41f0f72f3cfab566ea6880b",
+    "engineering/test/monthly.parquet": "c105f9650cd422472bc4cf9369cb8205feb2532e1868dd173bce3fc3f8d063ac",
+    "engineering/test/predictive.parquet": "c5dcb1d3094301d65e528c1eb93c3eddb9ce1de5e599e404afc01c00e2e9e1f7",
+    "engineering/test/audits.parquet": "b4367ddf74f413896b530d2fe6c88cc5a7616559db62e40d1904e6aa2b1f503c",
+    "engineering/test/trials.parquet": "f6acdfc08eaeec5e2b8a35674ec3dfd2fc4d8eb657db39a5acd4c8e22a195317",
+    "engineering/test/folds.parquet": "f6acdfc08eaeec5e2b8a35674ec3dfd2fc4d8eb657db39a5acd4c8e22a195317"
+  },
+  "parent_manifest_sha256": "0dc4d709f54634430e060273bfe013f60fdcd5a3f6b424948504d533f3d8c895"
 }

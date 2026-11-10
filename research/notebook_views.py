@@ -237,6 +237,16 @@ def source_note(kind) -> str:
             f"{meta.get('holdout_first_return_month')} through {meta.get('holdout_last_return_month')}. "
             f"Search score {meta.get('scoring')}. Prediction target {target}."
         )
+    if kind == "engineering":
+        from research.engineering_study import latest_engineering
+        directory = latest_engineering(artifact_root())
+        if directory is None:
+            raise FileNotFoundError("No completed engineering training study.")
+        return (
+            f"Newest completed engineering training study {directory.name}. "
+            "January 2007–December 2009 holdout. The test file is not part of this study's training scope. "
+            "The 0_7 comparison file is a separate, previously viewed 2010–2018 notebook result."
+        )
     if kind == "grouping":
         from research.grouping import load_latest_grouping
         meta = load_latest_grouping(artifact_root())["metadata"]
@@ -288,6 +298,7 @@ _CELL_EXPORTS = (
     ("06_risk.py", ("risk_table", "path_figure", "risk_note")),
     ("07_choice.py", ("choice_text",)),
     ("08_grouping.py", ("grouping_search_table", "grouping_class_table", "grouping_book_table", "grouping_note")),
+    ("09_engineering.py", ("engineering_holdout_table", "engineering_comparison_table", "engineering_note")),
 )
 for _filename, _names in _CELL_EXPORTS:
     _export_cell(_filename, _names)

@@ -7,7 +7,7 @@ import streamlit as st
 from research.models import default_model_registry
 from research.strategies import default_registry
 from research.tuning_holdout import VERSIONS, list_tuning_holdouts, load_tuning_holdout
-from portfolio_focus import main_portfolio_focus
+from strategy_groups import family_for
 
 
 COLORS = {"No ML": "#68716e", "ML, not tuned": "#536da6", "Tuned ML": "#287d68"}
@@ -36,13 +36,27 @@ METRIC_HELP = {
 
 def render_tuning_holdout(store=None, published=None):
     st.header("Tuned model")
-    main_only = main_portfolio_focus('tuning')
     st.info("**Training data only.** These are frozen holdout comparisons inside the training years, separate from the official 2010–2018 test.")
-    if main_only:
-        st.caption("Among the four main portfolio families, tuning is saved for the equal-weight reference only. "
-                   "The grouped/top-10 momentum families have not been tuned. Turn the focus filter off to inspect all saved basic-strategy holdouts.")
-    st.write("Choose a prediction model, a basic trading strategy, and the next-month event "
-             "to predict. Compare the model before and after hyperparameter tuning.")
+    st.write("Tune the up/down prediction model first, then see how its probabilities change a fixed starting portfolio. "
+             "The search minimizes prediction log loss; it does not optimize the portfolio's Sharpe or return.")
+    studies = list_tuning_holdouts(store.root) if published is None else published.list_studies()
+    saved_rules = {key for item in studies for key in item["metadata"]["strategies"]}
+    st.caption(f"{len(saved_rules)} basic strategies have saved tuning comparisons. All are available below by default; "
+               "the main-portfolio filter on other tabs does not restrict this chooser.")
+    with st.expander("What is being tuned? And does equal weight plus ML make sense?"):
+        st.write("The grid search chooses classifier settings, such as logistic regularization or tree depth, "
+                 "on chronological folds of early training data. Up and down are separate prediction targets. "
+                 "It does not tune the stock-selection rule, momentum window, grouping method or trading threshold.")
+        st.write("Yes: equal weight is a useful starting portfolio and a clean benchmark. Its original stock weights are 1/N. "
+                 "Multiplying those weights by stock-specific ML signals produces an ML-tilted portfolio, which is no longer equally weighted. "
+                 "Keep the untouched equal-weight row beside it to measure what the overlay actually changes.")
+        st.caption("Example: two stocks start at 50% each. Loss probabilities of 80% and 20%, at strength 0.5, "
+                   "give raw weights 30% and 45%; normalizing the fully invested rule gives 40% and 60%. "
+                   "The original benchmark stays 50%/50%.")
+        st.write("For a fully invested strategy, the downside reductions are normalized back to 100% stocks. "
+                 "They change relative weights rather than market exposure. For the explicit cash-capable strategy, reductions stay in cash. "
+                 "If every held stock receives the same multiplier, the normalized portfolio stays unchanged.")
+    _grouping_tuning_notes()
     names = default_model_registry()
     rules = default_registry()
     controls = st.columns(3)
@@ -50,13 +64,14 @@ def render_tuning_holdout(store=None, published=None):
     model_key = model_labels[controls[0].selectbox(
         "1. Model", list(model_labels), key="tuning_holdout_model",
         help="Compare this model's original settings with its chronological grid-search winner.")]
-    strategies = {spec.label: key for key, spec in rules.items() if not main_only or key == 'equal_weight_universe'}
+    strategies = {spec.label: key for key, spec in rules.items() if key in saved_rules or not saved_rules}
     if st.session_state.get('tuning_holdout_strategy') not in strategies:
         st.session_state.pop('tuning_holdout_strategy', None)
     strategy_label = controls[1].selectbox(
-        "2. Basic strategy", list(strategies), key="tuning_holdout_strategy",
+        "2. Starting strategy", list(strategies), key="tuning_holdout_strategy",
         help="The trading rule stays fixed. Its weights are adjusted using the chosen model's probabilities.")
     strategy = strategies[strategy_label]
+    st.caption(f"{family_for(strategy).title} · {rules[strategy].description}")
     target = TARGETS[controls[2].selectbox(
         "3. Prediction target", list(TARGETS), key="tuning_holdout_target",
         help="Choose what the model predicts. Settings minimize log loss for this event, "
@@ -65,7 +80,6 @@ def render_tuning_holdout(store=None, published=None):
     event = "next down" if target == "loss" else "next up"
     st.caption("Tuning objective: minimize prediction log loss on chronological cross-validation folds. "
                "The strategy, feature list and trading thresholds are held fixed.")
-    studies = list_tuning_holdouts(store.root) if published is None else published.list_studies()
     compatible = [item for item in studies
                   if item["metadata"].get("prediction_target", "loss") == target
                   and model_key in item["metadata"]["model_keys"]
@@ -110,7 +124,8 @@ def render_tuning_holdout(store=None, published=None):
                        "The earlier feature study also scored 2007–2009, so the choice of ANOVA "
                        "versus pruning was not blind to this holdout. The hyperparameter search was.")
         st.caption("One pooled model per version scores every stock; there is no per-stock tuning here. "
-                   "The grouped positive-volatility strategy belongs to the separate Advanced ML study.")
+                   "Grouped K-means/Ward portfolios have separate untuned evidence in Grouping With ML; "
+                   "they have not been replayed using these basic-study tuning forecasts. Feature engineering evaluates its own recipe-specific tuned models.")
     st.caption(f"Inputs: {source.get('recipe', 'fixed list')} ({len(meta['feature_columns'])} features). "
                f"Fit/tune: labels known through {meta['trained_through_return_month']}. "
                f"Training-period holdout: {meta['holdout_first_return_month']} to {meta['holdout_last_return_month']}. "
@@ -158,10 +173,16 @@ def render_tuning_holdout(store=None, published=None):
     st.dataframe(table.style.format(formats), use_container_width=True, hide_index=True)
     title = f"Training holdout · {meta['holdout_first_return_month']} to {meta['holdout_last_return_month']}"
     st.plotly_chart(_figure(study["monthly"], strategy, model_key, title), use_container_width=True, key="tuning_holdout_chart")
-    if not main_only:
-        with st.expander("All basic strategies on this holdout"):
-            wide = _wide_sharpe(study["metrics"], model_key)
-            st.dataframe(wide.style.format("{:.3f}"), use_container_width=True)
+    with st.expander("Compare every saved strategy on this holdout", expanded=True):
+        metric = st.selectbox("Portfolio comparison metric", list(PORTFOLIO_METRICS), key="tuning_comparison_metric")
+        field, number_format = PORTFOLIO_METRICS[metric]
+        wide = _wide_metric(study["metrics"], model_key, field)
+        st.dataframe(wide.style.format(number_format), use_container_width=True)
+        st.caption("The same fixed/tuned probability forecasts are reused across these rules. This is a comparison, "
+                   "not a strategy-ranking objective for the grid search. Changing a choice never reruns training.")
+    st.info("Final-test status: these basic-strategy tuning winners are not automatically applied to a final study. "
+            "The earlier grouped final study uses fixed classifiers; the Feature engineering extension carries its own tuning winners. "
+            "Selecting a strategy here does not change either saved evaluation.")
 
 
 def _parameter_table(model_key, chosen):
@@ -236,7 +257,35 @@ def _predictive(predictive, model_key):
                "These prediction scores are separate from portfolio performance.")
 
 
-def _wide_sharpe(metrics, model_key):
-    rows = metrics.loc[metrics.model_key.isin(["none", model_key]), ["label", "version", "sharpe"]]
-    wide = rows.pivot(index="label", columns="version", values="sharpe")
+def _wide_metric(metrics, model_key, metric):
+    rows = metrics.loc[metrics.model_key.isin(["none", model_key]), ["label", "version", metric]]
+    wide = rows.pivot(index="label", columns="version", values=metric)
     return wide.reindex(columns=list(VERSIONS)).rename_axis("Strategy")
+
+
+def _wide_sharpe(metrics, model_key):
+    return _wide_metric(metrics, model_key, "sharpe")
+
+
+PORTFOLIO_METRICS = {
+    "Sharpe": ("sharpe", "{:.3f}"),
+    "CAGR": ("cagr", "{:.2%}"),
+    "Annual log growth": ("annualized_log_growth", "{:.2%}"),
+    "Volatility": ("annualized_volatility", "{:.2%}"),
+    "Max drawdown": ("max_drawdown", "{:.2%}"),
+    "Turnover": ("avg_one_way_turnover", "{:.2%}"),
+}
+
+
+def _grouping_tuning_notes():
+    with st.expander("Can we tune K-means and hierarchical grouping too?"):
+        st.write("Yes. Cluster count, trailing-history length and the clustering method are design choices "
+                 "we can compare using training data. A silhouette score measures compactness/separation without future labels; "
+                 "we can also check whether groups remain similar under small input changes. Neither proves the groups make a profitable portfolio.")
+        st.write("For a trading application, keep the momentum/cash rule fixed and evaluate each declared grouping recipe on later "
+                 "training months, including turnover and cash. Choose a recipe before examining official-test results. "
+                 "Optimizing portfolio returns is a separate strategy search, not the log-loss classifier search shown here.")
+        st.caption("Current coverage: K-means and Ward use five groups and a 12-month history; no clustering hyperparameter search "
+                   "has been run for stock grouping. Grouped portfolios are absent from this basic-strategy tuning holdout. "
+                   "Feature engineering separately tunes factor recipes/classifiers and applies them to K-means/Ward starting portfolios.")
+        st.markdown("[scikit-learn: evaluating clustering without labels](https://scikit-learn.org/stable/modules/clustering.html#silhouette-coefficient)")

@@ -11,6 +11,7 @@ from research.store import ExperimentStore
 
 def main():
     parser = argparse.ArgumentParser(description="Score correlation-basket momentum against equal weight and ungated momentum.")
+    parser.add_argument("--grouping", choices=["kmeans", "ward"], default="kmeans", help="Unsupervised grouping method; trading rules stay fixed.")
     parser.add_argument("--clusters", type=int, default=5)
     parser.add_argument("--lookback", type=int, default=12, help="Months of return history used only to form the groups.")
     parser.add_argument("--momentum", nargs="+", type=int, default=[1, 2, 3], help="Holding windows, in months.")
@@ -20,7 +21,7 @@ def main():
     print("Holding windows:", ", ".join(f"{months} months" for months in args.momentum))
     print("A second book keeps the 10 highest positive-vol names in each basket and trades 1- and 2-month momentum.")
     result = create_basket_study(store.project_root, n_clusters=args.clusters, lookback=args.lookback,
-                                 momentum_months=tuple(args.momentum))
+                                 momentum_months=tuple(args.momentum), grouping_method=args.grouping)
     directory = save_basket_study(result, store.root / "basket_studies")
     print(json.dumps({"directory": str(directory), **{key: result["metadata"][key] for key in
         ["first_snapshot", "last_snapshot", "first_return_month", "last_return_month", "months",

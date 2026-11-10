@@ -82,6 +82,8 @@ def grouping_note() -> str:
         f"for multinomial logistic regression, using labels through {metadata['asof']} and the {metadata['scoring']} score. "
         f"On the {start}–{end} training holdout, K nearest neighbors accuracy is "
         f"{knn_class['holdout_accuracy']:.1%} against a chance accuracy of {knn_class['chance_accuracy']:.1%}. "
+        f"Its holdout log loss is {knn_class['holdout_log_loss']:.3f}, and logistic regression holdout log loss is "
+        f"{classes['logistic']['holdout_log_loss']:.3f}, against a uniform-guess log loss of {knn_class['uniform_log_loss']:.3f}. "
         f"Its top-category book has annual log growth {knn_book['annualized_log_growth']:.2%} "
         f"and CAGR {knn_book['cagr']:.2%}, against equal weight at "
         f"{equal['annualized_log_growth']:.2%} and {equal['cagr']:.2%}. "

@@ -243,14 +243,14 @@ class FinalBookTests(unittest.TestCase):
             self.assertTrue(any("Book" in frame.value for frame in app.dataframe))
             self.assertFalse(any("Strategy" in frame.value for frame in app.dataframe))
             self.assertTrue(any(
-                "Final frozen-model test evaluation is pending" in item.value for item in app.info))
+                "Formal submission release approval is pending" in item.value for item in app.info))
             self.assertTrue(app.checkbox(key='final_main_families_only').value)
             app.checkbox(key='final_main_families_only').uncheck().run()
             app.checkbox(key="show_test_history").check().run()
             self.assertFalse(app.exception)
             self.assertTrue(any("Strategy" in frame.value for frame in app.dataframe))
             self.assertTrue(any(
-                "Final frozen-model test evaluation is pending" in item.value for item in app.info))
+                "Formal submission release approval is pending" in item.value for item in app.info))
 
 
 if __name__ == "__main__":

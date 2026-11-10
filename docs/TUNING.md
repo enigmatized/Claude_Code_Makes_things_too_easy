@@ -1,5 +1,28 @@
 # Chronological grid search
 
+Feature engineering has its own tuning subtab and saved study. It fits the input
+construction inside every chronological fold, including return-IC blends, then
+compares fixed/tuned classifier and recipe settings. These settings are carried
+into a separately fitted final evaluation. The older fourteen-basic-rule holdout
+below remains unchanged and has different input recipes/provenance. See
+[the six recipes, grids and scorer](FEATURE_ENGINEERING.md).
+
+## Current presentation (2026-11-10)
+
+All **fourteen saved basic strategies** are available by default in Tuned model.
+The former four-portfolio-family filter was hiding thirteen; it has been removed
+from this tab. Choose model, starting strategy and next-up/down target, then review
+probability scores, chosen settings/trials and portfolio effects. Compare all
+saved strategies on CAGR, annual log growth, Sharpe, volatility, drawdown or turnover.
+An equal-weight original plus ML is a valid controlled comparison; the adjusted
+weights are no longer equal. Cash/rescaling semantics are explicitly explained.
+
+Clustering tuning is a separate unrun experiment, discussed inside the tab.
+Grouped portfolios have not been replayed with these holdout's tuned forecasts.
+The current final study uses fixed K-means classifiers/ANOVA-10, not these winners.
+No new experiments accompany this presentation change. See
+[review, examples and next steps](TUNING_AND_FINAL_REVIEW.md).
+
 ## What the app is tuning
 
 Choose the three controls at the top of **Tuned model**, in order:

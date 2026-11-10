@@ -5,3 +5,6 @@ scikit-learn==1.4.2
 streamlit==1.32.0
 plotly==5.22.0
 pyarrow==14.0.2
+
+# Saved Ward dendrogram rendering and research clustering.
+scipy==1.13.1

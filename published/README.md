@@ -1,10 +1,13 @@
 # Published presentation data
 
-`project/` is the current default **six-tab** publication, about 114.5 MB. It
+`project/` is the current default **seven-tab** publication, about 172.6 MB. It
+includes K-means and Ward hierarchical grouping with the same trading rules;
 adds feature selection (including advanced books), both tuning targets/trials,
 and frozen test/training/entire-path views to the earlier three-tab package.
 No raw data, experiment catalog, fitted estimators or runtime model/backtest
-execution is needed. The earlier publications below are preserved.
+execution is needed. It also includes the completed feature-engineering training/tuning/final study,
+with six input recipes and all four classifiers. Earlier publications below
+are preserved.
 
 `advanced_ml/` preserves the three-tab publication. It preserves the
 first two tabs and adds saved K-means memberships, grouping-pattern illustrations,

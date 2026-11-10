@@ -1,224 +1,134 @@
 ---
-title: "MLFactor: Long-only strategy research"
-subtitle: "Training feature study complete — final choice and evaluation pending"
+title: "MLFactor long-only strategy"
+subtitle: "Annual log growth, four factory models, and a feature-engineering check"
 jupyter: python3
-format: html
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: true
+    code-summary: "Show analysis code"
+    embed-resources: true
+execute:
+  warning: false
 ---
+
+The graded return is annual log growth, 12 times the mean monthly portfolio log return, log(1 + r). CAGR is exp(of that growth) minus 1, and it stays beside the log growth. Volatility, Sharpe, and max drawdown use the simple monthly returns. Results are gross of costs. Cash earns nothing.
 
 ```{python}
 #| include: false
-from pathlib import Path
+import os
 import sys
-root = Path.cwd().parent
-sys.path.insert(0, str(root))
+from pathlib import Path
+os.environ["MLFACTOR_READ_ONLY"] = "1"
+here = Path.cwd().resolve()
+for candidate in (here, *here.parents):
+    if (candidate / "research" / "notebook_views.py").is_file():
+        sys.path.insert(0, str(candidate))
+        break
 from IPython.display import display
-from research.reporting import load_release, predictive_table, portfolio_table, portfolio_figure, readiness, benchmark_table
-import matplotlib.pyplot as plt
-import pandas as pd
-summary = load_release()
-```
-
-## Decision so far
-
-The fixed-model comparison does not support adopting an ML adjustment yet.
-All four classifiers have weak loss-probability performance, and none improves
-on the historical loss-frequency control on Brier score or log loss. Portfolio
-effects vary by the underlying trading rule.
-
-This is a reproducible research draft, not the final submission conclusion.
-A final feature choice, hyperparameter tuning, a final strategy choice and
-the official frozen-training test comparison remain to be completed.
-
-## Comparison design
-
-The experiment compares thirteen original portfolios and fifty-two adjusted
-versions over the same January 2005–December 2009 earned-return window. Initial
-history comes from the first sixty training snapshots. Each classifier uses the
-same twenty original factors and the same annual expanding fit dates. The
-non-ML portfolio rules and probability-to-weight adjustment are held fixed.
-
-These are training-period validation results. The previously viewed test period
-is not a fresh holdout. The final test model fits will use the separate
-frozen-at-origin policy, rather than learning from earlier test labels.
-
-## Predictive quality
-
-Lower Brier score and log loss indicate better probability estimates. ROC AUC
-measures ranking and is not, by itself, evidence of useful portfolio returns.
-
-```{python}
-#| label: tbl-predictors
-#| tbl-cap: "Fixed classifiers against a historical loss-frequency control."
-display(predictive_table(summary).style.format({"Brier score": "{:.6f}", "Log loss": "{:.6f}", "ROC AUC": "{:.4f}"}))
-```
-
-## Portfolio outcomes
-
-The following portfolios illustrate the effect of applying each model to the
-same trading rule. The complete saved result contains all 65 portfolio cases.
-Returns are gross of transaction costs; every portfolio is long-only and fully
-invested. The model changes relative stock weights, not total market exposure.
-
-```{python}
-#| label: tbl-cagr
-#| tbl-cap: "Matched-window CAGR by model and portfolio rule."
-display(portfolio_table(summary).style.format("{:.2%}"))
-```
-
-```{python}
-#| label: fig-portfolios
-#| fig-cap: "Growth of an initial dollar and drawdown for original and model-adjusted portfolios."
-figure = portfolio_figure(summary)
-display(figure)
-plt.close(figure)
-```
-
-## Equal-weight accounting reference
-
-This independent reference covers the full supplied train and test return
-windows, unlike the shorter model-validation comparison above. Each month's
-portfolio return is the arithmetic average of stock simple returns. These
-portfolio returns are then compounded through time. Averaging stock log returns
-would produce a different, incorrect equal-capital portfolio calculation.
-
-```{python}
-#| label: tbl-equal-weight
-#| tbl-cap: "Full-window equal-weight accounting reference from Part 0."
-display(benchmark_table().style.format({"Months": "{:.0f}", "CAGR": "{:.2%}", "Volatility": "{:.2%}", "Sharpe": "{:.3f}", "Max drawdown": "{:.2%}"}))
-```
-
-## Feature selection: four matched recipes
-
-This is a separately pinned training study, with all fourteen current portfolio
-rules, four fixed pooled downside classifiers, annual expanding fits and the
-same January 2005–December 2009 earned months. The cash-capable annual-consistency
-rule uses three-month momentum. All recipes use adjustment strength 0.50. This
-study has 280 portfolio cases across four runs; the earlier thirteen-rule
-comparison above remains its own recorded experiment.
-
-```{python}
-#| label: feature-study-protocol
-from IPython.display import Markdown
-from research.feature_reporting import (
-    method_notes, importance_table, importance_figure, selection_overlap,
-    prediction_summary, portfolio_table as feature_portfolio_table,
-    portfolio_figure as feature_portfolio_figure, forest_findings,
+from research.notebook_views import (
+    choice_text, classifier_growth_table, engineering_comparison_table,
+    engineering_holdout_table, engineering_note, equal_weight_benchmark,
+    equal_weight_sentence, feature_cut_table, feature_name_note, grouping_note,
+    non_ml_figure, non_ml_windows_table, path_figure, risk_note, risk_table,
+    source_note, style_table, tuning_note, tuning_portfolio_table, tuning_search_table,
 )
-feature_study = summary.get("feature_study")
-if feature_study is None:
-    display(Markdown("No feature study is pinned in this release."))
-else:
-    display(Markdown(method_notes()))
-    display(pd.DataFrame([{"Recipe": key, "Saved run": value}
-                         for key, value in feature_study["metadata"]["runs"].items()]))
 ```
 
-### Forest importance and selected inputs
+## Decision
 
-The chart uses the first historical training fit, before the displayed
-validation returns were earned. The selector forest and downstream predictor
-have separate jobs. Bar lengths measure training split importance; error bars
-show standard deviation across trees, not confidence intervals. Correlated
-factors can share importance. Financial interpretations of the supplied factors
-remain available in the data dictionary and the app.
+The book to trade is top-10 positive-vol with no probability overlay. Each month it forms five groups from the trailing 12-month return path, keeps at most ten high positive-vol names in each group, and invests only where one-month momentum is positive. The rest is cash. Its official-test annual log growth is higher than equal weight, and its Sharpe is lower. Factor models, a ten-factor cut, grid search, and the engineered recipes do not produce a forecast that beats a historical base rate. The engineering notebook's higher CAGR lines up with a volatility tilt that a model-free rule already captures.
 
 ```{python}
-#| label: fig-forest-importance
-#| fig-cap: "Forest selection from twenty candidates at the first historical origin; highlighted factors are retained."
-if feature_study is not None:
-    figure = importance_figure(feature_study)
-    display(figure)
-    plt.close(figure)
+print(choice_text())
 ```
 
+## Equal-weight log growth and CAGR
+
+Training is January 2000–December 2009. The official test is January 2010–December 2018, 108 months. Combined compounds those monthly simple returns through December 2018. The graded annualized return is the official-test CAGR, shown with its annual log growth.
+
 ```{python}
-#| label: tbl-forest-selected
-#| tbl-cap: "Actual selected factors and overlap between selection methods at the first fit."
-if feature_study is not None:
-    selected = importance_table(feature_study)
-    display(selected.loc[selected.selected, ["feature", "group", "meaning", "rank", "score", "importance_std"]].round(6))
-    display(selection_overlap(feature_study))
+print(source_note("benchmark"))
+display(style_table(equal_weight_benchmark()))
+print(equal_weight_sentence())
 ```
 
-### Effects after retraining
+## Two non-ML books
 
-Every classifier was independently refitted for each recipe at every origin.
-Selection and scaling see only then-known outcomes. Non-ML rules remain
-identical across recipes. Lower Brier score and log loss are better; selected
-recipes should also be compared against the historical event-frequency control.
+All of these books are long-only and gross of costs. Cash earns nothing.
+
+Equal weight gives every stock the same weight and stays fully invested.
+
+Top 10 positive-vol and full baskets invest only in positive one-month momentum. One month is the last simple return the stock has already earned. Held names are weighted in proportion to that return. Every other dollar is cash.
+
+Each month, stocks with a complete 12-month return path are split into five K-means groups, fit on those past returns. The groups are fit again the next month. A group whose own one-month return is not positive is left in cash, including members that were up on their own. Inside a group that was up, only members that were up receive weight.
+
+Top 10 positive-vol makes each group smaller first. It keeps at most ten names per group, the ones with the highest positive volatility over the same twelve months. Positive volatility is the root-mean-square of the up months; down months contribute zero. Capital is then scaled to the names that remain, and the one-month rule above is applied.
+
+Full baskets use the same five groups and the same one-month rule, with every name still in the group.
+
+The training window here is January 2005–December 2009, because the groups need twelve months of history. The chart is the official test.
 
 ```{python}
-#| label: tbl-feature-prediction
-#| tbl-cap: "Four fixed predictors across all twenty, ANOVA, pruning and forest-selected recipes."
-if feature_study is not None:
-    display(Markdown(forest_findings(feature_study)))
-    display(prediction_summary(feature_study)[[
-        "model_id", "recipe", "brier_score", "log_loss", "roc_auc",
-        "Brier change vs all 20", "Log-loss change vs all 20",
-    ]].round(6))
+print(source_note("final"))
+display(style_table(non_ml_windows_table()))
+display(non_ml_figure("test"))
 ```
 
-The following portfolio example uses the same logistic predictor and
-annual-consistency/momentum/cash trading rule for all four recipes. Cash earns
-an assumed zero return; results are gross of costs. A favorable portfolio row
-does not establish useful forecasting. The app and exported tables cover all
-fourteen rules and all four predictors.
+## Four model types
+
+Logistic regression, Gaussian naive Bayes, random forest, and histogram gradient boosting. The first, third, and fourth have tunable hyperparameters. These official books use factory settings.
+
+The models do not choose a new list of stocks. Each overlay starts from top-10 positive-vol or from full baskets and only rescales weights that are already positive.
+
+Downside to cash multiplies each held weight by (1 − 0.5 × P(next month is down)). The reduction goes to cash.
+
+Upside tilt multiplies a held weight by 1.5 when P(next month is up) is at least 0.60, then scales the stock weights back to that book's original stock budget. Cash stays where the momentum rule left it. The two adjustments are separate rows.
 
 ```{python}
-#| label: tbl-feature-portfolios
-#| tbl-cap: "Matched feature recipes: logistic overlay on the three-month momentum/cash rule."
-if feature_study is not None:
-    display(feature_portfolio_table(feature_study, "logistic", ["annual_consistency_momentum_cash"])[[
-        "recipe", "cagr", "annualized_log_growth", "sharpe", "sortino", "max_drawdown",
-        "avg_one_way_turnover", "avg_cash_weight", "change_cagr_vs_all20",
-    ]].round(6))
+growth = classifier_growth_table()
+official = growth.loc[growth["Window"].str.startswith("Official test")].drop(columns=["Window"])
+display(style_table(official))
 ```
 
+## Categories, the ten-factor cut, and grid search
+
+K nearest neighbors is an additional model type. It classifies the within-month quintile of the next return. The portfolio row equal-weights the names placed in the top quintile. A month with none of those names is cash at zero. The search is a training holdout, and the frozen 2010–2018 books stay on the four factory classifiers. The K-means books group past return paths and then apply the positive one-month rule.
+
+The ten-factor question is whether a subset changes the book versus all twenty factors on the training years. GridSearchCV scores log loss on a training holdout. The official books were not refit with the chosen settings.
+
 ```{python}
-#| label: fig-feature-log-returns
-#| fig-cap: "Saved cumulative portfolio log returns and drawdowns; unchanged non-ML reference shown once."
-if feature_study is not None:
-    figure = feature_portfolio_figure(feature_study, cumulative_log=True)
-    display(figure)
-    plt.close(figure)
+print(grouping_note())
+display(style_table(feature_cut_table()))
+print(feature_name_note())
+display(tuning_search_table().style.format({"Best score": "{:.4f}"}, na_rep="—").hide(axis="index"))
+books = tuning_portfolio_table()
+percent = {column: "{:.2%}" for column in books.columns if column not in {"Strategy", "Model"}}
+display(books.style.format(percent, na_rep="—").hide(axis="index"))
+print(tuning_note())
 ```
 
-### Separate tuning evidence and pending final evaluation
+## Feature engineering
 
-Annual selected-feature unions may exceed ten; each fitted selected model uses
-at most ten. A frozen final model must choose its inputs once before evaluation.
-This feature study uses fixed model settings. A separate saved tuning holdout
-comparison is available in the app for logistic regression and histogram
-boosting; it uses a different January 2007–December 2009 window and is not part
-of this pinned feature comparison. A forest-selected tuned comparison, final
-specification and official frozen-training test result remain pending.
-
-## Data and reproducibility
-
-A row describes one stock at a month-end snapshot. Its forward return belongs
-to the following month. Source data, derived input timing, parameters, runtime
-versions and result identities are recorded in the pinned artifact's manifest.
-Rendering this document loads saved results; it does not train models or run a
-parameter search.
+Two saved pieces sit behind this section. The completed study fits every learned transform inside chronological folds and scores January 2007–December 2009 without loading the test file. The table is the same K-means top-10 book, positive one-month momentum with residual cash, then a logistic downside haircut, for each recipe. The second table is the previously viewed notebook comparison on 2010–2018. Each month it equal-weights the 20% of names with the highest predicted probability and stays fully invested. Annual log growth in that table is log(1 + CAGR).
 
 ```{python}
-display(pd.DataFrame([{"Property": name, "Value": str(value)} for name, value in {
-    "Pinned run": summary["run_id"],
-    "Source splits": summary["data_audit"]["source_splits"],
-    "First earned month": summary["data_audit"]["first_return_month"],
-    "Last earned month": summary["data_audit"]["last_return_month"],
-    "Evaluation rows": summary["data_audit"]["evaluation_rows"],
-    "Model training policy": summary["manifest"]["config"].get("fit_policy", "expanding"),
-}.items()]))
+print(source_note("engineering"))
+display(style_table(engineering_holdout_table()))
+comparison = engineering_comparison_table()
+display(style_table(comparison).format({"Test AUC": "{:.3f}"}))
+print(engineering_note())
 ```
 
-## Completion status
+Learned clusters, principal components, and IC weights are fit on training labels or training correlations and then frozen. A ten-column composite can still draw on all twenty source factors. ANOVA-10 is the cut that stays inside ten original factors. Unsupervised construction can overfit the choice of groups even when it does not use the return as a label. IC and Q5−Q1 spreads diagnose a factor. They are not the return of a long-only portfolio.
 
-The following checks describe the current artifact, not an assertion that every
-assignment requirement is complete. The final narrative and presentation will
-be revised after the remaining research.
+## Risk on the whole path
+
+The path compounds the strategy's training months and then the official-test months. The dotted line is the first official-test month. Equal weight's deeper drawdown on that path comes from the training window.
 
 ```{python}
-display(pd.DataFrame([{"Requirement": key, "Recorded": "Yes" if value else "Pending"}
-                      for key, value in readiness(summary).items()]))
+display(style_table(risk_table()))
+display(path_figure())
+print(risk_note())
 ```

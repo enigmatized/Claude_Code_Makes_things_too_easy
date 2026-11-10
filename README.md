@@ -1,25 +1,33 @@
 # MLFactor long-only project
 
 The app now has explicit **research** and **deploy/view** modes. Start local
-research with `python3 run_app.py`; preview all six published tabs with
+research with `python3 run_app.py`; preview all seven published tabs with
 `python3 run_app.py --mode deploy --port 8502`. Deploy mode reads a self-contained
-114.5 MB results export, with no raw dataset, research catalog or model fitting.
-All six tabs are published. Training comparisons and the frozen official test
+172.6 MB results export, with no raw dataset, research catalog or model fitting.
+All seven tabs are published. Training comparisons and the frozen official test
 are explicitly separated. Both modes clearly label the first tab as training-only,
 and strategy names in its results tables have hover/focus explanations.
 Basic ML has three collapsed-by-default sections for prediction quality,
 portfolio results and changes from the originals. Both up/down patterns,
 four pooled classifiers and the per-stock logistic comparison have saved views.
-Advanced ML has two subtabs: **Build the grouped strategy** explains K-means,
-shows saved memberships and standardized return patterns, then applies positive
-momentum/cash and the top-10 positive-volatility screen. **Add up/down predictions**
-compares the same starting books with separate directional adjustments.
-Feature selection, Tuned Model and Final test default to the four main portfolio
-families; turn the focus filter off to review the wider saved comparisons.
+**Grouping With ML** has three subtabs: **K-means**, **Hierarchical clustering**
+(Ward, with its actual saved merge tree), and **Adding a direction**. Both methods
+feed the same momentum/cash and top-ten positive-volatility rules, then the same
+four saved up/down models. See [grouping guide](docs/GROUPING_WITH_ML.md).
+Feature selection and Final test default to the four main portfolio families;
+turn their focus filter off to review the wider saved comparisons. Tuned model
+shows all fourteen saved basic strategies by default, with four classifier and
+separate up/down choices.
 Feature-importance hovers explain the abbreviated factor names. Advanced
 portfolio feature comparisons are included; K-means and trading rules stay fixed.
-The advanced grouped/top-ten portfolios have no tuned study yet; the focused
-tuning view explicitly shows only the available equal-weight holdout comparison.
+The grouped/top-ten portfolios have no tuned study yet. Final test explicitly
+labels its fixed K-means models and offers CAGR/log-return views and changes
+from each original portfolio. See [the tuning/final review](docs/TUNING_AND_FINAL_REVIEW.md).
+**Feature engineering** follows Tuned model, with construction explanations,
+PCA/IC charts, model/portfolio comparisons and its own tuning subtab. Six recipes
+feed all four classifiers; their fixed/tuned frozen final variants are included
+in Final test on K-means and Ward starting books. See
+[the full notebook review and protocol](docs/FEATURE_ENGINEERING.md).
 See [deployment modes and tab-by-tab handoff](docs/DEPLOYMENT.md).
 
 For a new context, start with [AGENTS.md](AGENTS.md) and the

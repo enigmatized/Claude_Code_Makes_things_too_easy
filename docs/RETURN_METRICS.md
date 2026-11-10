@@ -21,6 +21,10 @@ advantage retain their definitions. The **Logarithmic wealth scale** checkbox
 changes only the wealth axis and is disabled in log-return views, whose values
 can be negative. Choosing a view reads saved results without fitting models.
 
+Final test now also offers these three chart measures and shows CAGR beside
+annual log growth; it reads the saved portfolio simple returns. The entire path
+explicitly joins two model protocols at the training/test boundary.
+
 Momentum, feature-selection and archived test comparison tables also show
 annual log growth. Their existing charts continue to show wealth. A ready saved
 final or exploratory run uses the same comparison renderer and return selector.

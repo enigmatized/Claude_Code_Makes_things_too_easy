@@ -1,5 +1,37 @@
 # Correlation-basket momentum
 
+## Finding the original strategy in Final test (2026-11-10)
+
+Open **Final test → K-means strategies**. The original is named
+**K-means top 10 positive-vol · 1M momentum + cash** in the table and
+**K-means top 10 · 1M momentum + cash (original)** on the chart. Its grouping,
+screen, short momentum and cash behavior are explicitly explained. It requires
+no directional predictor; K-means itself remains the unsupervised grouping step.
+The same book is the default starting portfolio under Feature-engineered variants.
+
+This was already in the saved results, previously abbreviated “Top 10 positive-vol”.
+Its CAGR is 24.6807% on January 2005–December 2009 training validation and
+19.6133% on January 2010–December 2018 test; test average cash is 51.5556%.
+The holding window is one month; the positive-volatility screen and grouping
+use twelve months of already-earned returns. No computation or results changed.
+
+Feature engineering now separately scores both the K-means and Ward full/top-ten
+one-month starting books with its own new fixed/tuned input/model variants on
+training validation and 2010–2018. The original Grouping With ML studies and their
+expanding all-20 forecasts are unchanged. Its stock-group settings remain five
+groups / twelve months; the new tuning of factor-column groups is a different
+operation. See [the completed extension](FEATURE_ENGINEERING.md).
+
+## Current: two grouping methods (2026-11-10)
+
+The third tab is now **Grouping With ML**, with **K-means**, **Hierarchical
+clustering** (Ward) and **Adding a direction**. Both methods use the same
+strategy and saved directional forecasts. The default six-tab publication is
+`published/project` (169,973,507 bytes). See [the current grouping handoff](GROUPING_WITH_ML.md)
+for algorithms, saved experiments, deployment and report reuse. The two-subtab
+description below records the preceding presentation. Downstream feature/tuning/
+final studies still use K-means.
+
 ## App progression and deployment — 2026-11-09
 
 Advanced ML now has **two subtabs**, keeping the six-main-tab navigation:

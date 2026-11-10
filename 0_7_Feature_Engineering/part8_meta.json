@@ -1,0 +1,35 @@
+{
+  "features": [
+    "cl5_avg",
+    "cl1_avg",
+    "cl2_avg",
+    "cl4_avg",
+    "cl6_avg",
+    "cl3_avg",
+    "ta_px_vs_ma_3m_rk",
+    "ta_px_vs_ma_12m_rk",
+    "ta_vol_6m_rk",
+    "ta_ma_cross_rk"
+  ],
+  "momentum_signal": "ta_ma_3m_rk",
+  "volatility_signal": "ta_vol_6m_rk",
+  "vol_buckets": 5,
+  "top_fraction": 0.2,
+  "chosen_weights": {
+    "momentum": 0.5,
+    "volatility": 0.0
+  },
+  "weight_grid": [
+    0.0,
+    0.25,
+    0.5,
+    0.75,
+    1.0
+  ],
+  "walk_forward": "annual refit, snapshots through prior December, 2005-2009",
+  "tuning": "GridSearchCV roc_auc; walk-forward params from pre-2005 data, final params from all training data",
+  "test_previously_viewed": true,
+  "test_used_for_choices": false,
+  "train_rows": 126066,
+  "test_rows": 127620
+}

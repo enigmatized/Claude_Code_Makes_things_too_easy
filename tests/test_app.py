@@ -15,7 +15,7 @@ from research.store import ExperimentStore
 from test_research import toy_panel
 
 APP = Path(__file__).resolve().parents[1] / "app.py"
-TABS = ["Strategies", "Basic ML", "Advanced ML strategy", "Feature selection", "Tuned model", "Final test"]
+TABS = ["Strategies", "Basic ML", "Grouping With ML", "Feature selection", "Tuned model", "Feature engineering", "Final test"]
 
 
 def plot_spec(element):
