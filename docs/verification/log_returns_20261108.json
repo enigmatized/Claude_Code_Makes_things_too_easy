@@ -1,0 +1,25 @@
+{
+  "update": "Expose saved monthly/cumulative log returns and annual log growth alongside CAGR",
+  "training_run_reviewed": "20261109T040626_e0a702234197",
+  "portfolio_log_and_wealth_identities_checked": 70,
+  "baseline_table_rows_exact": 14,
+  "basic_ml_table_rows_exact": 70,
+  "training_strategies_and_basic_ml_return_views_checked": true,
+  "monthly_log_returns_have_only_60_earned_months": true,
+  "cumulative_logs_start_at_zero": true,
+  "feature_momentum_archived_test_growth_columns_checked": true,
+  "real_app_review_with_computation_blocked": true,
+  "preserved_files": 203,
+  "existing_exact_cache_matches": 5,
+  "no_new_research_experiments": true,
+  "live_app_health": "ok",
+  "research_app_tests_passed": 125,
+  "browser_log_views_checked": [
+    "Strategies: cumulative log",
+    "Strategies: monthly log",
+    "Basic ML: cumulative log",
+    "Basic ML: monthly log"
+  ],
+  "catalog_training_runs": 12,
+  "catalog_test_runs": 0
+}

@@ -1,0 +1,122 @@
+---
+title: "MLFactor: Comparing model adjustments"
+subtitle: "Training feature study complete — final choice and evaluation pending"
+jupyter: python3
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    embed-resources: true
+    transition: none
+execute:
+  echo: false
+---
+
+```{python}
+#| include: false
+from pathlib import Path
+import sys
+sys.path.insert(0, str(Path.cwd().parent))
+from IPython.display import display
+from research.reporting import load_release, predictive_table, portfolio_table, portfolio_figure
+import matplotlib.pyplot as plt
+summary = load_release()
+```
+
+## Current finding
+
+- No classifier beats the historical loss-rate control on probability scores.
+- Portfolio effects depend on the original trading rule.
+- Four feature recipes are compared; final choice and evaluation remain pending.
+
+## A controlled comparison
+
+- Same stock-month inputs and validation window.
+- Same trading rules and loss-probability weight adjustment.
+- Four fixed classifiers; one original per strategy.
+- Thirteen originals plus fifty-two adjusted portfolios.
+
+## Predictive quality
+
+```{python}
+display(predictive_table(summary).style.format({"Brier score": "{:.4f}", "Log loss": "{:.4f}", "ROC AUC": "{:.3f}"}))
+```
+
+## Portfolio growth
+
+```{python}
+display(portfolio_table(summary).style.format("{:.2%}"))
+```
+
+## Momentum: paths and risk
+
+```{python}
+slide_summary = {**summary, "release": {**summary["release"], "focus_strategies": ["momentum_weighted"]}}
+figure = portfolio_figure(slide_summary)
+display(figure)
+plt.close(figure)
+```
+
+## Random forest selects ten inputs {.smaller}
+
+:::: {.columns}
+::: {.column width="30%"}
+
+- Fit using then-known training outcomes.
+- Keep ten inputs and retrain each predictor.
+- Error bars show tree variation, not confidence intervals.
+- Training importance does not establish future returns.
+
+:::
+::: {.column width="70%"}
+
+```{python}
+from research.feature_reporting import importance_figure, prediction_summary, forest_findings
+feature_study = summary.get("feature_study")
+if feature_study is not None:
+    figure = importance_figure(feature_study)
+    figure.set_size_inches(9, 6)
+    figure.axes[0].tick_params(axis="y", labelsize=7)
+    figure.tight_layout()
+    display(figure)
+    plt.close(figure)
+```
+
+:::
+::::
+
+## Does forest selection help? {.smaller}
+
+All 20, ANOVA, pruning and forest recipes use the same months and trading rules.
+Compare prediction quality before interpreting portfolio gains.
+
+```{python}
+from IPython.display import Markdown
+if feature_study is not None:
+    display(Markdown(forest_findings(feature_study, brief=True)))
+    scores = prediction_summary(feature_study)
+    table = scores.loc[scores.recipe.eq("forest_10"), [
+        "model_id", "brier_score", "log_loss", "Brier change vs all 20",
+    ]].rename(columns={"model_id": "Model", "brier_score": "Brier", "log_loss": "Log loss",
+                       "Brier change vs all 20": "Brier change"})
+    table["Model"] = table["Model"].map({"logistic": "Logistic", "naive_bayes": "Naive Bayes",
+                                      "random_forest": "Forest", "hist_gradient_boosting": "Boosting"})
+    display(table.style.hide(axis="index").format({"Brier": "{:.6f}", "Log loss": "{:.6f}",
+        "Brier change": "{:+.6f}"}).set_table_styles([
+            {"selector": "th, td", "props": [("padding", "0.3em 0.7em"), ("text-align", "right")]},
+            {"selector": "th:first-child, td:first-child", "props": [("text-align", "left")]},
+        ]))
+```
+
+## Remaining analysis
+
+- Review the four-recipe study and choose the final feature specification.
+- Integrate the separate training-holdout tuning evidence into the final release.
+- Choose specifications using training evidence.
+- Complete the frozen-training test comparison and final recommendation.
+
+::: notes
+This is a draft presentation generated from the pinned saved experiment. Expand
+and revise after tuning and final evaluation to meet the approximately
+15-minute final presentation requirement. No code snippets appear on slides.
+:::

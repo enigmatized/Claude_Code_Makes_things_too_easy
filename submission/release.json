@@ -1,0 +1,18 @@
+{
+  "artifact_root": "../artifacts",
+  "run_id": "20261108T144257_f45441ba8e83",
+  "stage": "research_draft",
+  "focus_strategies": [
+    "equal_weight_universe",
+    "momentum_weighted",
+    "training_high_vol_momentum_weighted"
+  ],
+  "final_choice_case_id": null,
+  "reference_files": {
+    "part0_data_and_benchmark/outputs/equal_weight_metrics.csv": "5aba16de6859fc68f0085dedf34ebf666ac13eefee212f3e0a38df21f1e45dca"
+  },
+  "feature_study": {
+    "study_id": "features_20261109T202318_8b01fe74",
+    "sha256": "c1a6c3e8efe48d1ec571800a9541859e4a93087c159671f9de66249f8508b8ce"
+  }
+}

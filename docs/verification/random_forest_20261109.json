@@ -1,0 +1,238 @@
+{
+  "study_id": "features_20261109T202318_8b01fe74",
+  "runs": {
+    "all_20": "20261109T202421_184e95372ab2",
+    "anova_10": "20261109T202516_039a5a86258b",
+    "pruned_10": "20261109T202612_7da383c77e5b",
+    "forest_10": "20261109T202931_597510736fb4"
+  },
+  "portfolio_cases": 280,
+  "prediction_rows_per_model_recipe": 71631,
+  "classifier_fits": 80,
+  "forest_selector_fits": 20,
+  "fits_per_model_recipe": 5,
+  "maximum_selected": 10,
+  "forest_union": 11,
+  "all20_parity": {
+    "probability_tables": 4,
+    "books": 70,
+    "weights": 70,
+    "exact": true
+  },
+  "preserved_file_hashes": 2004,
+  "new_exact_cache_matches": 4,
+  "sources": [
+    "train"
+  ],
+  "read_only_app_methods_checked": 3,
+  "release_study_checked": true,
+  "new_run_mib": 143.52235412597656,
+  "plan_to_completion_seconds": 375.5159330368042,
+  "smoke": {
+    "seconds": 5.5703821839997545,
+    "training_rows": 69108,
+    "fit_snapshot": "2004-12-31 00:00:00",
+    "selected": [
+      "Tot_Debt_Rev",
+      "Share_Turn_3M",
+      "Ocf_Ce",
+      "Fcf_Yld",
+      "Div_Yld",
+      "Share_Turn_12M",
+      "Tev_Less_Mktcap",
+      "Ev_Ebitda",
+      "Share_Turn_6M",
+      "Capex_Sales"
+    ]
+  },
+  "finding": "Forest selection lowers Brier score relative to all twenty factors for 2 of 4 predictors. 0 of the forest-selected predictors beat the historical event-frequency control on Brier score (control: 0.249023). These are training-validation comparisons; portfolio effects must be assessed separately. They do not declare a final feature/model choice or provide a tuned frozen-test result.",
+  "prediction_scores": [
+    {
+      "model_id": "logistic",
+      "recipe": "all_20",
+      "brier_score": 0.24966664243337916,
+      "log_loss": 0.6925775806814706,
+      "Brier change vs all 20": 0.0
+    },
+    {
+      "model_id": "logistic",
+      "recipe": "anova_10",
+      "brier_score": 0.24943397218573488,
+      "log_loss": 0.6920796178748488,
+      "Brier change vs all 20": -0.00023267024764428434
+    },
+    {
+      "model_id": "logistic",
+      "recipe": "pruned_10",
+      "brier_score": 0.2495068615452899,
+      "log_loss": 0.6922358015097178,
+      "Brier change vs all 20": -0.00015978088808926705
+    },
+    {
+      "model_id": "logistic",
+      "recipe": "forest_10",
+      "brier_score": 0.2494744216663904,
+      "log_loss": 0.6921739171745233,
+      "Brier change vs all 20": -0.000192220766988771
+    },
+    {
+      "model_id": "naive_bayes",
+      "recipe": "all_20",
+      "brier_score": 0.25975882529989786,
+      "log_loss": 0.7149800904288365,
+      "Brier change vs all 20": 0.0
+    },
+    {
+      "model_id": "naive_bayes",
+      "recipe": "anova_10",
+      "brier_score": 0.2574969808386761,
+      "log_loss": 0.7097453998354096,
+      "Brier change vs all 20": -0.0022618444612217403
+    },
+    {
+      "model_id": "naive_bayes",
+      "recipe": "pruned_10",
+      "brier_score": 0.2540208378056083,
+      "log_loss": 0.7019979568215611,
+      "Brier change vs all 20": -0.005737987494289554
+    },
+    {
+      "model_id": "naive_bayes",
+      "recipe": "forest_10",
+      "brier_score": 0.25448911466035845,
+      "log_loss": 0.7029165640421732,
+      "Brier change vs all 20": -0.0052697106395394044
+    },
+    {
+      "model_id": "random_forest",
+      "recipe": "all_20",
+      "brier_score": 0.24938676957407604,
+      "log_loss": 0.6920209785938424,
+      "Brier change vs all 20": 0.0
+    },
+    {
+      "model_id": "random_forest",
+      "recipe": "anova_10",
+      "brier_score": 0.24942821676360866,
+      "log_loss": 0.6921012767286688,
+      "Brier change vs all 20": 4.144718953261184e-05
+    },
+    {
+      "model_id": "random_forest",
+      "recipe": "pruned_10",
+      "brier_score": 0.24954758738419666,
+      "log_loss": 0.6923629708935907,
+      "Brier change vs all 20": 0.00016081781012061702
+    },
+    {
+      "model_id": "random_forest",
+      "recipe": "forest_10",
+      "brier_score": 0.24951499271026942,
+      "log_loss": 0.692300079871583,
+      "Brier change vs all 20": 0.00012822313619337278
+    },
+    {
+      "model_id": "hist_gradient_boosting",
+      "recipe": "all_20",
+      "brier_score": 0.24971511539451693,
+      "log_loss": 0.6927188283507516,
+      "Brier change vs all 20": 0.0
+    },
+    {
+      "model_id": "hist_gradient_boosting",
+      "recipe": "anova_10",
+      "brier_score": 0.2496825840469221,
+      "log_loss": 0.6926322982537021,
+      "Brier change vs all 20": -3.253134759484411e-05
+    },
+    {
+      "model_id": "hist_gradient_boosting",
+      "recipe": "pruned_10",
+      "brier_score": 0.2498264448876791,
+      "log_loss": 0.6929443979237713,
+      "Brier change vs all 20": 0.00011132949316217111
+    },
+    {
+      "model_id": "hist_gradient_boosting",
+      "recipe": "forest_10",
+      "brier_score": 0.24976892272859857,
+      "log_loss": 0.6928346213166667,
+      "Brier change vs all 20": 5.380733408164029e-05
+    }
+  ],
+  "tests": {
+    "command": "python3 -m unittest discover -s tests",
+    "passed": 155
+  },
+  "read_only_builds": {
+    "review_notebook": true,
+    "submission_notebook": true,
+    "quarto_html": true,
+    "quarto_slides": true
+  },
+  "release": {
+    "artifact_root": "../artifacts",
+    "run_id": "20261108T144257_f45441ba8e83",
+    "stage": "research_draft",
+    "focus_strategies": [
+      "equal_weight_universe",
+      "momentum_weighted",
+      "training_high_vol_momentum_weighted"
+    ],
+    "final_choice_case_id": null,
+    "reference_files": {
+      "part0_data_and_benchmark/outputs/equal_weight_metrics.csv": "5aba16de6859fc68f0085dedf34ebf666ac13eefee212f3e0a38df21f1e45dca"
+    },
+    "feature_study": {
+      "study_id": "features_20261109T202318_8b01fe74",
+      "sha256": "c1a6c3e8efe48d1ec571800a9541859e4a93087c159671f9de66249f8508b8ce"
+    }
+  },
+  "browser": {
+    "app_importance_bars": 20,
+    "app_selected_bars": 10,
+    "all_four_recipe_curves_visible": true,
+    "report_reviewed": true,
+    "slides_reviewed": 2,
+    "slide_overflow_check_passed": true,
+    "screenshots": [
+      "random_forest_importance_app.png",
+      "random_forest_model_effects_app.png",
+      "random_forest_recipe_curves_app.png",
+      "random_forest_quarto_report.png",
+      "random_forest_quarto_slide.png",
+      "random_forest_quarto_results_slide.png"
+    ]
+  },
+  "build_status": {
+    "run_id": "20261108T144257_f45441ba8e83",
+    "release_sha256": "3d73f0be9dbb7c8caf6b83bf84241049e5c6785800037449981a89dee78c7d62",
+    "feature_study": {
+      "study_id": "features_20261109T202318_8b01fe74",
+      "sha256": "c1a6c3e8efe48d1ec571800a9541859e4a93087c159671f9de66249f8508b8ce"
+    },
+    "mode": "draft",
+    "checks": {
+      "Declared input subset has at most 10 features": false,
+      "Four model types recorded": true,
+      "GridSearchCV evidence for at least two models": false,
+      "Two non-ML controls including equal weight": true,
+      "Risk and reward metrics recorded": true,
+      "Official test models frozen before evaluation": false,
+      "Final strategy/model choice recorded": false
+    },
+    "outputs": [
+      "analysis.ipynb",
+      "_output/project_report.html",
+      "_output/presentation.html"
+    ]
+  },
+  "final_readiness_gate": "rejects incomplete final submission as expected",
+  "publication_sha256": {
+    "analysis.ipynb": "d350bb0f0562c4daaf74f5bd841fa21dec8f15717325b3f700523bcaa8dda2cb",
+    "project_report.qmd": "23609ecbee9db65f63c9d82bc51d4443d05969e21da0387aa3656fd6dee74f69",
+    "presentation.qmd": "f96b3194e8b6b78b9cf411fce9d052c81888162e5760bc947deeb6c0d10952b1",
+    "_output/project_report.html": "f8fc3a0d0a7cfe3416d1282d3003b66082df6a1e729f592848ddad031764708b",
+    "_output/presentation.html": "b1db3fcf56473cf1def0bd4ad75f665b82eaa715f4219b5e4a900dd10f598bd8"
+  }
+}

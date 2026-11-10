@@ -1,0 +1,108 @@
+{
+  "task": "Advanced ML story: grouped strategy first, then up/down predictors; third-tab deployment",
+  "verified_utc": "2026-11-10T04:05:23.797948+00:00",
+  "main_tabs_unchanged": 6,
+  "advanced_subtabs": [
+    "Build the grouped strategy",
+    "Add up/down predictions"
+  ],
+  "published_tabs": [
+    "Strategies",
+    "Basic ML",
+    "Advanced ML strategy"
+  ],
+  "pending_deployed_tabs": [
+    "Feature selection",
+    "Tuned model",
+    "Final test"
+  ],
+  "new_production_cluster_fits": 0,
+  "new_production_prediction_fits": 0,
+  "portfolio_replays": 0,
+  "publication": {
+    "publication_bytes": 111258117,
+    "publication_manifest_sha256": "8d19a641093d57699a235ab390cc565d0a6b864762522fd27ff2d54469d951e9",
+    "advanced_source_metadata_sha256": "090f940091d36d0b043ff19cfadb2caa8debcd28efbb91e2aa4994d5abf6aa12",
+    "advanced_books": 49,
+    "monthly_rows": 2940,
+    "basket_rows": 13500,
+    "assignment_rows": 1988037,
+    "latest_profile_members": 1191,
+    "latest_profile_illustrated": 1191,
+    "all_advanced_frames_exact": true,
+    "first_two_tabs_unchanged": true,
+    "standalone_no_csv_no_archive": true
+  },
+  "published_parquet_checksums_verified": 306,
+  "verification": {
+    "full_suite": {
+      "passed": 198,
+      "seconds": 115.467,
+      "log": "/tmp/mlfactor_advanced_refactor_full_tests.log",
+      "note": "Before final selector-label clarification; five focused checks followed."
+    },
+    "focused_final": {
+      "passed": 5,
+      "seconds": 5.31,
+      "log": "/tmp/mlfactor_basket_presentation_tests_final.log"
+    },
+    "real_data": {
+      "log": "/tmp/mlfactor_advanced_deployment_review.log",
+      "checks": [
+        "Exact 49-book metrics and 2,940 monthly records",
+        "Exact 13,500 basket and 1,988,037 stock assignment/weight/probability records after canonical row ordering",
+        "Exact four-model x three-horizon Plotly curve JSON",
+        "First-two-tab summary data unchanged",
+        "Fresh standalone deploy_app.py with code + three-tab publication only, no raw CSV or artifacts/catalog",
+        "Four classifiers, full/top-ten starting books, inspection, independent horizons and unavailable 3m top-ten state work under failing raw read/store/K-means/prediction/replay guards"
+      ]
+    },
+    "browser": {
+      "log": "/tmp/mlfactor_advanced_deploy_browser.log",
+      "checks": [
+        "Two Advanced subtabs render",
+        "K-means explanation and actual membership/counts/profile heatmap",
+        "Coverage 1191/1191 visible",
+        "Positive-momentum/cash and top-ten stages displayed",
+        "Separate directional controls/results rendered without Streamlit exceptions"
+      ]
+    }
+  },
+  "grouping_illustration": {
+    "source": "Saved original full-group one-month stock momentum, already-earned returns",
+    "window": 12,
+    "memberships": "Current snapshot labels applied to the historical paths; older IDs are not linked",
+    "standardization": "Per stock, mean centered and population standard deviation scaled",
+    "coverage": "Exclude missing/constant paths and display member coverage; no heatmap when incomplete archive has no full paths",
+    "first_eleven_snapshots": "Input paths unavailable in archive; actual memberships remain visible"
+  },
+  "code_sha256": {
+    "basket_ui.py": "94060f5f3db1bd18b7b88fa63c49be1c06d15f457fb8331c510e651756bd015e",
+    "research/basket_reporting.py": "e156d8f9c76755c2481f07a2d4f22350ca98f1f60c335b4717a4c31e32a45a4f",
+    "published_results.py": "5fe52b882ab9246b977b51c05e2fe93e882da031ef718b9af1f944383fef340f",
+    "publish_results.py": "cfb27ae98af8b3dcc61db0303edc49336085896da77e8f5444a8e09946be0c35",
+    "app.py": "e2d2b60f63b29c1ceb7cc538f1bbebc08e187f775b2fc706e61f72f6bb7bcd7a",
+    "app_mode.py": "03e81dbf14152fc4a249988643e2476411e0211f7db3aed90885dbafd5220e02",
+    "tests/test_basket_presentation.py": "a66ca7853c884fda2b0ce02c3d690bbb47ea38907f47ead8424983e53bccd6be",
+    "tests/test_basket_adjustments.py": "e4927bf130325b234197e6d2f28af7c32e6229953315e1feb2911abd90ebdbad"
+  },
+  "screenshots_sha256": {
+    "advanced_grouping_explanation_20261109.png": "e0333979480c367b5e05f1e091f5bccd9f73e313b2d76a01b08d151769d76585",
+    "advanced_group_profiles_20261109.png": "e7b2d998d2b887256597d026a501cb6d0d34c895c10c47fa425313108b3b2be6",
+    "advanced_momentum_cash_20261109.png": "323f87f96bc0779c6265d1631fbb73d9554b0e0ad2f1c582f3eb8c9dfab0e9ca",
+    "advanced_top_vol_20261109.png": "8b6ca6b31ac7a73efecb943bf6695d3fc371a60a793bab8c4743e13746f550ce",
+    "advanced_directional_controls_20261109.png": "d68a6d071315b89d7cf5e5c4f1dd40d1aff4b77da61c8a15f222a11527cb0c18"
+  },
+  "formal_release_sha256_unchanged": "3d73f0be9dbb7c8caf6b83bf84241049e5c6785800037449981a89dee78c7d62",
+  "older_publication_sha256_unchanged": {
+    "strategies": "8fb7de06ec8df9c336e10e735e36ff46a4e749e4a5c83ad3f8ac233f07701bd9",
+    "basic_ml": "f01e3763d7bdfdd789b1f24e2cb69a5330d05fcd0f52f0b71a7cbd06fead6fef"
+  },
+  "limitations": [
+    "No grouping-only portfolio backtest is invented",
+    "Top-ten screening saved at 1/2m only; 3m is full groups only",
+    "Early archived periods lack full saved path illustrations",
+    "No additional model tuning, feature selection, formal report/notebook/slide rendering or online deployment"
+  ],
+  "next_step": "Publish the feature-selection tab using saved masks/rankings/model comparisons; reuse grouping/directional narrative and pure basket_reporting frames in the later Quarto build."
+}

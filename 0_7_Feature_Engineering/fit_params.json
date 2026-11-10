@@ -1,0 +1,159 @@
+{
+  "groups": {
+    "5": [
+      "Ocf_Toa",
+      "Ocf_Ce",
+      "Ocf_Ta"
+    ],
+    "1": [
+      "Tot_Debt_Rev",
+      "Net_Debt",
+      "Total_Liabilities_Total_Assets",
+      "Debtequity",
+      "Tev_Less_Mktcap",
+      "Total_Debt_Capital"
+    ],
+    "2": [
+      "Share_Turn_3M",
+      "Share_Turn_12M",
+      "Share_Turn_6M"
+    ],
+    "4": [
+      "Fcf_Tbv",
+      "Ocf_Tbv"
+    ],
+    "6": [
+      "Fcf_Yld",
+      "Capex_Sales"
+    ],
+    "3": [
+      "Div_Yld"
+    ],
+    "8": [
+      "Netdebtyield"
+    ],
+    "9": [
+      "Bb_Yld"
+    ],
+    "7": [
+      "Ev_Ebitda"
+    ]
+  },
+  "signs": {
+    "5": {
+      "Ocf_Toa": 1,
+      "Ocf_Ce": 1,
+      "Ocf_Ta": 1
+    },
+    "1": {
+      "Tot_Debt_Rev": 1,
+      "Net_Debt": 1,
+      "Total_Liabilities_Total_Assets": 1,
+      "Debtequity": 1,
+      "Tev_Less_Mktcap": 1,
+      "Total_Debt_Capital": 1
+    },
+    "2": {
+      "Share_Turn_3M": 1,
+      "Share_Turn_12M": 1,
+      "Share_Turn_6M": 1
+    },
+    "4": {
+      "Fcf_Tbv": 1,
+      "Ocf_Tbv": 1
+    },
+    "6": {
+      "Fcf_Yld": 1,
+      "Capex_Sales": -1
+    },
+    "3": {
+      "Div_Yld": 1
+    },
+    "8": {
+      "Netdebtyield": 1
+    },
+    "9": {
+      "Bb_Yld": 1
+    },
+    "7": {
+      "Ev_Ebitda": 1
+    }
+  },
+  "pca": {
+    "5": {
+      "members": [
+        "Ocf_Toa",
+        "Ocf_Ce",
+        "Ocf_Ta"
+      ],
+      "explained_var": 0.7207913118702135
+    },
+    "1": {
+      "members": [
+        "Tot_Debt_Rev",
+        "Net_Debt",
+        "Total_Liabilities_Total_Assets",
+        "Debtequity",
+        "Tev_Less_Mktcap",
+        "Total_Debt_Capital"
+      ],
+      "explained_var": 0.7539442008463408
+    },
+    "2": {
+      "members": [
+        "Share_Turn_3M",
+        "Share_Turn_12M",
+        "Share_Turn_6M"
+      ],
+      "explained_var": 0.9787753141131491
+    },
+    "4": {
+      "members": [
+        "Fcf_Tbv",
+        "Ocf_Tbv"
+      ],
+      "explained_var": 0.9292272859456601
+    },
+    "6": {
+      "members": [
+        "Fcf_Yld",
+        "Capex_Sales"
+      ],
+      "explained_var": 0.7299102837893422
+    }
+  },
+  "ic_w": {
+    "all": {
+      "Ocf_Toa": 0.00799,
+      "Tot_Debt_Rev": -0.0053,
+      "Net_Debt": -0.0016,
+      "Total_Liabilities_Total_Assets": -0.001,
+      "Share_Turn_3M": -0.00747,
+      "Fcf_Tbv": 0.00248,
+      "Debtequity": 0.00201,
+      "Ocf_Ce": 0.01129,
+      "Fcf_Yld": 0.01043,
+      "Ocf_Tbv": 0.00654,
+      "Div_Yld": -0.00016,
+      "Netdebtyield": -0.00531,
+      "Share_Turn_12M": -0.00855,
+      "Tev_Less_Mktcap": 0.00291,
+      "Bb_Yld": -0.00272,
+      "Ev_Ebitda": -0.00362,
+      "Total_Debt_Capital": 0.00256,
+      "Share_Turn_6M": -0.00882,
+      "Capex_Sales": -0.00501,
+      "Ocf_Ta": 0.00844
+    },
+    "pruned_features": [
+      "Ocf_Ce",
+      "Ocf_Tbv",
+      "Fcf_Yld",
+      "Ocf_Toa",
+      "Netdebtyield",
+      "Capex_Sales"
+    ]
+  },
+  "cluster_dist": 0.6,
+  "corr_cap": 0.6
+}

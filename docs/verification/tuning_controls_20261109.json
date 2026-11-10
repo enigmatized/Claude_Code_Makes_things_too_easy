@@ -1,0 +1,704 @@
+{
+  "date_local": "2026-11-09",
+  "timezone": "America/Chicago",
+  "change": "Explicit tuning model/basic-strategy/next-up-down controls with metric-header help.",
+  "protocol": {
+    "fit_labels_through": "2006-12-31",
+    "holdout": "2007-01-31 to 2009-12-31",
+    "source_csv": "train only",
+    "feature_recipe": "frozen downside ANOVA-10 reused for both targets",
+    "feature_selection_for_upside_recomputed": false,
+    "strategy_rules_and_thresholds_tuned": false,
+    "scoring": "neg_log_loss",
+    "upside_threshold": 0.6,
+    "adjustment_strength": 0.5,
+    "model_scope": "pooled",
+    "fit_policy": "frozen_at_origin"
+  },
+  "studies": {
+    "holdout_20261109T202045_b0a51718": {
+      "target": "loss",
+      "model_keys": [
+        "logistic",
+        "hist_gradient_boosting"
+      ],
+      "study_sha256": "1c91a4a7dd70e1b3615f6e6e329938ea96b189304966980885cc8e66f035d461",
+      "frame_sha256": {
+        "metrics": "d7b35a416a67fc89b9a7572e3470786924847ac47d9ed68323ecd0d2cc8f2fc6",
+        "monthly": "d4d00b2fd9284728027f541cae64f5600e39b18ec96f9313b04dc0d7bb1edfd8",
+        "predictive": "f36fcd40dec62e5f2ce21f972a779830ce906b06364d6f09c81c090d9786f400"
+      },
+      "feature_source": {
+        "recipe": "anova_10",
+        "model_id": "logistic",
+        "fit_snapshot": "2006-12-31",
+        "trained_through_return_month": "2006-12-31",
+        "n_features": 10,
+        "columns": [
+          "Tot_Debt_Rev",
+          "Net_Debt",
+          "Total_Liabilities_Total_Assets",
+          "Share_Turn_3M",
+          "Debtequity",
+          "Div_Yld",
+          "Share_Turn_12M",
+          "Tev_Less_Mktcap",
+          "Total_Debt_Capital",
+          "Share_Turn_6M"
+        ],
+        "feature_study_id": "features_20261108T153403_ddfe05c8"
+      },
+      "chosen": {
+        "logistic": {
+          "params": {
+            "model__C": 0.1
+          },
+          "best_score": -0.6791862845819034,
+          "seconds": 0.47966393001843244,
+          "n_fits": 10,
+          "grid": {
+            "model__C": [
+              0.1,
+              1.0,
+              10.0
+            ]
+          }
+        },
+        "hist_gradient_boosting": {
+          "params": {
+            "model__learning_rate": 0.05,
+            "model__max_leaf_nodes": 15
+          },
+          "best_score": -0.6792290015175025,
+          "seconds": 7.0178185909753665,
+          "n_fits": 13,
+          "grid": {
+            "model__learning_rate": [
+              0.05,
+              0.1
+            ],
+            "model__max_leaf_nodes": [
+              15,
+              31
+            ]
+          }
+        }
+      },
+      "source_sha256": null,
+      "code_sha256": null,
+      "n_portfolio_books": 70,
+      "total_bytes": 319809,
+      "prediction_scores": [
+        {
+          "model": "Logistic regression",
+          "rows": 42951,
+          "observed_loss_rate": 0.47984913040441435,
+          "brier_score": 0.25339643617142277,
+          "log_loss": 0.7001123905559289,
+          "roc_auc": 0.4964524007824466,
+          "accuracy_at_half": 0.5201508695955857,
+          "version": "ML, not tuned",
+          "model_key": "logistic"
+        },
+        {
+          "model": "Historical loss-rate control",
+          "rows": 42951,
+          "observed_loss_rate": 0.47984913040441435,
+          "brier_score": 0.25254531881453607,
+          "log_loss": 0.6983177424647454,
+          "roc_auc": 0.5,
+          "accuracy_at_half": 0.5201508695955857,
+          "version": "ML, not tuned",
+          "model_key": "logistic"
+        },
+        {
+          "model": "Logistic regression",
+          "rows": 42951,
+          "observed_loss_rate": 0.47984913040441435,
+          "brier_score": 0.2533951113464018,
+          "log_loss": 0.7001096075414988,
+          "roc_auc": 0.496463552964427,
+          "accuracy_at_half": 0.5201508695955857,
+          "version": "Tuned ML",
+          "model_key": "logistic"
+        },
+        {
+          "model": "Historical loss-rate control",
+          "rows": 42951,
+          "observed_loss_rate": 0.47984913040441435,
+          "brier_score": 0.25254531881453607,
+          "log_loss": 0.6983177424647454,
+          "roc_auc": 0.5,
+          "accuracy_at_half": 0.5201508695955857,
+          "version": "Tuned ML",
+          "model_key": "logistic"
+        },
+        {
+          "model": "Histogram gradient boosting",
+          "rows": 42951,
+          "observed_loss_rate": 0.47984913040441435,
+          "brier_score": 0.25357338893685966,
+          "log_loss": 0.7005185286982973,
+          "roc_auc": 0.5033772531669753,
+          "accuracy_at_half": 0.5187539288957184,
+          "version": "ML, not tuned",
+          "model_key": "hist_gradient_boosting"
+        },
+        {
+          "model": "Historical loss-rate control",
+          "rows": 42951,
+          "observed_loss_rate": 0.47984913040441435,
+          "brier_score": 0.25254531881453607,
+          "log_loss": 0.6983177424647454,
+          "roc_auc": 0.5,
+          "accuracy_at_half": 0.5201508695955857,
+          "version": "ML, not tuned",
+          "model_key": "hist_gradient_boosting"
+        },
+        {
+          "model": "Histogram gradient boosting",
+          "rows": 42951,
+          "observed_loss_rate": 0.47984913040441435,
+          "brier_score": 0.25357338893685966,
+          "log_loss": 0.7005185286982973,
+          "roc_auc": 0.5033772531669753,
+          "accuracy_at_half": 0.5187539288957184,
+          "version": "Tuned ML",
+          "model_key": "hist_gradient_boosting"
+        },
+        {
+          "model": "Historical loss-rate control",
+          "rows": 42951,
+          "observed_loss_rate": 0.47984913040441435,
+          "brier_score": 0.25254531881453607,
+          "log_loss": 0.6983177424647454,
+          "roc_auc": 0.5,
+          "accuracy_at_half": 0.5201508695955857,
+          "version": "Tuned ML",
+          "model_key": "hist_gradient_boosting"
+        }
+      ]
+    },
+    "holdout_20261110T012820_d20ce131": {
+      "target": "loss",
+      "model_keys": [
+        "naive_bayes",
+        "random_forest"
+      ],
+      "study_sha256": "9f9a9929dcc43f786748b7a0134ceee6860579bac80c8989a451526915c21e90",
+      "frame_sha256": {
+        "metrics": "d604c7d0c3aa042dc4e8c9834c9b7d99aa53831658606d4958999e00d4995f63",
+        "monthly": "fe11fb96e6ddade677b15245681b0ab977b112b3183810a1bbbc352058e2314e",
+        "predictive": "9faf74441366b95e774c63a532574f9d2785701f4b14a934a8f6fcc1cb515127"
+      },
+      "feature_source": {
+        "recipe": "anova_10",
+        "model_id": "logistic",
+        "fit_snapshot": "2006-12-31",
+        "trained_through_return_month": "2006-12-31",
+        "n_features": 10,
+        "columns": [
+          "Tot_Debt_Rev",
+          "Net_Debt",
+          "Total_Liabilities_Total_Assets",
+          "Share_Turn_3M",
+          "Debtequity",
+          "Div_Yld",
+          "Share_Turn_12M",
+          "Tev_Less_Mktcap",
+          "Total_Debt_Capital",
+          "Share_Turn_6M"
+        ],
+        "feature_study_id": "features_20261108T153403_ddfe05c8"
+      },
+      "chosen": {
+        "naive_bayes": {
+          "params": {
+            "model__var_smoothing": 1e-05
+          },
+          "best_score": -0.6945105104535076,
+          "seconds": 0.10938405300839804,
+          "n_fits": 7,
+          "fixed_params": {},
+          "grid": {
+            "model__var_smoothing": [
+              1e-09,
+              1e-05
+            ]
+          }
+        },
+        "random_forest": {
+          "params": {
+            "model__max_depth": 4,
+            "model__min_samples_leaf": 200
+          },
+          "best_score": -0.6784358936750131,
+          "seconds": 22.489877640997292,
+          "n_fits": 13,
+          "fixed_params": {},
+          "grid": {
+            "model__max_depth": [
+              4,
+              6
+            ],
+            "model__min_samples_leaf": [
+              50,
+              200
+            ]
+          }
+        }
+      },
+      "source_sha256": {
+        "mlfactor_long_only_train.csv": "5689c609809ab73d412807ae466709f444af0e0f00b8895caae762836ce62591"
+      },
+      "code_sha256": {
+        "tuning_holdout.py": "76dd8b1fabf81c3957f721b944b32e230e42054bad9fcaac3030f02a62127211",
+        "tuning.py": "d7dadf74c0e32ed1d3101d2447b4a5b3714c9f9967fd2d05aac7d751b4b75acd"
+      },
+      "n_portfolio_books": 70,
+      "total_bytes": 418075,
+      "prediction_scores": [
+        {
+          "model": "Gaussian naive Bayes",
+          "rows": 42951,
+          "observed_loss_rate": 0.47984913040441435,
+          "brier_score": 0.2650380789086579,
+          "log_loss": 0.7260552762611201,
+          "roc_auc": 0.4972366565337094,
+          "accuracy_at_half": 0.5128169309212824,
+          "version": "ML, not tuned",
+          "model_key": "naive_bayes"
+        },
+        {
+          "model": "Historical loss-rate control",
+          "rows": 42951,
+          "observed_loss_rate": 0.47984913040441435,
+          "brier_score": 0.25254531881453607,
+          "log_loss": 0.6983177424647454,
+          "roc_auc": 0.5,
+          "accuracy_at_half": 0.5201508695955857,
+          "version": "ML, not tuned",
+          "model_key": "naive_bayes"
+        },
+        {
+          "model": "Gaussian naive Bayes",
+          "rows": 42951,
+          "observed_loss_rate": 0.47984913040441435,
+          "brier_score": 0.26503786616226943,
+          "log_loss": 0.7260547823273056,
+          "roc_auc": 0.49723661092595445,
+          "accuracy_at_half": 0.5128169309212824,
+          "version": "Tuned ML",
+          "model_key": "naive_bayes"
+        },
+        {
+          "model": "Historical loss-rate control",
+          "rows": 42951,
+          "observed_loss_rate": 0.47984913040441435,
+          "brier_score": 0.25254531881453607,
+          "log_loss": 0.6983177424647454,
+          "roc_auc": 0.5,
+          "accuracy_at_half": 0.5201508695955857,
+          "version": "Tuned ML",
+          "model_key": "naive_bayes"
+        },
+        {
+          "model": "Random forest",
+          "rows": 42951,
+          "observed_loss_rate": 0.47984913040441435,
+          "brier_score": 0.25340736418701154,
+          "log_loss": 0.7001691542243628,
+          "roc_auc": 0.5001225610682952,
+          "accuracy_at_half": 0.5199413284906056,
+          "version": "ML, not tuned",
+          "model_key": "random_forest"
+        },
+        {
+          "model": "Historical loss-rate control",
+          "rows": 42951,
+          "observed_loss_rate": 0.47984913040441435,
+          "brier_score": 0.25254531881453607,
+          "log_loss": 0.6983177424647454,
+          "roc_auc": 0.5,
+          "accuracy_at_half": 0.5201508695955857,
+          "version": "ML, not tuned",
+          "model_key": "random_forest"
+        },
+        {
+          "model": "Random forest",
+          "rows": 42951,
+          "observed_loss_rate": 0.47984913040441435,
+          "brier_score": 0.2532188188246082,
+          "log_loss": 0.6997585068489227,
+          "roc_auc": 0.49834024692603185,
+          "accuracy_at_half": 0.520220716630579,
+          "version": "Tuned ML",
+          "model_key": "random_forest"
+        },
+        {
+          "model": "Historical loss-rate control",
+          "rows": 42951,
+          "observed_loss_rate": 0.47984913040441435,
+          "brier_score": 0.25254531881453607,
+          "log_loss": 0.6983177424647454,
+          "roc_auc": 0.5,
+          "accuracy_at_half": 0.5201508695955857,
+          "version": "Tuned ML",
+          "model_key": "random_forest"
+        }
+      ]
+    },
+    "holdout_20261110T013013_6f2fd4f9": {
+      "target": "upside",
+      "model_keys": [
+        "logistic",
+        "naive_bayes",
+        "random_forest",
+        "hist_gradient_boosting"
+      ],
+      "study_sha256": "ea07d202075d526b14da6da68d42aa69e888b1de0b44e5268a0bb79669ad0bae",
+      "frame_sha256": {
+        "metrics": "b667d0ce18119670b2eaf2e7975264cd51d7c451509246c4fa903f157d0c90e4",
+        "monthly": "e9a2c24a6622bd5d6a9a64f6f1531b43e4c4ce388c3b8010621374a6fe02d7d3",
+        "predictive": "4bb6d3ef8d499e3c6cb92824e28658dd23e285fc74762195e2c17c8ee144ccdf"
+      },
+      "feature_source": {
+        "recipe": "anova_10",
+        "model_id": "logistic",
+        "fit_snapshot": "2006-12-31",
+        "trained_through_return_month": "2006-12-31",
+        "n_features": 10,
+        "columns": [
+          "Tot_Debt_Rev",
+          "Net_Debt",
+          "Total_Liabilities_Total_Assets",
+          "Share_Turn_3M",
+          "Debtequity",
+          "Div_Yld",
+          "Share_Turn_12M",
+          "Tev_Less_Mktcap",
+          "Total_Debt_Capital",
+          "Share_Turn_6M"
+        ],
+        "feature_study_id": "features_20261108T153403_ddfe05c8"
+      },
+      "chosen": {
+        "logistic": {
+          "params": {
+            "model__C": 0.1
+          },
+          "best_score": -0.6816532355387858,
+          "seconds": 0.39123555697733536,
+          "n_fits": 10,
+          "fixed_params": {},
+          "grid": {
+            "model__C": [
+              0.1,
+              1.0,
+              10.0
+            ]
+          }
+        },
+        "naive_bayes": {
+          "params": {
+            "model__var_smoothing": 1e-05
+          },
+          "best_score": -0.6950221267251845,
+          "seconds": 0.08801574201788753,
+          "n_fits": 7,
+          "fixed_params": {},
+          "grid": {
+            "model__var_smoothing": [
+              1e-09,
+              1e-05
+            ]
+          }
+        },
+        "random_forest": {
+          "params": {
+            "model__max_depth": 4,
+            "model__min_samples_leaf": 200
+          },
+          "best_score": -0.6809273671985866,
+          "seconds": 23.62627956698998,
+          "n_fits": 13,
+          "fixed_params": {},
+          "grid": {
+            "model__max_depth": [
+              4,
+              6
+            ],
+            "model__min_samples_leaf": [
+              50,
+              200
+            ]
+          }
+        },
+        "hist_gradient_boosting": {
+          "params": {
+            "model__learning_rate": 0.05,
+            "model__max_leaf_nodes": 15
+          },
+          "best_score": -0.6817829287095721,
+          "seconds": 5.192759975994704,
+          "n_fits": 13,
+          "fixed_params": {},
+          "grid": {
+            "model__learning_rate": [
+              0.05,
+              0.1
+            ],
+            "model__max_leaf_nodes": [
+              15,
+              31
+            ]
+          }
+        }
+      },
+      "source_sha256": {
+        "mlfactor_long_only_train.csv": "5689c609809ab73d412807ae466709f444af0e0f00b8895caae762836ce62591"
+      },
+      "code_sha256": {
+        "tuning_holdout.py": "76dd8b1fabf81c3957f721b944b32e230e42054bad9fcaac3030f02a62127211",
+        "tuning.py": "d7dadf74c0e32ed1d3101d2447b4a5b3714c9f9967fd2d05aac7d751b4b75acd"
+      },
+      "n_portfolio_books": 126,
+      "total_bytes": 665240,
+      "prediction_scores": [
+        {
+          "model": "Logistic regression",
+          "rows": 42951,
+          "observed_up_rate": 0.5157039417010081,
+          "brier_score": 0.2532217078390333,
+          "log_loss": 0.6997188635898279,
+          "roc_auc": 0.4954492051573749,
+          "accuracy_at_half": 0.5157272240460059,
+          "version": "ML, not tuned",
+          "model_key": "logistic"
+        },
+        {
+          "model": "Historical up-rate control",
+          "rows": 42951,
+          "observed_up_rate": 0.5157039417010081,
+          "brier_score": 0.2524027519599493,
+          "log_loss": 0.6980094648429666,
+          "roc_auc": 0.5,
+          "accuracy_at_half": 0.5157039417010081,
+          "version": "ML, not tuned",
+          "model_key": "logistic"
+        },
+        {
+          "model": "Logistic regression",
+          "rows": 42951,
+          "observed_up_rate": 0.5157039417010081,
+          "brier_score": 0.253220279229017,
+          "log_loss": 0.6997158831465876,
+          "roc_auc": 0.495461331245687,
+          "accuracy_at_half": 0.5157272240460059,
+          "version": "Tuned ML",
+          "model_key": "logistic"
+        },
+        {
+          "model": "Historical up-rate control",
+          "rows": 42951,
+          "observed_up_rate": 0.5157039417010081,
+          "brier_score": 0.2524027519599493,
+          "log_loss": 0.6980094648429666,
+          "roc_auc": 0.5,
+          "accuracy_at_half": 0.5157039417010081,
+          "version": "Tuned ML",
+          "model_key": "logistic"
+        },
+        {
+          "model": "Gaussian naive Bayes",
+          "rows": 42951,
+          "observed_up_rate": 0.5157039417010081,
+          "brier_score": 0.26372203130795857,
+          "log_loss": 0.7227526430531905,
+          "roc_auc": 0.496268116559338,
+          "accuracy_at_half": 0.5103490023515168,
+          "version": "ML, not tuned",
+          "model_key": "naive_bayes"
+        },
+        {
+          "model": "Historical up-rate control",
+          "rows": 42951,
+          "observed_up_rate": 0.5157039417010081,
+          "brier_score": 0.2524027519599493,
+          "log_loss": 0.6980094648429666,
+          "roc_auc": 0.5,
+          "accuracy_at_half": 0.5157039417010081,
+          "version": "ML, not tuned",
+          "model_key": "naive_bayes"
+        },
+        {
+          "model": "Gaussian naive Bayes",
+          "rows": 42951,
+          "observed_up_rate": 0.5157039417010081,
+          "brier_score": 0.26372184023250206,
+          "log_loss": 0.7227522082031217,
+          "roc_auc": 0.4962681057072812,
+          "accuracy_at_half": 0.5103722846965146,
+          "version": "Tuned ML",
+          "model_key": "naive_bayes"
+        },
+        {
+          "model": "Historical up-rate control",
+          "rows": 42951,
+          "observed_up_rate": 0.5157039417010081,
+          "brier_score": 0.2524027519599493,
+          "log_loss": 0.6980094648429666,
+          "roc_auc": 0.5,
+          "accuracy_at_half": 0.5157039417010081,
+          "version": "Tuned ML",
+          "model_key": "naive_bayes"
+        },
+        {
+          "model": "Random forest",
+          "rows": 42951,
+          "observed_up_rate": 0.5157039417010081,
+          "brier_score": 0.25321836701185846,
+          "log_loss": 0.699738700940763,
+          "roc_auc": 0.4996729135808391,
+          "accuracy_at_half": 0.5153081418360457,
+          "version": "ML, not tuned",
+          "model_key": "random_forest"
+        },
+        {
+          "model": "Historical up-rate control",
+          "rows": 42951,
+          "observed_up_rate": 0.5157039417010081,
+          "brier_score": 0.2524027519599493,
+          "log_loss": 0.6980094648429666,
+          "roc_auc": 0.5,
+          "accuracy_at_half": 0.5157039417010081,
+          "version": "ML, not tuned",
+          "model_key": "random_forest"
+        },
+        {
+          "model": "Random forest",
+          "rows": 42951,
+          "observed_up_rate": 0.5157039417010081,
+          "brier_score": 0.2530374178535506,
+          "log_loss": 0.6993528521498265,
+          "roc_auc": 0.4979247025695392,
+          "accuracy_at_half": 0.5156806593560104,
+          "version": "Tuned ML",
+          "model_key": "random_forest"
+        },
+        {
+          "model": "Historical up-rate control",
+          "rows": 42951,
+          "observed_up_rate": 0.5157039417010081,
+          "brier_score": 0.2524027519599493,
+          "log_loss": 0.6980094648429666,
+          "roc_auc": 0.5,
+          "accuracy_at_half": 0.5157039417010081,
+          "version": "Tuned ML",
+          "model_key": "random_forest"
+        },
+        {
+          "model": "Histogram gradient boosting",
+          "rows": 42951,
+          "observed_up_rate": 0.5157039417010081,
+          "brier_score": 0.253423632586995,
+          "log_loss": 0.7001734319977586,
+          "roc_auc": 0.5019398409717888,
+          "accuracy_at_half": 0.5143302833461386,
+          "version": "ML, not tuned",
+          "model_key": "hist_gradient_boosting"
+        },
+        {
+          "model": "Historical up-rate control",
+          "rows": 42951,
+          "observed_up_rate": 0.5157039417010081,
+          "brier_score": 0.2524027519599493,
+          "log_loss": 0.6980094648429666,
+          "roc_auc": 0.5,
+          "accuracy_at_half": 0.5157039417010081,
+          "version": "ML, not tuned",
+          "model_key": "hist_gradient_boosting"
+        },
+        {
+          "model": "Histogram gradient boosting",
+          "rows": 42951,
+          "observed_up_rate": 0.5157039417010081,
+          "brier_score": 0.253423632586995,
+          "log_loss": 0.7001734319977586,
+          "roc_auc": 0.5019398409717888,
+          "accuracy_at_half": 0.5143302833461386,
+          "version": "Tuned ML",
+          "model_key": "hist_gradient_boosting"
+        },
+        {
+          "model": "Historical up-rate control",
+          "rows": 42951,
+          "observed_up_rate": 0.5157039417010081,
+          "brier_score": 0.2524027519599493,
+          "log_loss": 0.6980094648429666,
+          "roc_auc": 0.5,
+          "accuracy_at_half": 0.5157039417010081,
+          "version": "Tuned ML",
+          "model_key": "hist_gradient_boosting"
+        }
+      ]
+    }
+  },
+  "tests": {
+    "full_suite": {
+      "passed": 175,
+      "seconds": 77.224,
+      "log": "/tmp/mlfactor_tuning_direction_full_tests.log"
+    },
+    "focused": {
+      "passed": 11,
+      "log": "/tmp/mlfactor_tuning_direction_tests.log"
+    },
+    "saved_only_review": {
+      "model_target_pairs": 8,
+      "portfolio_views": 16,
+      "fitting_search_replay_blocked": true,
+      "log": "/tmp/mlfactor_tuning_controls_review.log",
+      "checks": [
+        "exact original non-ML book parity across all three studies",
+        "all saved 36-month compounding/CAGR identities",
+        "exact displayed prediction/portfolio values",
+        "native column-help metadata",
+        "historical-control equality before collapsing",
+        "old downside target inference",
+        "source and current calculation-code hashes",
+        "same frozen input list"
+      ]
+    },
+    "browser": {
+      "status": "passed",
+      "log": "/tmp/mlfactor_tuning_browser.log",
+      "actual_pointer_header_hover": [
+        "Brier score",
+        "Log loss",
+        "ROC AUC"
+      ],
+      "actual_target_selector": "next down \u2192 next up; updated heading and score table visually reviewed",
+      "no_streamlit_exceptions": true,
+      "screenshots": {
+        "tuning_controls_20261109.png": "9ec43aee7adde20a765ff69bacd9a92081d8906ae36f807042ffa5e817e13727",
+        "tuning_brier_tooltip_20261109.png": "87e3d4fffa7db57f9dab5b97af65d908e2f70ab3465833e028e4144ccc624b71",
+        "tuning_log_loss_tooltip_20261109.png": "5bd486b59092057e11a932cefa060df2593139ffc67bf5d1ae8e5436a00d359f",
+        "tuning_roc_auc_tooltip_20261109.png": "052363992008d7418e452d1b7da4468b2b622bc5b83bfa6f9d6d22a10d7df9fa",
+        "tuning_upside_controls_20261109.png": "cf7666876c26483ff5fc3dcd975f6fd88f66131c4cbe00decb72074e1f8fce4f",
+        "tuning_upside_scores_20261109.png": "f1b56ed60774cb3994edb3e5d210608a674dc21265d6c2c6b4242e2d31742ac7"
+      }
+    }
+  },
+  "release_sha256": "3d73f0be9dbb7c8caf6b83bf84241049e5c6785800037449981a89dee78c7d62",
+  "release_changed": false,
+  "formal_report_notebook_slides_rendered": false,
+  "experiment_catalog_run_added": false,
+  "official_test_csv_loaded": false,
+  "results_note": "No fixed/tuned classifier beats historical event frequency on holdout Brier or log loss; boosting keeps original settings.",
+  "next_steps": [
+    "Review saved evidence and choose final specification",
+    "Integrate selected tuning evidence into formal submission",
+    "Frozen official test remains pending"
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "task": "Incremental Strategies publication mode, per-strategy tooltips, training-only boundary",
+  "verified_utc": "2026-11-10T03:21:35.721084+00:00",
+  "implemented_tabs": [
+    "Strategies"
+  ],
+  "pending_deployed_tabs": [
+    "Basic ML",
+    "Advanced ML strategy",
+    "Feature selection",
+    "Tuned model",
+    "Final test"
+  ],
+  "source_run_id": "20261109T202421_184e95372ab2",
+  "source_artifact_sha256": "7d44f4c58390559d2124259cb62ef27a43a11c55ac6040261d3594c8d5864f28",
+  "source_momentum_study": "momentum_20261108T211612_b4723b7c",
+  "publication": {
+    "publication_bytes": 4504572,
+    "manifest_sha256": "8fb7de06ec8df9c336e10e735e36ff46a4e749e4a5c83ad3f8ac233f07701bd9",
+    "strategy_count": 14,
+    "monthly_rows": 840,
+    "first_return_month": "2005-01-31 00:00:00",
+    "last_return_month": "2009-12-31 00:00:00",
+    "initial_summary_parquet_bytes": 101419,
+    "standalone_no_csv_no_archive": true,
+    "exact_curve_and_metric_parity": true,
+    "exact_allocations_all_14": true,
+    "exact_momentum_parity": true
+  },
+  "publication_manifest": "published/strategies/manifest.json",
+  "fits": 0,
+  "portfolio_replays": 0,
+  "tests": {
+    "full_suite": {
+      "passed": 189,
+      "seconds": 83.822,
+      "log": "/tmp/mlfactor_deploy_full_tests.log",
+      "note": "Before final presentation/description refinements; six focused tests, real-data parity, standalone and browser checks repeated afterward."
+    },
+    "focused_publication": {
+      "passed": 6,
+      "log": "/tmp/mlfactor_published_tests.log",
+      "seconds": 4.204
+    },
+    "real_data_and_standalone": {
+      "log": "/tmp/mlfactor_deployment_review.log",
+      "checks": [
+        "Exact baseline metrics and monthly frames",
+        "Exact Plotly JSON for all three return measures and both wealth-axis settings",
+        "Exact weights/allocation matrices for all 14 strategies",
+        "Exact original-only four-window momentum table and Plotly curves",
+        "Fresh-process deploy_app.py from code + publication only, no source CSVs or artifacts/catalog",
+        "Raw CSV reading, research-store construction and computation patched to raise; allocations/momentum still work"
+      ]
+    },
+    "browser": {
+      "log": "/tmp/mlfactor_deploy_browser.log",
+      "checks": [
+        "Real pointer hover displays explanation",
+        "Keyboard focus displays explanation",
+        "Training-only period text visible",
+        "Grouped/full tables contain explanations for all strategies",
+        "Allocation opt-in works",
+        "Unpublished Basic ML shows honest pending state; no Streamlit exceptions"
+      ]
+    }
+  },
+  "code_sha256": {
+    "app.py": "4060589d907f5c3b3ad70d611e482b4a175ea49efb30ba2d4d17508accdd4a2c",
+    "app_mode.py": "182fed394cf1eef877a9fd34008853f77a7788ba1d9e5c13df7e12e82a13f85d",
+    "deploy_app.py": "7420992cce92dc44367abcfc280aaa22705483e63cfd7d38ef8ac9fa06fc7b91",
+    "published_results.py": "298c2ab4811b3f7be21e85e368c49501989f89300771b2c2d67fab1f8ce5acc6",
+    "publish_results.py": "bcc3bd3e7110495f720a28f863cbda47e13cb491db697a497a9839ad388e4b6c",
+    "strategy_help.py": "646c28f39d64c7fcc72a5bb7bd2dfbf532d081dbb418a0b9f19cad1572451256",
+    "strategy_results_ui.py": "1759086355da266494557eecadf4b0ca8dd1bc94aeae3369ff8478fc8e8ac9fb",
+    "momentum_study_ui.py": "76d47295635f3fd530176482644e44382451ce5f3bcad7f18fe45a5e707a76b4",
+    "run_app.py": "3c0727055fe48ca288e997764a16490ac09b42c3ee0ddbfe7cd99e77ba8716ad",
+    "tests/test_published_results.py": "523635341f88b49ed1d7875cf37e5c300bff1a75b96b22f513bb64ad8acda7e0",
+    "tests/test_app.py": "2447c720b82fe0523abf02f561b3aee17f42b2f8c32617ef72d5aba5a8680521"
+  },
+  "screenshots": {
+    "strategies_deploy_20261109.png": "7a2e76c14e7914e399d4018d1163dc7e1287df3fa59d3b5a1d045154e3b46830",
+    "strategies_hover_20261109.png": "0c8ee3782997e3a46ca14ab82c4f19e06397a404926602f86d56a662121129bc",
+    "strategies_full_table_20261109.png": "8188752e173b6109eb819bfa479176aabdb898aff50d2aeb57c1d91bc64f1def"
+  },
+  "formal_release_sha256_unchanged": "3d73f0be9dbb7c8caf6b83bf84241049e5c6785800037449981a89dee78c7d62",
+  "limitations": [
+    "Only first tab has self-contained deploy readers",
+    "Published rebalance inspection has stock IDs/weights, not full research signal/pool audit",
+    "Other lookbacks have published performance curves but allocations are for main published run",
+    "Cloud deployment/resource profiling not yet performed",
+    "No change to formal report/notebook/slides or submission pin"
+  ],
+  "next_step": "Publish chosen Basic ML model/target/scope cases and matched diagnostics through same manifest; keep raw/prediction panels local unless needed for a specific view."
+}

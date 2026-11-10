@@ -1,0 +1,21 @@
+{
+  "update": "Grouped strategy results and compact ML-change grids",
+  "run_id_reviewed": "20261108T234216_191b0784406b",
+  "families": 6,
+  "strategies": 14,
+  "models": 4,
+  "exact_recorded_delta_cells_checked": 280,
+  "research_app_tests_passed": 116,
+  "final_grouping_checks_passed": 6,
+  "real_browser_saved_run_review": true,
+  "real_browser_loaded_saved_comparison_only": true,
+  "new_experiment_computed": false,
+  "preserved_input_archive_catalog_reference_files": 189,
+  "existing_saved_runs_still_exact_cache_matches": 5,
+  "catalog_evaluation_counts": {
+    "training_validation": 11
+  },
+  "live_app_health": "ok",
+  "preview": "grouped_strategy_changes.png",
+  "additional_preview": "grouped_hybrids_and_cash.png"
+}

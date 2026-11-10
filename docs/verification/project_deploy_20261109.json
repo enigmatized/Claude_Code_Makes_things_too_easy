@@ -1,0 +1,128 @@
+{
+  "task": "Feature explanations and all-six-tab deployment, saved tuning/final results, default main-family focus",
+  "verified_utc": "2026-11-10T04:29:06.638626+00:00",
+  "published_tabs": [
+    "strategies",
+    "basic_ml",
+    "advanced_ml",
+    "features",
+    "tuning",
+    "final"
+  ],
+  "publication": {
+    "publication_bytes": 114541240,
+    "manifest_sha256": "faabf71ddf5566616d2328b4f6422a9604aab4027c3f2c36bdde3de91ac49f4a",
+    "feature_fit_rows": 80,
+    "feature_adjusted_portfolios": 224,
+    "advanced_feature_books": 166,
+    "advanced_feature_months": 9960,
+    "tuning_monthly_rows": 9576,
+    "tuning_trial_rows": 26,
+    "final_test_rows": 5292,
+    "final_windows": {
+      "test": 5292,
+      "training": 2940,
+      "entire": 8232
+    },
+    "standalone_all_six_tabs": true,
+    "all_saved_data_parity": true,
+    "prior_frame_checksums_unchanged": true
+  },
+  "parquet_checksums_verified": 362,
+  "new_production_fits": 0,
+  "production_strategy_replays": 0,
+  "sources": {
+    "feature_registry": "features_20261109T202318_8b01fe74",
+    "advanced_feature_books": "features_20261110T022741_e6f5661f",
+    "tuning": [
+      "holdout_20261109T202045_b0a51718",
+      "holdout_20261110T012820_d20ce131",
+      "holdout_20261110T013013_6f2fd4f9"
+    ],
+    "final": "final_20261110T025420_6d3405bd"
+  },
+  "verification": {
+    "full_suite": {
+      "passed": 203,
+      "seconds": 126.347,
+      "log": "/tmp/mlfactor_project_deploy_full_tests_final.log"
+    },
+    "real_data": {
+      "log": "/tmp/mlfactor_project_deployment_review.log",
+      "checks": [
+        "All feature summary frames, fit audits, correlations and calibration exact",
+        "112 registry curve views (14 strategies x 4 models x growth/log) exact",
+        "Advanced feature metrics/monthly/curves exact, with explicit original full-basket reference",
+        "All tuning frames and model-specific trial scores exact",
+        "Final frames and all three precomputed windows exact",
+        "Preceding three-tab publication frame checksums unchanged"
+      ]
+    },
+    "standalone": {
+      "checks": [
+        "Code plus publication only, no source/results CSVs or research catalog/archive",
+        "Failing read_csv, store-construction, K-means, selector/predictor fitting, runner replay guards",
+        "Four feature models, eight tuning model/target selections, all final windows and old archived comparisons",
+        "Final window_books blocked to prove deployed use of precomputed window tables"
+      ]
+    },
+    "browser": {
+      "log": "/tmp/mlfactor_project_deploy_browser.log",
+      "checks": [
+        "Physical pointer hover over Div_Yld bar shows Dividend yield/category/importance/SD/selection",
+        "Focus off reveals registry comparisons",
+        "Tuning focus coverage visible and toggles",
+        "Final official-test and 168-month entire-path views render with correct labels and boundary"
+      ]
+    }
+  },
+  "focus_assumption": {
+    "meaning": "Four main portfolio families, separate from four classifiers",
+    "scope": [
+      "Feature selection",
+      "Tuned model",
+      "Final test"
+    ],
+    "default": true,
+    "off": "Extra registry/horizon/model comparisons become available",
+    "advanced_tuning": "Not performed; focused tuning has equal-weight evidence only"
+  },
+  "code_sha256": {
+    "published_analysis.py": "002a4dc8b795ca310af2031773f63a3a08bafe7a95a6315ca8111f007aac1bf9",
+    "published_results.py": "5a5568b58091a53542891697dca1fbc80ecfb7b677db887f897342604bbd3bbb",
+    "publish_results.py": "edabaf14b845ef817e44d37a62c45ba08afe1719c3f6272c6ca2695ed341bd93",
+    "portfolio_focus.py": "8ab28223d959440ce1c62269ad4d4d5dbde09a9d275ba42058695142d6821dc2",
+    "app_mode.py": "33b33c54ccf1bc65c3376b47ac1280fe9d7d7d7bea0f365da2409d6cc9f18a1c",
+    "app.py": "359e8309878cc6621378d3b7480df61aac39b2a514e674e287b889f8b085e9bc",
+    "feature_study_ui.py": "d9e4dbb6d223932101790c234fb9e0e3edfc2ca937387761d5a9d92b4d6ba41c",
+    "basket_feature_ui.py": "646815c35dc0ebd5b09cb8afa1d5c2801c952f03c2af49b7ab78337722274408",
+    "tuning_ui.py": "51777228f98acb99429202962247d997d7295a09d3c8237cba5fbeaa9f2d6f5c",
+    "final_book_ui.py": "aaa153e96f7a3c29b1edc1ac9166021112c5ee0179033c85194e13131eb2a809",
+    "evaluation_ui.py": "abe4cad8334396e6b1307c342488e93aa3f3f6e9c19cc5fbae18e79b95c6878a",
+    "tests/test_published_analysis.py": "6f460fafcc672872af4a3e704688382fb9f40a28acc69d7667f37f13012e0d88",
+    "tests/test_tuning_ui.py": "fff2b40e920667dc251c73cfa3fa61de5f1d97947f02269e0a6645a7d50fa4f8",
+    "tests/test_final_books.py": "e824e2be377e20b098f5e8604e71759daba5bba52fd3af15e24ed505f3865236"
+  },
+  "screenshots_sha256": {
+    "features_meaning_hover_20261109.png": "b96cc3bdd9779cacb15664d4da4da20b19b32d993b47a2a914563ab1c5e2cd6d",
+    "tuning_deploy_focus_20261109.png": "868db4d4af11cfd1800743b6b646653a66b1112766fffc0130bb5c0a9113e423",
+    "final_deploy_test_20261109.png": "fbccd8e52921ed7c05a39d8e8b7d27933784dc12abed03915c1d4f43c6d568b7",
+    "final_deploy_entire_20261109.png": "d03eb871afa32d610e5cd3d169a5aff6b1e98b1e593cc6a927768f96ba3ff1e3"
+  },
+  "formal_release_sha256_unchanged": "3d73f0be9dbb7c8caf6b83bf84241049e5c6785800037449981a89dee78c7d62",
+  "prior_publication_manifest_sha256": {
+    "strategies": "8fb7de06ec8df9c336e10e735e36ff46a4e749e4a5c83ad3f8ac233f07701bd9",
+    "basic_ml": "f01e3763d7bdfdd789b1f24e2cb69a5330d05fcd0f52f0b71a7cbd06fead6fef",
+    "advanced_ml": "8d19a641093d57699a235ab390cc565d0a6b864762522fd27ff2d54469d951e9"
+  },
+  "limitations": [
+    "Hover descriptions are on feature bars, with a caption explaining how to access them",
+    "Detailed feature-ranking audit is downside; advanced upside recipes are independently fitted",
+    "K-means/groups/volatility/momentum rules are held fixed by feature comparisons",
+    "No tuned advanced-family study exists",
+    "Final saved study uses factory settings and ANOVA-10, not tuned holdout winners",
+    "Joined path uses expanding all-20 training and frozen ANOVA-10 test models, labeled separately",
+    "No actual online deployment, cloud resource profiling, or formal Quarto/notebook/slides/release rebuild"
+  ],
+  "next_step": "Review focused views, profile cloud resource use and curate GitHub deployment files; formal submission evidence integration remains separate."
+}

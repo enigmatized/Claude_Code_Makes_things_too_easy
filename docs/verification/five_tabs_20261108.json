@@ -1,0 +1,36 @@
+{
+  "update": "Five progressive tabs using existing calculation and presentation components",
+  "tabs": [
+    "Strategies",
+    "Basic ML",
+    "Advanced ML strategy",
+    "Feature selection",
+    "Final test"
+  ],
+  "training_run_reviewed": "20261108T234216_191b0784406b",
+  "baseline_cases_exact": 14,
+  "basic_ml_cases_exact": 70,
+  "first_tab_has_no_prediction_controls_or_adjusted_cases": true,
+  "advanced_strategy_placeholder_only": true,
+  "multiple_feature_strategies_verified": 2,
+  "unavailable_cash_feature_comparison_labeled": true,
+  "historical_test_is_opt_in_and_does_not_change_training": true,
+  "final_result_requires_pinned_ready_frozen_test": true,
+  "real_app_review_with_computation_blocked": true,
+  "no_new_research_experiments": true,
+  "preserved_calculation_data_catalog_archive_report_files": 203,
+  "existing_runs_still_exact_cache_matches": 5,
+  "live_app_health": "ok",
+  "tests": {
+    "research_app_suite": 121,
+    "final_stage_ui_checks": 7
+  },
+  "browser_review": "Five stages inspected in a real headless browser; no compute actions clicked.",
+  "screenshots": [
+    "five_tabs_strategies.png",
+    "five_tabs_basic_ml.png",
+    "five_tabs_advanced_placeholder.png",
+    "five_tabs_feature_selection.png",
+    "five_tabs_final_test.png"
+  ]
+}

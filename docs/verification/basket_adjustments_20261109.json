@@ -1,0 +1,73 @@
+{
+  "date": "2026-11-09",
+  "study_id": "baskets_20261109T225254_b6a479dd",
+  "study_sha256": "0ed97bccce5393b6ca6d5631c418278d3d78437bc6fc7ce15d38901cd5ee1338",
+  "basket_source": {
+    "directory": "artifacts/basket_studies/baskets_20261109T223026_c7be47ff",
+    "study_sha256": "c27d003f1684d17cfc827e76af67e200531bcff45cbd65a60139207986066bf3"
+  },
+  "forecast_sources": {
+    "loss": {
+      "run_id": "20261109T185402_0722a7ec725c",
+      "artifact_sha256": "ecad8fcb8c06273e331b0923d4e5392ae2ccd7212ae03579f4bf854fd5211098"
+    },
+    "upside": {
+      "run_id": "20261109T185621_fe4017faa327",
+      "artifact_sha256": "fc6d9793311e0eb004e73f74bcdcfc525ec951c88df5e28af28ad58720ec9a14"
+    }
+  },
+  "new_prediction_fits": 0,
+  "model_keys": [
+    "logistic",
+    "naive_bayes",
+    "random_forest",
+    "hist_gradient_boosting"
+  ],
+  "feature_selection": "none",
+  "features": 20,
+  "tuning": "none; separate frozen ANOVA-10 holdout unchanged",
+  "first_return_month": "2005-01-31",
+  "last_return_month": "2009-12-31",
+  "test_csv_loaded": false,
+  "strength": 0.5,
+  "upside_threshold": 0.6,
+  "versions": [
+    "Equal weight",
+    "Momentum + cash",
+    "Basket momentum + cash",
+    "Top 10 positive-vol baskets",
+    "Top 10 + downside to cash",
+    "Top 10 + upside tilt"
+  ],
+  "portfolio_rows": 25,
+  "saved_bytes": 3809378,
+  "original_parity": "All four baseline frames, original columns, exact saved values; all 16 adjusted books share original dates; growth and cash identities verified.",
+  "tests": {
+    "full_suite_before_final_provenance_test": {
+      "passed": 171,
+      "seconds": 65.941,
+      "log": "/tmp/mlfactor_basket_overlay_full_tests.log"
+    },
+    "final_focused": {
+      "passed": 4,
+      "seconds": 2.411,
+      "log": "/tmp/mlfactor_basket_adjustment_tests.log"
+    }
+  },
+  "artifact_only_review": {
+    "log": "/tmp/mlfactor_basket_adjustments_review.log",
+    "status": "passed all four actual table selections, both momentum windows, allocation audits, archived basket compatibility and tuning explanation with fitting/replay blocked"
+  },
+  "browser_review": {
+    "log": "/tmp/mlfactor_basket_browser.log",
+    "status": "passed; screenshots visually inspected",
+    "screenshots": [
+      "basket_directional_controls_app.png",
+      "basket_directional_curves_app.png",
+      "tuning_explanation_app.png"
+    ]
+  },
+  "release_sha256_unchanged": "3d73f0be9dbb7c8caf6b83bf84241049e5c6785800037449981a89dee78c7d62",
+  "publication_status": "Shared read-only loader available; no notebook/QMD/report repinning or rerendering in this change.",
+  "next": "Review training comparisons, declare selected-feature/tuned hybrid experiment if desired, then frozen final test and final release."
+}

@@ -1,0 +1,32 @@
+{
+  "update": "Basic ML upside target and pooled/per-stock comparison",
+  "research_app_tests_passed": 138,
+  "runs": [
+    "20261109T185402_0722a7ec725c",
+    "20261109T185517_1bf238ea2712",
+    "20261109T185621_fe4017faa327",
+    "20261109T185736_3b19b90c1122"
+  ],
+  "old_pooled_prediction_tables_exact": 4,
+  "old_matching_setting_portfolio_books_exact": 70,
+  "source_csv_test_read_during_experiments": false,
+  "prediction_rows_per_model": 71631,
+  "same_originals_across_all_four_cells": true,
+  "all_four_saved_app_views_reviewed_with_computation_disabled": true,
+  "cash_and_zero_weight_exclusions_preserved": true,
+  "first_tab_source_unchanged_when_switching_basic_ml": true,
+  "legacy_feature_and_momentum_studies_still_readable": true,
+  "preserved_historical_data_and_artifact_files": 1570,
+  "new_exact_cache_matches": 4,
+  "artifact_bytes": 98932537,
+  "live_app_health": "ok",
+  "browser_review": [
+    "pooled upside diagnostics",
+    "per-stock upside diagnostics",
+    "matched predictive and portfolio scope comparison"
+  ],
+  "historical_parity_references": [
+    "20261108T234216_191b0784406b",
+    "20261108T211720_6c1ba3996026"
+  ]
+}

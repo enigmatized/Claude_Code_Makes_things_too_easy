@@ -1,0 +1,143 @@
+{
+  "task": "Basic ML collapsible panels and self-contained deployment",
+  "verified_utc": "2026-11-10T03:44:02.348847+00:00",
+  "published_tabs": [
+    "Strategies",
+    "Basic ML"
+  ],
+  "pending_deployed_tabs": [
+    "Advanced ML strategy",
+    "Feature selection",
+    "Tuned model",
+    "Final test"
+  ],
+  "panels": {
+    "default_expanded": false,
+    "sibling_labels": [
+      "1. Does the model predict downside? / 1. Does the model predict an up move?",
+      "2. What changes in the portfolios?",
+      "Change from each original portfolio"
+    ],
+    "nested_expanders": false,
+    "grouping": "Bordered containers inside panels; optional settings/details checkboxes"
+  },
+  "publication": {
+    "publication_bytes": 56589983,
+    "manifest_sha256": "f01e3763d7bdfdd789b1f24e2cb69a5330d05fcd0f52f0b71a7cbd06fead6fef",
+    "runs": [
+      {
+        "run_id": "20261109T185402_0722a7ec725c",
+        "target": "loss",
+        "scope": "pooled",
+        "models": [
+          "logistic",
+          "naive_bayes",
+          "random_forest",
+          "hist_gradient_boosting"
+        ],
+        "cases": 70,
+        "monthly_rows": 4200,
+        "source_artifact_sha256": "ecad8fcb8c06273e331b0923d4e5392ae2ccd7212ae03579f4bf854fd5211098"
+      },
+      {
+        "run_id": "20261109T185621_fe4017faa327",
+        "target": "upside",
+        "scope": "pooled",
+        "models": [
+          "logistic",
+          "naive_bayes",
+          "random_forest",
+          "hist_gradient_boosting"
+        ],
+        "cases": 70,
+        "monthly_rows": 4200,
+        "source_artifact_sha256": "fc6d9793311e0eb004e73f74bcdcfc525ec951c88df5e28af28ad58720ec9a14"
+      },
+      {
+        "run_id": "20261109T185517_1bf238ea2712",
+        "target": "loss",
+        "scope": "per_stock",
+        "models": [
+          "logistic"
+        ],
+        "cases": 28,
+        "monthly_rows": 1680,
+        "source_artifact_sha256": "90527d62e7ae082a07ea8340b63690918c643c7d3e1c57c0bf1a4d4361da7041"
+      },
+      {
+        "run_id": "20261109T185736_3b19b90c1122",
+        "target": "upside",
+        "scope": "per_stock",
+        "models": [
+          "logistic"
+        ],
+        "cases": 28,
+        "monthly_rows": 1680,
+        "source_artifact_sha256": "87484b316115c43385fea1f52dff5b324d69ec0f34db486c5cdbed4dcf1e9d28"
+      }
+    ],
+    "portfolio_cases": 196,
+    "monthly_rows": 11760,
+    "standalone_no_csv_no_archive": true,
+    "first_tab_parity": true,
+    "exact_score_curve_weight_scope_parity": true
+  },
+  "file_count_checksums_verified": 212,
+  "new_research_fits": 0,
+  "portfolio_replays": 0,
+  "verification": {
+    "full_suite": {
+      "passed": 193,
+      "seconds": 105.998,
+      "log": "/tmp/mlfactor_basic_deploy_full_tests_final.log"
+    },
+    "real_data_and_standalone": {
+      "log": "/tmp/mlfactor_basic_deployment_review.log",
+      "checks": [
+        "Exact metric/monthly/case/change frames from four saved sources",
+        "Exact all-model Plotly JSON for growth/log/cumulative-log and original-relative curves",
+        "Exact scores, controls, calibration, fit audits and local/fallback counts",
+        "All strategy/model allocation matrices exact",
+        "Pooled/local matched comparison tables and source IDs exact",
+        "First-tab case/metric/monthly frames unchanged",
+        "Fresh standalone deploy_app.py with code and publication only, no CSV or research artifacts/catalog",
+        "All four target/scope combinations, lazy fit audit and cash allocations under failing raw-read/store/fitting/replay guards"
+      ]
+    },
+    "browser": {
+      "log": "/tmp/mlfactor_basic_deploy_browser.log",
+      "checks": [
+        "Three sibling panels closed by default",
+        "Real open/close interaction displays probability scores, fourteen portfolio tables and six change grids",
+        "No nested-expander exception",
+        "Upside/downside labels and pooled/per-stock controls switch saved views without errors"
+      ]
+    }
+  },
+  "code_sha256": {
+    "app.py": "84927783778c177719e87429749c10758ea55ec103e0f529ed21ea20ff799163",
+    "published_results.py": "5e39d27c7852d3dad2d637ae00552488000bdf15d05ff755bd3ccf05ea140265",
+    "publish_results.py": "5dcf82b38bb942c73ac639a46353291c4b31026f067716e275022d39edfd0322",
+    "basic_ml_ui.py": "14ea4549121b45dd7e7c69366d7c2d5066350f345156038eaa583cea5b08a9d8",
+    "strategy_results_ui.py": "80271511619d5a80990cf07db839cf80c65e3f73c19c1df53d6790d08fa71552",
+    "app_mode.py": "ec7c1f5fe0253ae2eb87294d20fff15b1a925d5f00beedd1ffeb06babd9b4432",
+    "tests/test_published_basic_ml.py": "2348aa2f0a4c0af7b4a3d57f93f2e812b9ad5922f657b20561839ef87edad717"
+  },
+  "screenshot_sha256": {
+    "basic_ml_deploy_collapsed_20261109.png": "0f7720e9929abb770701097cb9c3792ae7e953f87d76a359ab9f570d804c3036",
+    "basic_ml_deploy_prediction_20261109.png": "b619b1f3c7aba82d29d0c3519b13cd1a3f9b3c93a448415763eb06c63548e4b9",
+    "basic_ml_deploy_portfolios_20261109.png": "7e9351b0f70b50c3ac88f8e69d04c0b0eb48a62cab0f21fd82098f4ebbe50128",
+    "basic_ml_deploy_changes_20261109.png": "89fb5a6f35df5bafbca207a036e8c56d5a6b6f0481c896c67ee32bcb1c4cf418",
+    "basic_ml_deploy_upside_20261109.png": "316424c369bd5ab02d91670f370769f09f7f6e11645272789639e8428b3ec2f0"
+  },
+  "formal_release_sha256_unchanged": "3d73f0be9dbb7c8caf6b83bf84241049e5c6785800037449981a89dee78c7d62",
+  "original_strategies_publication_sha256_unchanged": "8fb7de06ec8df9c336e10e735e36ff46a4e749e4a5c83ad3f8ac233f07701bd9",
+  "limitations": [
+    "Four pooled models but only logistic is available per stock, matching actual saved coverage",
+    "Full stock-month probabilities/signals and report ZIP remain local research features",
+    "Model-specific momentum-lookback comparison remains local; original-only study is in published Strategies",
+    "Remaining four deployed tabs are pending",
+    "No online hosting/resource profiling or formal submission rebuild performed"
+  ],
+  "next_step": "Publish the selected Advanced ML basket study through the same checked manifest, preserving its separate source protocol and existing shared renderers."
+}

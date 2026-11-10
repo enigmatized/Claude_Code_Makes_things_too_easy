@@ -1,0 +1,8 @@
+# Full Python research/app/report environment, tested in this course workspace.
+# Install the Quarto CLI separately (tested: 1.10.18).
+-r requirements-app.txt
+matplotlib==3.8.4
+nbformat==5.9.2
+nbclient==0.8.0
+nbconvert==7.10.0
+ipykernel==6.28.0

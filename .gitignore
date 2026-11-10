@@ -1,0 +1,71 @@
+# Local datasets and CSV research reports. The hosted app reads published Parquet.
+*.csv
+*.csv.*
+
+# Full experiment catalog, fitted objects and generated research outputs.
+/artifacts/
+outputs/
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+*.joblib
+*.pkl
+*.pickle
+
+# Publish only the current self-contained six-tab release and its guide.
+# Keep Parquet files inside project/: they are required by deploy_app.py.
+/published/*
+!/published/README.md
+!/published/project/
+
+# Generated Quarto/Jupyter files; retain .qmd and .ipynb source documents.
+.quarto/
+.jupyter_cache/
+.ipynb_checkpoints/
+*_cache/
+*_files/
+/submission/_output/
+/submission/archives/
+/submission/build_status.json
+
+# Python bytecode, local environments, package builds and test caches.
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+/build/
+/dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Local credentials. Theme configuration and example environment files are kept.
+.env
+.env.*
+!.env.example
+!.env.sample
+.streamlit/secrets.toml
+.streamlit/secrets.*.toml
+!.streamlit/secrets.example.toml
+
+# Editor, operating-system and temporary files.
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+*.swo
+*.tmp
+*~

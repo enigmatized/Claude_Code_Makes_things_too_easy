@@ -1,0 +1,20 @@
+{
+  "update": "Feature selection split into selected inputs/method and retrained ML effects",
+  "feature_and_app_tests_passed": 22,
+  "subtabs": [
+    "Selected features & method",
+    "Effect on ML models"
+  ],
+  "real_study": "features_20261108T153403_ddfe05c8",
+  "selected_name_checks": 4,
+  "selection_visible_without_supported_portfolios": true,
+  "predictive_scores_independent_of_portfolio_selection": true,
+  "saved_run_and_refit_provenance_checked": 3,
+  "recorded_portfolio_metrics_unchanged": true,
+  "no_model_or_selector_fitting_during_review": true,
+  "no_new_research_runs": true,
+  "preserved_data_artifact_catalog_calculation_files": 2099,
+  "current_exact_cache_matches": 4,
+  "live_app_health": "ok",
+  "browser_subtabs_reviewed": true
+}

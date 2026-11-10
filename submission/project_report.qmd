@@ -1,0 +1,224 @@
+---
+title: "MLFactor: Long-only strategy research"
+subtitle: "Training feature study complete — final choice and evaluation pending"
+jupyter: python3
+format: html
+---
+
+```{python}
+#| include: false
+from pathlib import Path
+import sys
+root = Path.cwd().parent
+sys.path.insert(0, str(root))
+from IPython.display import display
+from research.reporting import load_release, predictive_table, portfolio_table, portfolio_figure, readiness, benchmark_table
+import matplotlib.pyplot as plt
+import pandas as pd
+summary = load_release()
+```
+
+## Decision so far
+
+The fixed-model comparison does not support adopting an ML adjustment yet.
+All four classifiers have weak loss-probability performance, and none improves
+on the historical loss-frequency control on Brier score or log loss. Portfolio
+effects vary by the underlying trading rule.
+
+This is a reproducible research draft, not the final submission conclusion.
+A final feature choice, hyperparameter tuning, a final strategy choice and
+the official frozen-training test comparison remain to be completed.
+
+## Comparison design
+
+The experiment compares thirteen original portfolios and fifty-two adjusted
+versions over the same January 2005–December 2009 earned-return window. Initial
+history comes from the first sixty training snapshots. Each classifier uses the
+same twenty original factors and the same annual expanding fit dates. The
+non-ML portfolio rules and probability-to-weight adjustment are held fixed.
+
+These are training-period validation results. The previously viewed test period
+is not a fresh holdout. The final test model fits will use the separate
+frozen-at-origin policy, rather than learning from earlier test labels.
+
+## Predictive quality
+
+Lower Brier score and log loss indicate better probability estimates. ROC AUC
+measures ranking and is not, by itself, evidence of useful portfolio returns.
+
+```{python}
+#| label: tbl-predictors
+#| tbl-cap: "Fixed classifiers against a historical loss-frequency control."
+display(predictive_table(summary).style.format({"Brier score": "{:.6f}", "Log loss": "{:.6f}", "ROC AUC": "{:.4f}"}))
+```
+
+## Portfolio outcomes
+
+The following portfolios illustrate the effect of applying each model to the
+same trading rule. The complete saved result contains all 65 portfolio cases.
+Returns are gross of transaction costs; every portfolio is long-only and fully
+invested. The model changes relative stock weights, not total market exposure.
+
+```{python}
+#| label: tbl-cagr
+#| tbl-cap: "Matched-window CAGR by model and portfolio rule."
+display(portfolio_table(summary).style.format("{:.2%}"))
+```
+
+```{python}
+#| label: fig-portfolios
+#| fig-cap: "Growth of an initial dollar and drawdown for original and model-adjusted portfolios."
+figure = portfolio_figure(summary)
+display(figure)
+plt.close(figure)
+```
+
+## Equal-weight accounting reference
+
+This independent reference covers the full supplied train and test return
+windows, unlike the shorter model-validation comparison above. Each month's
+portfolio return is the arithmetic average of stock simple returns. These
+portfolio returns are then compounded through time. Averaging stock log returns
+would produce a different, incorrect equal-capital portfolio calculation.
+
+```{python}
+#| label: tbl-equal-weight
+#| tbl-cap: "Full-window equal-weight accounting reference from Part 0."
+display(benchmark_table().style.format({"Months": "{:.0f}", "CAGR": "{:.2%}", "Volatility": "{:.2%}", "Sharpe": "{:.3f}", "Max drawdown": "{:.2%}"}))
+```
+
+## Feature selection: four matched recipes
+
+This is a separately pinned training study, with all fourteen current portfolio
+rules, four fixed pooled downside classifiers, annual expanding fits and the
+same January 2005–December 2009 earned months. The cash-capable annual-consistency
+rule uses three-month momentum. All recipes use adjustment strength 0.50. This
+study has 280 portfolio cases across four runs; the earlier thirteen-rule
+comparison above remains its own recorded experiment.
+
+```{python}
+#| label: feature-study-protocol
+from IPython.display import Markdown
+from research.feature_reporting import (
+    method_notes, importance_table, importance_figure, selection_overlap,
+    prediction_summary, portfolio_table as feature_portfolio_table,
+    portfolio_figure as feature_portfolio_figure, forest_findings,
+)
+feature_study = summary.get("feature_study")
+if feature_study is None:
+    display(Markdown("No feature study is pinned in this release."))
+else:
+    display(Markdown(method_notes()))
+    display(pd.DataFrame([{"Recipe": key, "Saved run": value}
+                         for key, value in feature_study["metadata"]["runs"].items()]))
+```
+
+### Forest importance and selected inputs
+
+The chart uses the first historical training fit, before the displayed
+validation returns were earned. The selector forest and downstream predictor
+have separate jobs. Bar lengths measure training split importance; error bars
+show standard deviation across trees, not confidence intervals. Correlated
+factors can share importance. Financial interpretations of the supplied factors
+remain available in the data dictionary and the app.
+
+```{python}
+#| label: fig-forest-importance
+#| fig-cap: "Forest selection from twenty candidates at the first historical origin; highlighted factors are retained."
+if feature_study is not None:
+    figure = importance_figure(feature_study)
+    display(figure)
+    plt.close(figure)
+```
+
+```{python}
+#| label: tbl-forest-selected
+#| tbl-cap: "Actual selected factors and overlap between selection methods at the first fit."
+if feature_study is not None:
+    selected = importance_table(feature_study)
+    display(selected.loc[selected.selected, ["feature", "group", "meaning", "rank", "score", "importance_std"]].round(6))
+    display(selection_overlap(feature_study))
+```
+
+### Effects after retraining
+
+Every classifier was independently refitted for each recipe at every origin.
+Selection and scaling see only then-known outcomes. Non-ML rules remain
+identical across recipes. Lower Brier score and log loss are better; selected
+recipes should also be compared against the historical event-frequency control.
+
+```{python}
+#| label: tbl-feature-prediction
+#| tbl-cap: "Four fixed predictors across all twenty, ANOVA, pruning and forest-selected recipes."
+if feature_study is not None:
+    display(Markdown(forest_findings(feature_study)))
+    display(prediction_summary(feature_study)[[
+        "model_id", "recipe", "brier_score", "log_loss", "roc_auc",
+        "Brier change vs all 20", "Log-loss change vs all 20",
+    ]].round(6))
+```
+
+The following portfolio example uses the same logistic predictor and
+annual-consistency/momentum/cash trading rule for all four recipes. Cash earns
+an assumed zero return; results are gross of costs. A favorable portfolio row
+does not establish useful forecasting. The app and exported tables cover all
+fourteen rules and all four predictors.
+
+```{python}
+#| label: tbl-feature-portfolios
+#| tbl-cap: "Matched feature recipes: logistic overlay on the three-month momentum/cash rule."
+if feature_study is not None:
+    display(feature_portfolio_table(feature_study, "logistic", ["annual_consistency_momentum_cash"])[[
+        "recipe", "cagr", "annualized_log_growth", "sharpe", "sortino", "max_drawdown",
+        "avg_one_way_turnover", "avg_cash_weight", "change_cagr_vs_all20",
+    ]].round(6))
+```
+
+```{python}
+#| label: fig-feature-log-returns
+#| fig-cap: "Saved cumulative portfolio log returns and drawdowns; unchanged non-ML reference shown once."
+if feature_study is not None:
+    figure = feature_portfolio_figure(feature_study, cumulative_log=True)
+    display(figure)
+    plt.close(figure)
+```
+
+### Separate tuning evidence and pending final evaluation
+
+Annual selected-feature unions may exceed ten; each fitted selected model uses
+at most ten. A frozen final model must choose its inputs once before evaluation.
+This feature study uses fixed model settings. A separate saved tuning holdout
+comparison is available in the app for logistic regression and histogram
+boosting; it uses a different January 2007–December 2009 window and is not part
+of this pinned feature comparison. A forest-selected tuned comparison, final
+specification and official frozen-training test result remain pending.
+
+## Data and reproducibility
+
+A row describes one stock at a month-end snapshot. Its forward return belongs
+to the following month. Source data, derived input timing, parameters, runtime
+versions and result identities are recorded in the pinned artifact's manifest.
+Rendering this document loads saved results; it does not train models or run a
+parameter search.
+
+```{python}
+display(pd.DataFrame([{"Property": name, "Value": str(value)} for name, value in {
+    "Pinned run": summary["run_id"],
+    "Source splits": summary["data_audit"]["source_splits"],
+    "First earned month": summary["data_audit"]["first_return_month"],
+    "Last earned month": summary["data_audit"]["last_return_month"],
+    "Evaluation rows": summary["data_audit"]["evaluation_rows"],
+    "Model training policy": summary["manifest"]["config"].get("fit_policy", "expanding"),
+}.items()]))
+```
+
+## Completion status
+
+The following checks describe the current artifact, not an assertion that every
+assignment requirement is complete. The final narrative and presentation will
+be revised after the remaining research.
+
+```{python}
+display(pd.DataFrame([{"Requirement": key, "Recorded": "Yes" if value else "Pending"}
+                      for key, value in readiness(summary).items()]))
+```

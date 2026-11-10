@@ -1,0 +1,34 @@
+{
+  "update": "Explicit evaluation periods and historical test viewer",
+  "registered_training_validation_runs": 10,
+  "registered_test_runs": 0,
+  "archived_test_strategies": 13,
+  "archived_test_first_month": "2010-01-31",
+  "archived_test_last_month": "2018-12-31",
+  "real_saved_app_verified_without_computation": true,
+  "pending_setting_does_not_relabel_loaded_result": true,
+  "independent_studies_keep_training_labels": true,
+  "no_new_research_test_backtest": true,
+  "preserved_files": 189,
+  "live_app_health": "ok",
+  "archived_file_sha256": {
+    "0_1_Basic_Strategies/outputs/downside/strategy_comparison.csv": "6554a74478991435279201bf9ce977ac60056edadca86da2fe5a9d5a7ff1d0f9",
+    "0_1_Basic_Strategies/outputs/monthly_strategy_returns.csv": "df796d5a91645cc8b72ad24bd357b7e17e665d89230a328b261b3942ba031772",
+    "0_1_Basic_Strategies/outputs/hybrid/hybrid_monthly_returns.csv": "5ac3a8e0abb1363022df7403849072eea4539e5f30959325053e1451955bc140",
+    "0_1_Basic_Strategies/outputs/downside/new_strategy_monthly_returns.csv": "7c57d2826e140dad718df8e53cc692881e3e96c24591ae885ba752f27784c0ee",
+    "0_1_Basic_Strategies/outputs/downside/run_manifest.json": "8edb4b27c439951244359d744b36c647fe0ca7b383c5c29bd08c8455adff5980",
+    "0_2_Strategy_Runner/outputs/ratio_pools_test_comparison/strategy_comparison.csv": "3eaeaa5bc277b6d3e6ca1ba6a5f8c8f2abe0dd45c2f5d8bba566b7c6f69b293d",
+    "0_2_Strategy_Runner/outputs/ratio_pools_test_comparison/monthly_returns.csv": "145f88da49d6994660e5ed14d0e2b8a6797731e27c64a844d685f4609a660bb8",
+    "0_2_Strategy_Runner/outputs/ratio_pools_test_comparison/manifest.json": "f0f75aa1823a28f9d3e8b3d27d24bf2225bd5731cce5dd6eed0c001149337017"
+  },
+  "tests": {
+    "distinct_total": 168,
+    "foundation": 15,
+    "original_strategies": 43,
+    "research_app": 110,
+    "final_focused_checks": 6
+  },
+  "existing_momentum_runs_still_exact_cache_matches": 4,
+  "existing_feature_and_momentum_studies_load": true,
+  "archived_test_portfolio_months": 1404
+}
