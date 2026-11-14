@@ -10,6 +10,9 @@ from research.basket_adjustments import (
     DOWNSIDE_VERSION, UPSIDE_VERSION,
 )
 from research.models import default_model_registry
+from acceleration_ui import render_acceleration
+from portfolio_selection import grouped_cases
+from portfolio_selection_ui import select_portfolio_case
 from research.basket_reporting import (normalize_study, require_basket_training, detail_frames, grouping_profiles,
                                        selected_vol_ranks)
 
@@ -59,6 +62,7 @@ def render_basket_strategy(store=None, published=None):
     st.header("Grouping With ML")
     st.write("Compare two ways of grouping stocks, apply the same investment rules, then add separate up/down predictions.")
     st.info("**Training data only.** These saved training-validation results use no test-period data. Test results belong in Final test.")
+    st.caption('Looking for the deceleration experiment? Open the fourth subtab, Momentum acceleration, below.')
     st.caption("These grouping studies keep their original model inputs and evaluation period. Feature engineering separately "
                "trains and tunes new input recipes on both K-means/Ward starting portfolios, with its own Final test section.")
     available = {}
@@ -66,7 +70,13 @@ def render_basket_strategy(store=None, published=None):
     if published is None and not studies:
         st.info("No grouped-strategy study is saved yet. Run python3 run_basket_momentum.py explicitly in research mode.")
         return
-    kmeans, ward, predictions = st.tabs(["K-means", "Hierarchical clustering", "Adding a direction"])
+    kmeans, ward, predictions, acceleration = st.tabs(["K-means", "Hierarchical clustering", "Adding a direction", "Momentum acceleration"])
+    with acceleration:
+        reader = published.publication.analysis_section("acceleration") if published is not None else None
+        if published is not None and reader is None:
+            st.info("The acceleration experiment has not been published in this release.")
+        else:
+            render_acceleration(store, published=reader)
     for method, tab in (("kmeans", kmeans), ("ward", ward)):
         with tab:
             reader = published.for_method(method) if published is not None else None
@@ -85,9 +95,14 @@ def render_basket_strategy(store=None, published=None):
         if not available:
             st.info("No saved grouped strategy is available yet.")
             return
-        options = {METHOD_NAMES[key]: key for key in available}
-        method = options[_select("Grouping method for directional adjustments", list(options), "basket_direction_grouping")]
-        _render_prediction_adjustments(available[method])
+        cases=pd.concat([grouped_cases(saved['metrics'],method).assign(method=method)
+                         for method,saved in available.items()],ignore_index=True)
+        cases=cases.loc[cases.model_key.ne('none')]
+        choice=select_portfolio_case(cases,'basket_selection',keys={'model':'basket_prediction_model'},
+                                    preferred_basket='K-means top 10 positive-vol per group')
+        if not choice.empty:
+            row=choice.iloc[0]
+            _render_prediction_adjustments(available[row.method],choice=row)
         if len(available) == 2:
             with st.expander("Compare grouping methods under the same trading rules"):
                 st.caption("Original portfolios only; identical earned months, momentum windows and cash rules. Group numbers are unrelated across methods.")
@@ -227,7 +242,7 @@ def _render_grouped_strategy(study, prefix="basket"):
         _baskets({**base, **details}, selected, key_prefix=f"{prefix}_base")
 
 
-def _render_prediction_adjustments(study):
+def _render_prediction_adjustments(study, choice=None):
     meta = study["metadata"]
     st.markdown("### Add the simple up/down models to the same starting portfolio")
     if not meta.get("directional_adjustment"):
@@ -235,17 +250,14 @@ def _render_prediction_adjustments(study):
         return
     registry = default_model_registry()
     options = {registry[key].label: key for key in registry if key in meta["model_keys"]}
-    model_label = _select("Prediction model for basket adjustments", list(options), "basket_prediction_model")
-    model = options[model_label]
-    books = {"Top 10 positive-vol stocks per group": (TOP_VOL_VERSION, *ADJUSTED_VERSIONS),
-             "Full correlation groups": (FULL_GROUP, *BASKET_ADJUSTED_VERSIONS)}
-    books = {label: versions for label, versions in books.items() if any(
-        study["metrics"].version.isin(versions[1:]))}
-    versions = books[_select("Starting grouped portfolio", list(books), "basket_overlay_book")]
-    available = study["metrics"].loc[lambda f: f.version.isin(versions[1:]) & f.model_key.eq(model)]
-    horizons = sorted(int(value) for value in available.momentum_months.unique())
-    names = {f"{month}-month momentum": month for month in horizons}
-    selected = names[_select("Momentum window", list(names), "basket_horizon")]
+    model = choice.model_key
+    model_label = registry[model].label
+    top = choice.version in ADJUSTED_VERSIONS
+    original = TOP_VOL_VERSION if top else FULL_GROUP
+    versions = (original, choice.version)
+    selected = int(choice.momentum_months)
+    st.caption('Allocation rule and momentum horizon are part of the saved case above. '
+               'Only the selected next-up or next-down adjustment is compared with its original.')
     strength, threshold = meta["adjustment_strength"], meta["upside_threshold"]
     st.markdown(f"**Downside to cash:** original momentum weight × (1 − {strength:g} × P(next return < 0)). "
                 "The reduction stays in cash.\n\n"
@@ -260,6 +272,9 @@ def _render_prediction_adjustments(study):
     st.caption("The grouping choice changes the starting portfolio. Both grouping methods reuse the same saved directional forecasts, "
                "so full-universe prediction scores are identical; portfolio results can differ.")
     scores = study["predictive"].loc[study["predictive"].model_key.eq(model)]
+    target_column = next((column for column in ('prediction_target','target') if column in scores),None)
+    if target_column is not None:
+        scores=scores.loc[scores[target_column].eq(choice.target)]
     with st.expander("Does the directional model predict usefully?", expanded=False):
         st.caption("Scores cover the full training-validation forecast universe, not just grouped or screened stocks. "
                    "Lower Brier/log loss is better; higher ROC AUC ranks events better. Each direction includes its historical-frequency control.")

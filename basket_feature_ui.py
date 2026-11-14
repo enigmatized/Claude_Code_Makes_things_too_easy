@@ -9,6 +9,8 @@ from research.basket_adjustments import (
 from research.basket_features import list_feature_book_scores, load_feature_book_scores
 from research.basket_momentum import TOP_VOL_VERSION
 from research.models import default_model_registry
+from portfolio_selection import grouped_cases
+from portfolio_selection_ui import select_portfolio_case
 
 
 FOCUS = (
@@ -61,22 +63,27 @@ def render_four_book_features(store=None, published=None, main_only=False):
         "Browsing does not fit a model. The 2010–2018 test file was not read.")
     registry = default_model_registry()
     model_labels = {registry[key].label: key for key in registry if key in set(study["metrics"].model_key)}
-    model_key = model_labels[st.selectbox("Prediction model for the four books", list(model_labels), key="feature_books_model")]
-    if main_only:
-        st.session_state['feature_books_show_all'] = False
-    show_all = st.checkbox("Show every model and horizon", key="feature_books_show_all", disabled=main_only)
-    table = _table(study["metrics"], meta, model_key, show_all)
+    choices=grouped_cases(study['metrics'])
+    choice=select_portfolio_case(choices.loc[choices.model_key.ne('none')], 'feature_books_selection',
+        keys={'model':'feature_books_model'},preferred_basket='K-means top 10 positive-vol per group')
+    if choice.empty:
+        return True
+    selected=choice.iloc[0]
+    model_key=selected.model_key
+    original=TOP_VOL_VERSION if selected.version in {DOWNSIDE_VERSION,UPSIDE_VERSION} else 'Basket momentum + cash'
+    show_all=st.checkbox('Compare more saved books and horizons',key='feature_books_show_all')
+    chosen_metrics=study['metrics']
+    if not show_all:
+        chosen_metrics=chosen_metrics.loc[chosen_metrics.version.isin([original,selected.version])
+            & chosen_metrics.momentum_months.eq(selected.momentum_months)
+            & chosen_metrics.model_key.isin(['none',model_key])]
+    table = _table(chosen_metrics, meta, model_key, True)
     formats = {column: "{:.3f}" if column == "Sharpe" else "{:+.2%}" if column.startswith("CAGR vs") else "{:.2%}"
                for column in table.columns if column not in {"Book", "Feature recipe", "Model", "Momentum"}}
     st.dataframe(table.style.format(formats), use_container_width=True, hide_index=True)
-    chart_books = {
-        "Top 10 + downside to cash": DOWNSIDE_VERSION,
-        "Top 10 + upside tilt": UPSIDE_VERSION,
-        "Baskets + downside to cash": BASKET_DOWNSIDE_VERSION,
-        "Baskets + upside tilt": BASKET_UPSIDE_VERSION,
-    }
-    chart_version = chart_books[st.selectbox("Overlay curve", list(chart_books), key="feature_books_curve")]
-    st.plotly_chart(_figure(study, chart_version, model_key, labels), use_container_width=True, key="feature_books_chart")
+    chart_version=selected.version
+    chart_study={**study,'monthly':study['monthly'].loc[study['monthly'].momentum_months.isin([0,int(selected.momentum_months)])].copy()}
+    st.plotly_chart(_figure(chart_study, chart_version, model_key, labels, months=int(selected.momentum_months)), use_container_width=True, key="feature_books_chart")
     st.caption("Turn off the focus filter to inspect additional basic strategies and every saved model/horizon." if main_only
                else "The fourteen registry rules stay below. They are a different set of books from these four.")
     return True
@@ -128,12 +135,12 @@ def _table(metrics, meta, model_key, show_all):
     return show
 
 
-def _figure(study, version, model_key, labels):
+def _figure(study, version, model_key, labels, months=1):
     monthly = study["monthly"]
     figure = go.Figure()
     for name, rows, color in (
         ("Equal weight", monthly.loc[monthly.version.eq("Equal weight")], "#68716e"),
-        ("Top 10 positive-vol", monthly.loc[monthly.version.eq(TOP_VOL_VERSION) & monthly.momentum_months.eq(1)], "#b36a2e"),
+        ("Top 10 positive-vol", monthly.loc[monthly.version.eq(TOP_VOL_VERSION) & monthly.momentum_months.eq(months)], "#b36a2e"),
     ):
         rows = rows.sort_values("return_month")
         figure.add_trace(go.Scatter(
@@ -143,13 +150,13 @@ def _figure(study, version, model_key, labels):
              "Ten high positive-volatility stocks per group, weighted by positive momentum with cash; no directional predictor.") +
             "<extra>%{fullData.name}</extra>"))
     if version in {BASKET_DOWNSIDE_VERSION, BASKET_UPSIDE_VERSION}:
-        original = monthly.loc[monthly.version.eq('Basket momentum + cash') & monthly.momentum_months.eq(1)]
+        original = monthly.loc[monthly.version.eq('Basket momentum + cash') & monthly.momentum_months.eq(months)]
         original = original.sort_values('return_month')
         if not original.empty:
             figure.add_trace(go.Scatter(x=[original.snapshot_date.iloc[0], *original.return_month],
                 y=[1, *original.wealth], name='Full baskets — original', line=dict(color='#287d68'),
                 hovertemplate='%{x|%b %Y}<br>Growth $%{y:.3f}<br>Original grouped positive-momentum and cash portfolio; no directional adjustment.<extra>%{fullData.name}</extra>'))
-    overlays = monthly.loc[monthly.version.eq(version) & monthly.model_key.eq(model_key) & monthly.momentum_months.eq(1)]
+    overlays = monthly.loc[monthly.version.eq(version) & monthly.model_key.eq(model_key) & monthly.momentum_months.eq(months)]
     for recipe, rows in overlays.groupby("recipe", sort=False):
         rows = rows.sort_values("return_month")
         explanation = {"all_20": "Directional model fitted with all 20 supplied factors.",
@@ -162,5 +169,5 @@ def _figure(study, version, model_key, labels):
             hovertemplate="%{x|%b %Y}<br>Growth $%{y:.3f}<br>" + explanation + "<extra>%{fullData.name}</extra>"))
     figure.update_layout(template="plotly_white", height=460, hovermode="x unified",
                          legend=dict(orientation="h", y=-.2), margin=dict(l=10, r=10, t=30, b=10),
-                         title="1-month growth of $1", yaxis_title="Growth of $1")
+                         title=f"{months}-month momentum · growth of $1", yaxis_title="Growth of $1")
     return figure

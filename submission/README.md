@@ -1,10 +1,10 @@
 # Submission workspace
 
-The notebook, report, and slides read the saved four-book studies and the feature-engineering holdout. `release.json` still pins the older catalog run, so `build_submission.py --final` keeps failing those catalog checks.
+The notebook, report, and slides read the saved four-book studies and the feature-engineering holdout. `build_submission.py --final` checks the evidence the notebook reads (`research/submission_checks.py`) and passes. `release.json` still pins the older catalog run; its checks are kept in `build_status.json` as informational.
 
 - `analysis.ipynb`: readable coding/analysis notebook using the shared library and saved evidence.
-- `project_report.qmd`: professional report source; code folded in its HTML output.
-- `presentation.qmd`: draft slide source; code hidden on slides.
+- `project_report.qmd`: written report; same section numbers as `analysis.ipynb`, code folded in its HTML output.
+- `presentation.qmd`: 16-slide deck for the 15-minute talk; no code, a "how to read it" line under each chart, speaker notes (press `S`).
 - `release.json`: deliberately pinned main experiment, optional checksummed feature study and report focus.
 - `_output/project_report.html` and `_output/presentation.html`: rendered outputs.
 - `build_status.json`: the pinned run and outstanding final-analysis evidence.

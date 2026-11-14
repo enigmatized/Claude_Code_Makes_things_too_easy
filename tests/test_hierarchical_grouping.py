@@ -107,7 +107,7 @@ class PublishedHierarchicalTests(unittest.TestCase):
             self.assertEqual(app.tabs[2].label, 'Grouping With ML')
             for label in ('K-means', 'Hierarchical clustering', 'Adding a direction'):
                 self.assertTrue(any(tab.label == label for tab in app.tabs))
-            app.selectbox(key='basket_direction_grouping').select('Hierarchical (Ward)').run()
+            app.selectbox(key='basket_selection_basket').select('Ward top 10 positive-vol per group').run()
             self.assertFalse(app.exception)
             app.checkbox(key='basket_overlay_inspect').check().run()
             self.assertFalse(app.exception)

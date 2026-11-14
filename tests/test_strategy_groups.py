@@ -67,7 +67,9 @@ class GroupedResultsAppTests(unittest.TestCase):
     def app(self):
         app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / "app.py"), default_timeout=90)
         app.session_state["training_result"] = self.result
-        return app.run()
+        app.run()
+        app.checkbox(key='basic_compare_more').check().run()
+        return app
 
     def test_grouped_overview_covers_all_strategies_and_exact_model_changes(self):
         with patch.dict("os.environ", {"MLFACTOR_ARTIFACT_ROOT": str(self.store.root)}), patch(

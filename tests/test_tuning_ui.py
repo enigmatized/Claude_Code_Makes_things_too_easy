@@ -13,6 +13,7 @@ from research.legacy import FEATURES
 from research.store import ExperimentStore
 from research.tuning_holdout import create_tuning_holdout, save_tuning_holdout
 from test_tuning import labeled_panel
+from portfolio_selection import TARGET_LABELS
 from tuning_ui import METRIC_HELP, TARGETS, _parameter_table, _predictive_table, _version_table
 
 
@@ -51,11 +52,11 @@ class TuningUI(unittest.TestCase):
              patch("research.models._fit_slice", side_effect=AssertionError("No fitting")):
             app = AppTest.from_string(script).run(timeout=30)
             self.assertFalse(app.exception)
-            self.assertEqual([box.label for box in app.selectbox[:3]],
-                             ["1. Model", "2. Starting strategy", "3. Prediction target"])
-            self.assertEqual(len(app.selectbox(key="tuning_holdout_strategy").options), 2)
+            self.assertEqual([box.label for box in app.selectbox[:4]],
+                             ["1. Asset basket", "2. Prediction model", "3. Allocation strategy", "4. Prediction target"])
+            self.assertEqual(len(app.selectbox(key="tuning_selection_basket").options), 2)
             self.assertFalse(any(box.key == "tuning_main_families_only" for box in app.checkbox))
-            for label, target in TARGETS.items():
+            for label, target in TARGET_LABELS.items():
                 app.selectbox(key="tuning_holdout_target").select(label).run()
                 self.assertFalse(app.exception)
                 expected = _predictive_table(self.studies[target][0]["predictive"], "logistic")
@@ -65,7 +66,7 @@ class TuningUI(unittest.TestCase):
                 config = json.loads(score.proto.columns)
                 for metric in METRIC_HELP:
                     self.assertEqual(config[metric]["help"], METRIC_HELP[metric])
-                app.selectbox(key="tuning_holdout_strategy").select("Positive momentum, score weights").run()
+                app.selectbox(key="tuning_selection_basket").select("Strongest positive-momentum stocks").run()
                 self.assertFalse(app.exception)
                 shown = next(table.value for table in app.dataframe if "CAGR" in table.value)
                 expected = _version_table(self.studies[target][0]["metrics"], "momentum_weighted", "logistic")
@@ -73,13 +74,7 @@ class TuningUI(unittest.TestCase):
                 # Prediction scores describe the model, not a portfolio screen.
                 pd.testing.assert_frame_equal(next(t.value for t in app.dataframe if "Brier score" in t.value),
                                               _predictive_table(self.studies[target][0]["predictive"], "logistic"))
-            app.selectbox(key="tuning_holdout_model").select("Random forest").run()
-            self.assertFalse(app.exception)
-            self.assertFalse(app.dataframe)
-            self.assertTrue(any("No saved tuning comparison" in item.value for item in app.info))
-            app.selectbox(key="tuning_holdout_model").select("Logistic regression").run()
-            self.assertFalse(app.exception)
-            self.assertTrue(app.dataframe)
+            self.assertEqual(app.selectbox(key='tuning_holdout_model').options,['Logistic regression'])
 
     def test_control_collapsing_checks_equality_and_default_setting_explanation(self):
         predictive = self.studies["loss"][0]["predictive"]

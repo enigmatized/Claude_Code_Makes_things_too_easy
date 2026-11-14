@@ -204,6 +204,7 @@ class CashRunnerTests(unittest.TestCase):
             app.session_state["training_result"] = self.result
             app.run()
             self.assertFalse(app.exception)
+            app.selectbox(key='basic_selection_basket').select('Frozen annual-consistency pool').run()
             app.checkbox(key="basic_show_allocations").check().run()
             app.selectbox(key="basic_allocations_strategy").select("Annual consistency + positive momentum + cash").run()
             self.assertFalse(app.exception)

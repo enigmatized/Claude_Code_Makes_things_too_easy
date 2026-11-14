@@ -1,5 +1,24 @@
 # Submission requirements and build pipeline
 
+2026-11-10 (later): `--final` now uses `research/submission_checks.py`, which reads the frozen
+final-book study, the GridSearchCV holdouts and the pinned engineering study, and passes.
+The notebook adds 5b (tuned settings on the chosen book, 2010–2018), 8b (trading costs) and
+8c (significance versus equal weight).
+
+
+The separate momentum-acceleration app experiment is published with both training
+and previously viewed final evidence. Its shared manifest reader can be reused
+from notebooks/QMD without fitting; see [protocol](MOMENTUM_ACCELERATION.md).
+No formal notebook/report/slides or `release.json` change is introduced by that
+experiment; the independent graded-notebook rewrite below is preserved. Acceleration
+has not yet been added to any classifier input recipe.
+
+2026-11-10: `analysis.ipynb` was rewritten for presentation and now maps each rubric
+item to a section. It adds a read-only Section 7 (volatility-neutral ML and the
+ML+momentum blend) from `0_7_Feature_Engineering/part8_*`. The declared choice,
+release pin, QMD sources and rendered HTML are unchanged.
+
+
 The user authorized a feature-engineering extension and its separate final
 variants. A new review notebook and standalone QMD supplement use published
 saved evidence; formal report/slides/release pins are not automatically replaced.

@@ -116,7 +116,8 @@ def engineering_note() -> str:
 def _final_clause(directory):
     if (Path(directory) / "test" / "complete.json").is_file():
         return (
-            "A completed 2010–2018 engineering stage is saved. This write-up does not use it to pick a recipe."
+            "A completed 2010–2018 engineering stage is saved. This write-up does not use it to pick a recipe; "
+            "Section 5 reads it only to ask whether tuning changed the chosen book."
         )
     return (
         "The engineering runner has no completed 2010–2018 file, so this submission does not add "
@@ -125,9 +126,8 @@ def _final_clause(directory):
 
 
 def _training():
-    directory = latest_engineering(PROJECT_ROOT / "artifacts")
-    if directory is None:
-        raise FileNotFoundError("No completed engineering training study.")
+    from research.notebook_views import pinned_engineering
+    directory = pinned_engineering()     # pinned in notebook_views.ENGINEERING_STUDY, not "newest"
     loaded = load_engineering_study(directory, "training")
     if loaded["scope"].get("test_csv_loaded"):
         raise ValueError("The engineering training scope records that the test file was loaded.")

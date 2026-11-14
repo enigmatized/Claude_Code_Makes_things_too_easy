@@ -1,6 +1,6 @@
 {
   "publication_schema": 1,
-  "created_utc": "2026-11-10T17:42:47.632948+00:00",
+  "created_utc": "2026-11-10T20:53:38.064083+00:00",
   "published_tabs": [
     "strategies",
     "basic_ml",
@@ -8,7 +8,8 @@
     "features",
     "tuning",
     "final",
-    "engineering"
+    "engineering",
+    "acceleration"
   ],
   "tabs": {
     "strategies": {
@@ -18891,6 +18892,72 @@
         }
       },
       "source_study_sha256": "8cd255c3f6bc4e7db474619c2aaf239aa0614baa0e0a7565017781c5a33b722d"
+    },
+    "acceleration": {
+      "study_id": "acceleration_20261110T204704_5c0c838f",
+      "metadata": {
+        "protocol": "grouped_momentum_deceleration",
+        "created_utc": "2026-11-10T20:47:04.346377+00:00",
+        "methods": [
+          "kmeans",
+          "ward"
+        ],
+        "variants": [
+          "Original",
+          "Stock deceleration",
+          "Basket deceleration",
+          "Stock + basket deceleration"
+        ],
+        "strength": 0.5,
+        "stock_groups": 5,
+        "top_per_group": 10,
+        "grouping_months": 12,
+        "positive_vol_months": 12,
+        "momentum_months": 1,
+        "acceleration": "r_t - r_(t-1), using already-earned simple monthly returns",
+        "basket_membership": "current selected members held fixed for both observations",
+        "missing_signal": "neutral multiplier 1; missing comparisons are not classified as deceleration",
+        "cash_return": 0,
+        "transaction_costs": 0,
+        "new_directional_fits": 0,
+        "tuning": "none",
+        "test_previously_viewed": true,
+        "code_sha256": "e1a070b8039f413a3115537de6598694784794aff8312cd181303e0a76cee388",
+        "source_train_sha256": "5689c609809ab73d412807ae466709f444af0e0f00b8895caae762836ce62591"
+      },
+      "windows": {
+        "training": {
+          "scope": {
+            "window": "training",
+            "test_csv_loaded": false,
+            "first_return_month": "2005-01-31",
+            "last_return_month": "2009-12-31",
+            "months": 60,
+            "source_test_sha256": null
+          },
+          "frames": {
+            "metrics": "acceleration/training/metrics.parquet",
+            "monthly": "acceleration/training/monthly.parquet",
+            "signals": "acceleration/training/signals.parquet"
+          }
+        },
+        "test": {
+          "scope": {
+            "window": "test",
+            "test_csv_loaded": true,
+            "first_return_month": "2010-01-31",
+            "last_return_month": "2018-12-31",
+            "months": 108,
+            "source_test_sha256": "7291a8c3008b4c7e04509ad28b0a0bebf20433c1c75a845b3672ffa60e5a8a94"
+          },
+          "frames": {
+            "metrics": "acceleration/test/metrics.parquet",
+            "monthly": "acceleration/test/monthly.parquet",
+            "signals": "acceleration/test/signals.parquet"
+          }
+        }
+      },
+      "source_study_sha256": "d6e262c08687874a472cbeef678a1148f9f617be69ad7221c79da4bcfadbe386"
     }
   },
   "file_sha256": {
@@ -19362,7 +19429,13 @@
     "engineering/test/predictive.parquet": "c5dcb1d3094301d65e528c1eb93c3eddb9ce1de5e599e404afc01c00e2e9e1f7",
     "engineering/test/audits.parquet": "b4367ddf74f413896b530d2fe6c88cc5a7616559db62e40d1904e6aa2b1f503c",
     "engineering/test/trials.parquet": "f6acdfc08eaeec5e2b8a35674ec3dfd2fc4d8eb657db39a5acd4c8e22a195317",
-    "engineering/test/folds.parquet": "f6acdfc08eaeec5e2b8a35674ec3dfd2fc4d8eb657db39a5acd4c8e22a195317"
+    "engineering/test/folds.parquet": "f6acdfc08eaeec5e2b8a35674ec3dfd2fc4d8eb657db39a5acd4c8e22a195317",
+    "acceleration/training/metrics.parquet": "2694dc8a447d148adbeb3a5552e258149f96694292c20b0ef6e916fa1f0c5bfe",
+    "acceleration/training/monthly.parquet": "77724c416099ceebaa2f7336a26d1a0523e4ef2ca6f9f06e5c166d0c2b9457e7",
+    "acceleration/training/signals.parquet": "db2081e5a28f7a1ee9dc614985660cfceee80c4f7a44255e9453f83eb01aeda4",
+    "acceleration/test/metrics.parquet": "a7c4c93dbe8cc6895d9c9e705a4c19afcddcfdab1ad6c8a6fe8996e3e2ab9c51",
+    "acceleration/test/monthly.parquet": "4ded4c65729a4b25b3a586d1dac88687efd4cbde8d714ec750cbcc030e2f1a1e",
+    "acceleration/test/signals.parquet": "af0368dfece409ccbe7e0db4046ec9497d133f7a21306aed20f3f94494756ff6"
   },
-  "parent_manifest_sha256": "0dc4d709f54634430e060273bfe013f60fdcd5a3f6b424948504d533f3d8c895"
+  "parent_manifest_sha256": "4df420855fe8e06be10ecf8cf52011fb6eae4e1147d9150fbab2737b04b65e1d"
 }

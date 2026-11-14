@@ -1,5 +1,26 @@
 # Research and published view modes
 
+Navigation update (2026-11-10): seven tabs now share basket/model/allocation/
+target selection where applicable, resolving only saved cases. Final supports a
+session comparison across its separately labeled studies. The existing 476-file
+publication and manifest remain unchanged; no new export or dependencies needed.
+Include `portfolio_selection.py`, `portfolio_selection_ui.py` and
+`final_comparison_ui.py` with the UI changes. Keep the preceding acceleration
+publication in the push if the hosted version predates it. Deployment still opens
+no raw CSV/catalog/fitted object and executes no fits or strategy replay. Verify
+locally with `python3 run_app.py --mode deploy --port 8502`; restart a running
+process to refresh imported modules. See [handoff](BASKET_FIRST_UI_PLAN.md).
+
+Latest release (2026-11-10): **476 files / 173,332,889 bytes**. New Momentum
+acceleration sections under Grouping With ML and Final test read six additional
+Parquet frames (about 0.76 MB); all 469 prior frame hashes are preserved. Prior
+default: ignored `published/project_before_acceleration_20261110`. Push code/docs
+and current `published/project`; no entry point, dependency or hosting setting
+change. Raw data, scientific artifacts and backups remain ignored. All 229 tests,
+source-free seven-tab checks and browser views pass. See
+[protocol, export command and evidence](MOMENTUM_ACCELERATION.md).
+The release-size and no-publication-change notes below describe earlier updates.
+
 Latest visibility fix: the first Final subtab is **K-means strategies**, with
 explicit original top-ten / one-month momentum / cash labels. Engineered final
 comparisons default to the same starting book. This is a code/docs-only update;
@@ -46,6 +67,13 @@ available for Git. It excludes CSV datasets/reports, `artifacts/`, research
 `outputs/`, older published releases, generated Quarto builds, caches, virtual
 environments and local credentials. The current release's Parquet and JSON files
 are deliberately included: the deployed app needs them. Files remain on disk.
+
+Local LLM assistant sessions, histories, caches and private settings are also
+excluded for Codex, Claude, Cursor, Gemini, Continue and Aider. Private instruction
+files can use `AGENTS.local.md`, `CLAUDE.local.md` or `GEMINI.local.md`. Shared
+`AGENTS.md` (already tracked), `CLAUDE.md`, `GEMINI.md`, skills, rules and shared
+assistant configuration remain eligible for Git; assistant directories are not
+blanket-ignored. Ignore rules do not remove any already-tracked file.
 
 After initializing your repository, review `git status --short` and
 `git add --dry-run .` before staging. Use `deploy_app.py` as the Streamlit Cloud

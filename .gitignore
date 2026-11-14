@@ -70,5 +70,28 @@ Thumbs.db
 *.tmp
 *~
 
+# Local LLM assistant state, histories, caches and private instructions.
+# Keep shared AGENTS.md, CLAUDE.md, GEMINI.md, skills and rules eligible for Git.
+.codex/sessions/
+.codex/archived_sessions/
+.codex/log/
+.codex/history.jsonl
+.claude/settings.local.json
+.claude/projects/
+.claude/history.jsonl
+.claude/debug/
+.cursor/chats/
+.cursor/projects/
+.gemini/tmp/
+.gemini/history/
+.continue/sessions/
+.continue/.cache/
+.aider.chat.history.md
+.aider.input.history
+.aider.tags.cache*/
+AGENTS.local.md
+CLAUDE.local.md
+GEMINI.local.md
+
 # Feature-engineering extended datasets are covered by *.csv above.
 # New fitted recipes, predictions, models and search caches live under /artifacts/.

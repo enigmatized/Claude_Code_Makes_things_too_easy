@@ -9,6 +9,7 @@ import streamlit as st
 
 from basket_feature_ui import render_four_book_features
 from research.feature_studies import feature_audit, list_feature_studies, load_feature_study
+from research.basket_features import list_feature_book_scores
 from research.models import default_model_registry
 from research.models import event_fields
 from research.feature_reporting import (feature_curves, importance_table, method_notes,
@@ -20,6 +21,8 @@ from research.strategies import default_registry
 from evaluation_ui import render_scope
 from research.evaluation import evaluation_scope
 from portfolio_focus import main_portfolio_focus
+from portfolio_selection import registry_cases
+from portfolio_selection_ui import select_portfolio_case, choose
 
 
 def _sync_feature_prediction_model(source_key, target_key):
@@ -59,13 +62,15 @@ def render_feature_studies(selected_strategies=None, key_prefix="features", publ
     store = ExperimentStore() if published is None else None
     main_only = main_portfolio_focus(key_prefix)
     st.info("**Training data only.** Feature comparisons use saved training-validation results; browsing does not fit selectors or prediction models.")
-    has_books = render_four_book_features(store, published=published, main_only=main_only)
+    has_books = bool(published.book_studies()) if published is not None else bool(list_feature_book_scores(store.root))
     available = list_feature_studies(store) if published is None else published.list_studies()
     st.subheader("Selected features and classifier evidence" if main_only and has_books else "Every saved registry strategy")
     st.caption("The selection audit and prediction diagnostics remain available for all four classifier types. "
                "Turn off the focus filter to add the fourteen basic strategy comparisons." if main_only and has_books else
                "These fourteen rules sit below the four books. A feature cut changes only their model inputs.")
     if not available:
+        if has_books:
+            render_four_book_features(store, published=published, main_only=main_only)
         st.info("No completed feature-selection study is saved yet. Run python3 run_feature_selection.py to create one.")
         return
     options = {f"{row['label']} · {row['study_id']}": row for row in available}
@@ -89,13 +94,14 @@ def render_feature_studies(selected_strategies=None, key_prefix="features", publ
     st.caption(f"Recorded study: {target} prediction · {scope} models. This study is separate from the target/scope currently selected in Basic ML.")
     models = default_model_registry()
     model = {spec.label: key for key, spec in models.items() if key in base_config["models"]}
-    model_id = model[st.selectbox("Prediction model to review", list(model),
-        help="Applies to both feature subtabs. Feature recipes choose inputs; this control chooses the model that predicts next-month direction.",
-        key=f"{key_prefix}_study_model")]
     selection_tab, effects_tab = st.tabs(["Selected features & method", "Effect on ML models"])
     with selection_tab:
+        model_id = model[st.selectbox("Prediction model for selection audit", list(model),
+            help="Recorded model context for feature masks and diagnostics; portfolio comparisons have their own model choice.",
+            key=f"{key_prefix}_study_model")]
         render_selected_features(study, model_id, key_prefix)
     with effects_tab:
+        has_books = render_four_book_features(store, published=published, main_only=main_only)
         render_feature_effects(study, model_id, selected_strategies, key_prefix,
                               include_registry=not main_only or not has_books)
         st.caption("The Tuned model tab freezes one feature list from this study and compares no ML, fixed ML, and tuned ML on a later slice of the training years.")
@@ -180,9 +186,19 @@ def render_selected_features(study, model_id, key_prefix):
 
 def render_feature_effects(study, model_id, selected_strategies, key_prefix, include_registry=True):
     st.subheader("What changed after retraining the ML models?")
+    base_config = study["metadata"]["config"]
+    requested = list(base_config["strategies"] if selected_strategies is None else selected_strategies)
+    supported = [key for key in requested if key in base_config['strategies']]
+    primary_strategy = supported[0] if supported else None
+    if include_registry and supported:
+        choice=select_portfolio_case(registry_cases(supported,base_config['models'],
+            (base_config.get('prediction_target','loss'),)),key_prefix+'_effects_selection',
+            keys={'model':key_prefix+'_portfolio_model'})
+        model_id=choice.model_key.iloc[0]
+        primary_strategy=choice.strategy.iloc[0]
     model_labels = {key: spec.label for key, spec in default_model_registry().items()}
     model_label = model_labels[model_id]
-    st.write(f"Prediction model shown: **{model_label}**. Use the model selector above or beside the portfolio results to compare another predictor.")
+    st.write(f"Prediction model shown: **{model_label}**. The selector for this section chooses the saved predictor; the feature-selection algorithm is a separate choice.")
     st.write("Each recipe has its own independently refitted model at each historical origin. The estimator settings, forecast dates and probability-to-weight rule stay fixed. Compare the saved predictions and ML-adjusted portfolios against the same model using all 20 factors.")
     st.caption("Feature selection applies to the ML component only. Non-ML strategies have no model inputs to select; their unchanged returns appear only as a reference curve.")
     base_config = study["metadata"]["config"]
@@ -223,41 +239,15 @@ def render_feature_effects(study, model_id, selected_strategies, key_prefix, inc
         st.info("Portfolio effects for the main families are shown in the advanced-book comparison above. "
                 "Turn off 'Show only the four main portfolio families' to inspect all saved basic-strategy portfolios too.")
         return
-    requested = list(base_config["strategies"] if selected_strategies is None else selected_strategies)
-    choices = {registry[key].label: key for key in requested}
-    if not choices:
-        st.info("Select training strategies in the sidebar to review feature effects.")
-        return
-    selection_key = f"{key_prefix}_strategies"
-    if selection_key in st.session_state:
-        previous = st.session_state[selection_key]
-        filtered = [name for name in previous if name in choices]
-        if previous and not filtered:
-            st.session_state.pop(selection_key, None)
-        else:
-            st.session_state[selection_key] = filtered
-    selected = st.multiselect("ML-adjusted strategies in feature comparison", list(choices), default=list(choices), key=selection_key)
-    wanted = [choices[name] for name in selected]
-    supported = [key for key in wanted if key in base_config["strategies"]]
-    unavailable = [registry[key].label for key in wanted if key not in base_config["strategies"]]
-    if unavailable:
-        st.info("No saved feature comparison yet for: " + ", ".join(unavailable) + ". The existing study predates these rules; no experiment will run automatically.")
     if not supported:
-        st.info("Choose a strategy covered by the saved study to see matched feature results.")
+        st.info('No saved feature comparison yet for the selected strategies.')
         return
-    strategies = {registry[key].label: key for key in supported}
-    detail_key = f"{key_prefix}_study_strategy"
-    if st.session_state.get(detail_key) not in strategies:
-        st.session_state.pop(detail_key, None)
-    strategy = strategies[st.selectbox("Portfolio curve to inspect", list(strategies), key=detail_key)]
-    st.markdown("**ML-adjusted portfolio results**")
-    model_options = [label for key, label in model_labels.items() if key in base_config["models"]]
-    portfolio_model_key = f"{key_prefix}_portfolio_model"
-    st.session_state[portfolio_model_key] = model_label
-    st.selectbox("Prediction model for portfolio comparison", model_options,
-        key=portfolio_model_key, on_change=_sync_feature_prediction_model,
-        args=(portfolio_model_key, f"{key_prefix}_study_model"),
-        help="Switch among the saved basic models. This also updates prediction scores, calibration, feature inspection and portfolio curves. Logistic regression is first.")
+    compare_more=st.checkbox('Compare more registry strategies',key=key_prefix+'_effects_compare_more')
+    if not compare_more:
+        supported=[primary_strategy]
+    strategies = {registry[key].label:key for key in supported}
+    strategy = strategies[choose('Portfolio curve to inspect',list(strategies),key_prefix+'_study_strategy')]
+    st.markdown('**ML-adjusted portfolio results**')
     st.caption(f"Within each strategy, compare {model_label} independently refitted for each feature recipe. Estimator settings and trading rules stay fixed. Feature recipe names describe input selection: Random forest top 10 selects inputs for the prediction model shown here.")
     portfolio = portfolio_table(study, model_id, supported)
     columns = ["label", "model_id", "recipe", "cagr", "annualized_log_growth", "sharpe", "sortino", "max_drawdown", "change_cagr_vs_all20", "change_sharpe_vs_all20"]

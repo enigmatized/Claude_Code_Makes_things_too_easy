@@ -1,5 +1,29 @@
 # Architecture
 
+Portfolio selection now uses a shared presentation layer over saved evidence.
+`portfolio_selection.py` describes explicit legacy strategy/book bundles without
+changing their original IDs or inventing pairings. `portfolio_selection_ui.py`
+filters basket → model → allocation → target using only recorded combinations,
+retaining source/recipe/fit identity and validating dependent widget state.
+Strategies omits prediction controls; method-learning views remain independent.
+Existing runner, feature fitting and accounting modules are unchanged.
+
+`final_comparison_ui.py` stores explicitly added official-test cases in session
+state, preserving exact metrics and monthly paths plus their source protocol.
+It charts only matching calendars; research/deploy or publication changes clear
+the comparison. No source catalog/object/fitting/replay is added to deploy.
+Current publication is unchanged. See [implementation, mapping and limitations](BASKET_FIRST_UI_PLAN.md).
+
+The grouping stage now has a fourth **Momentum acceleration** subtab and Final
+has a separately labeled acceleration section. `research/momentum_acceleration.py`
+reuses existing grouping, screening, allocation and accounting, saving causal
+stock/current-member basket acceleration and four fixed weight rules. Computation
+is explicit; `acceleration_ui.py` reads completed local stages or a
+`PublishedAcceleration` manifest reader. Optional `tabs.acceleration` adds six
+Parquet frames while preserving prior frames and model fits. Current default:
+476 files / 173,332,889 bytes. No source files, estimator objects or replay in
+deploy. See [protocol and handoff](MOMENTUM_ACCELERATION.md).
+
 Final presentation now names the original K-means top-ten momentum/cash book
 explicitly. `_final_book_sections` labels its first subtab K-means strategies;
 `final_book_ui` formats book names with their actual horizons. Feature-engineered

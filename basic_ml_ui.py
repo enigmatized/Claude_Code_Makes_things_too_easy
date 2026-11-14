@@ -5,10 +5,11 @@ import pandas as pd
 import streamlit as st
 
 
-def saved_basic_source(store, source, strategies, target, scope):
+def saved_basic_source(store, source, strategies, target, scope, required_model=None):
     def matches(config):
         return (config.include_ml and config.evaluation == 'training_validation'
                 and config.prediction_target == target and config.model_scope == scope
+                and (required_model is None or required_model in config.models)
                 and set(strategies).issubset(config.strategies))
     records = [row for row in store.list_runs() if row['evaluation'] == 'training_validation']
     configs = {row['run_id']: store.configuration(row['run_id']) for row in records}
@@ -37,6 +38,23 @@ def saved_basic_source(store, source, strategies, target, scope):
         cached = (token, store.load(run_id))
         st.session_state['basic_loaded_result'] = cached
     return cached[1]
+
+
+def basic_case_catalog(store, source, strategies, scope):
+    """Inventory configurations only; never load forecasts or fit on dropdown changes."""
+    from portfolio_selection import registry_cases
+    frames = []
+    configs = [(row['run_id'], store.configuration(row['run_id'])) for row in store.list_runs()
+               if row['evaluation'] == 'training_validation']
+    if source is not None and not hasattr(store, 'publication_token'):
+        configs.append(('active', source.config))
+    for run_id, config in configs:
+        if not config.include_ml or config.evaluation != 'training_validation' or config.model_scope != scope:
+            continue
+        present = [key for key in strategies if key in config.strategies]
+        frames.append(registry_cases(present, config.models, (config.prediction_target,), run_id=run_id,
+                                     model_scope=scope, feature_id=config.feature_spec.feature_id))
+    return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
 
 
 def scope_comparison(store, result, strategies):

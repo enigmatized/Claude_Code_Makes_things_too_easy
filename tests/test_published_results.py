@@ -121,6 +121,7 @@ class PublishedResultsTests(unittest.TestCase):
                 "research.runner.ExperimentRunner.run", side_effect=AssertionError("No strategy/model computation")):
             app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=30).run()
             self.assertFalse(app.exception)
+            app.checkbox(key='strategies_compare_more').check().run()
             first = app.tabs[0]
             self.assertTrue(any("Training data only" in item.value for item in first.info))
             self.assertFalse(any("compute" in button.label.lower() for button in app.button))

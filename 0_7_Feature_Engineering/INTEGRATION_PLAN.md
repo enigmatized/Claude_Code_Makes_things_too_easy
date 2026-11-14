@@ -1,7 +1,9 @@
 # Integrating part 8 into `submission/analysis.ipynb`
 
-Status: **prepared, not applied.** `submission/analysis.ipynb`, `research/notebook_views.py`
-and `submission/release.json` are unchanged.
+Status (2026-11-10): **applied to `submission/analysis.ipynb`** as Section 7, with the reader
+registered in `research/notebook_views.py`. Steps 3–5 done the same day: `project_report.qmd`
+and `presentation.qmd` were rewritten around the new notebook and rebuilt with `--final`.
+`submission/release.json` is unchanged.
 
 ## What exists now
 

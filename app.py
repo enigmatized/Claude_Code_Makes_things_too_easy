@@ -8,9 +8,13 @@ from plotly.colors import qualitative
 from plotly.subplots import make_subplots
 import streamlit as st
 from engineering_ui import render_engineering
+from acceleration_ui import render_acceleration, acceleration_available
 from research import FeatureSpec, RunConfig, default_model_registry, default_registry
 from research.models import event_fields
-from basic_ml_ui import saved_basic_source, render_scope_comparison
+from basic_ml_ui import saved_basic_source, render_scope_comparison, basic_case_catalog
+from portfolio_selection import registry_cases
+from portfolio_selection_ui import select_portfolio_case
+from final_comparison_ui import render_final_comparison
 from research.legacy import FEATURES
 from research.store import ExperimentStore
 from feature_study_ui import render_feature_studies
@@ -401,12 +405,26 @@ def _source_caption(result):
         st.caption(f"Saved experiment {info['run_id']} · Display filters preserve the original computation and provenance.")
 
 
+def _reset_comparison_widgets(prefix):
+    for suffix in ('family', 'chart_strategies', 'chart_models'):
+        st.session_state.pop(prefix+'_'+suffix, None)
+
+
 def render_strategies(source, strategies, store=None, published=None):
     st.header("Strategies")
     st.write("Start with the portfolio rules: which stocks to hold, how to weight them, and when to hold cash.")
     st.info("**Training data only.** This tab compares non-ML rules within the training dataset (earned returns 2000–2009). No test-period results are used here.")
+    available_strategies = list(strategies)
+    if source is not None and strategies:
+        choice = select_portfolio_case(registry_cases(strategies), 'strategies_selection', predictive=False)
+        compare_more = st.checkbox('Compare more baskets and strategies', key='strategies_compare_more',
+                                  on_change=_reset_comparison_widgets, args=('strategies',))
+        if not compare_more:
+            strategies = choice.strategy.drop_duplicates().tolist()
+        else:
+            st.caption('Expanded comparison includes the other available baskets and allocation rules below.')
     if published is None:
-        training_settings(store, source, strategies, include_ml=False)
+        training_settings(store, source, available_strategies, include_ml=False)
     if source is None:
         st.info("No saved training comparison is available. Load one or explicitly compute the portfolio rules above.")
         return
@@ -432,11 +450,26 @@ def render_strategies(source, strategies, store=None, published=None):
 
 def render_basic_ml(source, strategies, store, published=None):
     st.header("Basic ML")
-    controls = st.columns(2)
-    patterns = {"Downside protection": "loss", "Upside threshold boost": "upside"}
+    available_strategies = list(strategies)
     scopes = {"Pooled across stocks": "pooled", "Separate model per stock": "per_stock"}
-    target = patterns[controls[0].selectbox("Basic ML pattern", list(patterns), key="basic_pattern")]
-    scope = scopes[controls[1].selectbox("Model training scope", list(scopes), key="basic_scope")]
+    scope = scopes.get(st.session_state.get("basic_scope"), "pooled")
+    catalog = basic_case_catalog(store, source, strategies, scope)
+    choice = select_portfolio_case(catalog, "basic_selection", keys={"target": "basic_pattern"})
+    target = choice.target.iloc[0] if not choice.empty else "loss"
+    primary_model = choice.model_key.iloc[0] if not choice.empty else None
+    primary_strategy = choice.strategy.iloc[0] if not choice.empty else None
+    details = st.expander("Training scope, inputs and saved runs")
+    with details:
+        st.selectbox("Model training scope", list(scopes), key="basic_scope")
+        st.caption("Basket choices select saved portfolio rules. Pooled models keep their recorded training universe; "
+                   "they are not retrained on only the selected stocks. Prediction scores cover all scored stock-months.")
+    compare_more = st.checkbox("Compare more models and strategies", key="basic_compare_more",
+                               on_change=_reset_comparison_widgets, args=('basic_ml',))
+    if not compare_more and primary_strategy is not None:
+        strategies = [primary_strategy]
+    elif compare_more:
+        st.caption('Expanded comparison uses the model and strategy filters below, including other baskets. '
+                   'The prediction target and training scope above still apply.')
     st.info("**Training data only.** These are chronological validation results within the training years; test-period returns are excluded.")
     st.write("Pooled: one model per algorithm at each historical fit, trained on all stocks; apply it to each stock's current features. Per stock: separate fits using only that stock's past, with an explicit pooled fallback for insufficient history.")
     if target == "loss":
@@ -447,9 +480,10 @@ def render_basic_ml(source, strategies, store, published=None):
         st.write("Estimate the probability of a strictly positive next-month return. Boost held stocks that meet the probability threshold, then normalize within the original stock budget.")
         st.code("raw weight = original weight × (1 + strength × I(probability of up ≥ threshold))", language=None)
         st.caption("Default threshold 60%, strength 50%. Excluded stocks stay excluded; the original cash allocation is preserved. If all held stocks get the same multiplier, relative weights do not change. Flat returns count as neither an up move nor a loss.")
-    selected = saved_basic_source(store, source, strategies, target, scope)
+    with details:
+        selected = saved_basic_source(store, source, strategies, target, scope, required_model=primary_model)
     if published is None:
-        training_settings(store, selected or source, strategies, include_ml=True, target=target, scope=scope)
+        training_settings(store, selected or source, available_strategies, include_ml=True, target=target, scope=scope)
     if st.session_state.get("basic_error"):
         st.error(st.session_state["basic_error"])
     if selected is None or not selected.prediction_batches:
@@ -467,7 +501,10 @@ def render_basic_ml(source, strategies, store, published=None):
     if not strategies:
         st.info("Select at least one training strategy in the sidebar.")
         return
-    model_ids = model_chart_selector(source, "Models to compare", "basic_models")
+    if compare_more:
+        model_ids = model_chart_selector(source, "Models to compare", "basic_models")
+    else:
+        model_ids = [primary_model] if primary_model in source.prediction_batches else []
     if not model_ids:
         st.info("Choose at least one saved model to review.")
         return
@@ -506,19 +543,41 @@ def render_features(strategies, published=None):
     render_feature_studies(selected_strategies=strategies, key_prefix="features", published=published)
 
 
-def _final_book_sections(store=None, published=None, engineering=None):
-    ready = (engineering is not None and engineering.has_window('test')) if published is not None else bool(
+def _final_book_sections(store=None, published=None, engineering=None, acceleration=None):
+    namespace = ('published', published.token) if published is not None else ('research', str(store.root))
+    if st.session_state.get('final_comparison_namespace') != namespace:
+        st.session_state['final_comparison_namespace'] = namespace
+        st.session_state.pop('saved_final_comparisons', None)
+        st.session_state.pop('final_comparison_cases', None)
+    engineering_ready = (engineering is not None and engineering.has_window('test')) if published is not None else bool(
         list((Path(store.root) / 'engineering_studies').glob('*/test/complete.json')))
-    if ready:
-        earlier, engineered = st.tabs(['K-means strategies', 'Feature-engineered variants'])
-        with earlier:
-            saved = render_final_books(store, published=published)
-            st.caption('Earlier saved study: frozen ANOVA-10, fixed classifiers and K-means stock groups. '
-                       'The new engineered variants have their own separately labeled protocol.')
-        with engineered:
+    acceleration_ready = (
+        acceleration is not None and acceleration.has_window('test')
+    ) if published is not None else acceleration_available(store, window='test')
+    if not engineering_ready and not acceleration_ready:
+        saved = render_final_books(store, published=published)
+        if saved:
+            render_final_comparison()
+        return saved
+    labels = ['K-means strategies']
+    if engineering_ready:
+        labels.append('Feature-engineered variants')
+    if acceleration_ready:
+        labels.append('Momentum acceleration')
+    tabs = st.tabs(labels)
+    with tabs[0]:
+        render_final_books(store, published=published)
+        st.caption('Original grouped study: frozen ANOVA-10 and fixed directional classifiers. New experiments retain their own protocols.')
+    index = 1
+    if engineering_ready:
+        with tabs[index]:
             render_engineering(store, published=engineering, window='test')
-        return True
-    return render_final_books(store, published=published)
+        index += 1
+    if acceleration_ready:
+        with tabs[index]:
+            render_acceleration(store, published=acceleration, window='test')
+    render_final_comparison()
+    return True
 
 
 def render_final_test(store):
@@ -646,7 +705,6 @@ def main():
         render_deployment()
         return
     st.caption("Research mode · Load saved experiments or explicitly run new comparisons locally.")
-    st.write("Portfolio rules → downside prediction → correlation-basket momentum → feature evidence → tuned model → engineered inputs → final evaluation.")
     store = ExperimentStore()
     try:
         source, strategies = _training_sidebar(store)
@@ -697,7 +755,10 @@ def render_deployment():
                 st.session_state[selection_key] = filtered
         if selection_key not in st.session_state:
             st.session_state[selection_key] = list(names)
-        chosen = st.multiselect("Strategies to compare", list(names), key=selection_key)
+        with st.expander('Available strategies — advanced filter'):
+            chosen = st.multiselect("Strategies to compare", list(names), key=selection_key,
+                help='Limits the saved rules offered in Strategies, Basic ML and registry feature comparisons. '
+                     'Use the basket controls on each page for the normal selection flow.')
         strategies = [names[label] for label in chosen]
     tabs = st.tabs(["Strategies", "Basic ML", "Grouping With ML", "Feature selection", "Tuned model", "Feature engineering", "Final test"])
     with tabs[0]:
@@ -739,7 +800,7 @@ def render_deployment():
                     st.header('Final test')
                     st.info('**Official test: Jan 2010–Dec 2018.** This period was inspected previously. Training-only and entire-path views are separately labeled below.')
                     engineering = publication.analysis_section('engineering')
-                    _final_book_sections(published=analysis, engineering=engineering)
+                    _final_book_sections(published=analysis, engineering=engineering, acceleration=publication.analysis_section('acceleration'))
                     st.caption('Each saved evaluation records its own input recipe, fit origin and model settings. '
                                'Formal report/release sign-off remains a local project step.')
                     if not st.session_state.get('final_main_families_only', False) and st.checkbox('Show every saved test mixture', key='show_test_history'):

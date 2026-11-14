@@ -117,11 +117,11 @@ class DirectionalBasketTests(unittest.TestCase):
             app = AppTest.from_string(script).run(timeout=30)
             self.assertFalse(app.exception)
             self.assertEqual(app.selectbox(key="basket_prediction_model").value, "Logistic regression")
-            self.assertEqual([tab.label for tab in app.tabs], ["K-means", "Hierarchical clustering", "Adding a direction"])
+            self.assertEqual([tab.label for tab in app.tabs], ["K-means", "Hierarchical clustering", "Adding a direction", "Momentum acceleration"])
             app.checkbox(key="basket_overlay_inspect").check().run()
             app.selectbox(key="basket_screen_1").select(DOWNSIDE_VERSION).run()
             self.assertFalse(app.exception)
-            app.selectbox(key="basket_overlay_book").select("Full correlation groups").run()
+            app.selectbox(key="basket_selection_basket").select("K-means full groups").run()
             app.selectbox(key="basket_screen_1").select(BASKET_DOWNSIDE_VERSION).run()
             self.assertFalse(app.exception)
 

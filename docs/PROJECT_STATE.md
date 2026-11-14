@@ -1,5 +1,160 @@
 # Project state — 2026-11-09
 
+## Latest: local LLM assistant ignore rules (2026-11-14)
+
+Reviewed repository files and tracked assistant paths; only shared `AGENTS.md`
+is currently present. Added targeted ignores for local Codex, Claude, Cursor,
+Gemini, Continue and Aider histories/caches/settings, plus `*.local.md` instruction
+names for AGENTS/CLAUDE/GEMINI. Shared instructions, skills and rules remain
+eligible for Git. See [staging scope](DEPLOYMENT.md#github-staging-scope).
+Verified representative ignored paths and retained shared/project/publication
+paths using `git check-ignore`; no tracked files match the new rules. This was
+repository maintenance only; no experiments or model fits ran. Next: review the
+ignore changes alongside the existing uncommitted work before staging.
+
+## Latest: app header subtitle removed (2026-11-10)
+
+Removed the arrow-separated project-stage subtitle below the app title, as
+requested. Verified the text is absent from `app.py` and the file compiles.
+No new tests or experiments needed for this text-only change. Next: review the
+header after reloading the app; include this code change in the next site update.
+
+## Latest: basket/model/strategy/target navigation implemented (2026-11-10)
+
+The user subsequently requested implementation of the plan. Seven main tabs
+remain; saved portfolio comparisons now begin with asset basket, prediction
+model, allocation strategy and next-up/down target where applicable. Non-ML
+views use only applicable controls. Methods/selection teaching sections remain
+separate from portfolio effects. Only existing saved combinations are offered,
+with stale downstream choices reset and missing directions explained.
+
+`portfolio_selection.py` maps original registry/book IDs to display descriptions;
+`portfolio_selection_ui.py` shares the selectors. Strategies/Basic ML start with
+one configuration and retain earlier multi-model/strategy comparisons behind
+Compare more. Basic training scope/saved runs are secondary details; model fits
+retain their recorded universe. Grouped direction choices include method, full/
+top-ten basket and real momentum horizon. Feature effects now sit in their own
+subtab. Tuning and engineering retain their actual recipes/settings/protocols.
+
+Final has the same selection flow and a session-only **Compare saved final
+portfolios** list spanning its three labeled studies. Original metrics and paths
+are preserved; source protocols remain visible. Different calendars cannot be
+charted as matched tests, and publication/mode changes clear the list. The
+momentum-window allocation link selects the correct basket and saved run.
+
+Verification: **240 tests pass** (144.072 s, one native thread), including six new
+saved-case/protocol checks; source-free seven-tab scope/model/direction/horizon
+interactions and real-browser views pass. See
+`docs/verification/basket_first_ui_20261110.json` and companion screenshots.
+Manifest remains `5dc7835271b868a609798657d4fa043be7dc19623c87ef1356ba6e3f3bef9372`;
+all 475 display-frame hashes verified. No new experiments, fits, backtests,
+publication exports, dependencies or ignore-rule changes. Computational modules
+remain exact; independent submission work is preserved. No commit/push performed.
+
+Read [implementation and handoff](BASKET_FIRST_UI_PLAN.md). Next: user reviews
+navigation, then can push code/docs plus current publication (including the earlier
+acceleration extension). Basket-specific fitting, missing pairings and formal
+report integration remain separate work. The planning-only entry below records
+the previous turn and is superseded by this explicit implementation request.
+
+## Latest: basket-first navigation proposal — not implemented (2026-11-10)
+
+The user could not find the acceleration view and requested a tab-by-tab plan
+for basket → prediction model → strategy → up/down, explicitly declining a
+refactor for now. The current view is the fourth nested tab under Grouping With
+ML; its final evaluation has a separate Final test subtab. Acceleration source
+and display frames remain local/uncommitted at this review; this agent has not
+pushed the change to the hosted site.
+
+Saved [BASKET_FIRST_UI_PLAN.md](BASKET_FIRST_UI_PLAN.md): current control audit,
+seven-tab proposal, exceptions for non-ML/method views, shared saved-case adapters,
+coverage/provenance rules, deployment/report boundaries and an incremental rollout.
+Recommend Basic ML as a pilot. Choosing a basket initially filters existing
+portfolio evidence; basket-specific model retraining and arbitrary new pairings
+would be separate scientific work. No application code, experiment, publication,
+dependency or submission change accompanies this plan. No new tests or fits run;
+documentation paths and whitespace checked. Previous test evidence below belongs
+to the prior implementation, not a newly implemented UI proposal.
+
+Next: user reviews the plan. Do not start the proposal based on older “implement”
+requests in this history. Preserve concurrent submission work.
+
+## Latest: submission robustness and a passing --final build (2026-11-10)
+
+`python3 build_submission.py --final` exits 0. It now checks the evidence the notebook
+reads (`research/submission_checks.py`, 10/10 true); the older catalog-run checks are kept
+in `build_status.json` as `catalog_run_checks_informational`. The engineering study is
+pinned (`ENGINEERING_STUDY` in `research/notebook_views.py`), so the training-only
+`…172206` run no longer changes Section 6. New Sections 5b (tuned settings on the chosen
+book, 2010–2018: no material change), 8b (costs: chosen book still ahead of equal weight
+at 25 bps) and 8c (significance: not significant, p = 0.48 test).
+
+Report and slides rewritten to the notebook's structure (same day): `project_report.qmd`
+(sections numbered as in the notebook, inline numbers read from saved results) and
+`presentation.qmd` (16 slides, no code, a "how to read it" line per chart, speaker notes).
+Shared figures live in `context/notebook_cells/12_presentation.py`. Slide overflow checked
+with headless-Chrome screenshots. Old QMD/HTML archived in
+`submission/archives/pre_presentation_20261110/`. `--final` still 10/10.
+
+
+## Latest: grouped momentum acceleration experiment (2026-11-10)
+
+Added **Grouping With ML → Momentum acceleration** and a separate **Final test →
+Momentum acceleration** section. Original K-means/Ward group formation, top-ten
+positive-side-volatility screening, positive momentum and cash rules stay exact.
+The app explicitly distinguishes equal-weight basket return signals from actual
+momentum-weighted stock positions. The new experiment compares original, stock,
+basket and combined deceleration-to-cash rules, with a declared 50% haircut.
+Current members are fixed across the two return observations; all signals use
+already-earned returns. No directional classifiers were fitted or retuned.
+
+Study `acceleration_20261110T204704_5c0c838f` is complete: training January
+2005–December 2009 (60 months), then a separately labeled previously viewed
+2010–2018 check (108 months). Across both grouping methods, eight metric rows per
+phase, 480/864 monthly rows and 6,000/10,800 stock audits. All four original
+method/window books match saved references exactly. K-means test basket-only
+CAGR falls 19.61% → 14.36%, drawdown shrinks −21.33% → −14.65%; show the trade-off.
+
+Current publication: **476 files / 173,332,889 bytes**, preserving all 469 earlier
+frame hashes. Old default preserved in ignored `project_before_acceleration_20261110`.
+Deploy remains source/object/catalog/fit/replay free; existing ignore rules include
+new code and current Parquet while excluding scientific artifacts and backups.
+All **229 tests pass** (215.021 s, one native thread); source-free seven-tab AppTest
+and real-browser training/basket/final checks pass. See
+[MOMENTUM_ACCELERATION.md](MOMENTUM_ACCELERATION.md) and
+`docs/verification/momentum_acceleration_20261110.json` plus PNGs.
+
+Next: user reviews this fixed-rule comparison; a separately declared acceleration
+ML input recipe remains optional and unrun. Formal report/slides/release pin are
+not revised by this app experiment. Preserve the other LLM's independent notebook
+rewrite and volatility-neutral study below. No commit or push performed.
+
+## Latest: graded notebook rewritten for presentation (2026-11-10)
+
+`submission/analysis.ipynb` now follows the assignment rubric (summary, rubric map,
+sections 1–9, limitations). It stays read-only (`MLFACTOR_READ_ONLY=1`), executes
+cleanly with nbclient from `submission/`, and shows the modeling code a grader expects
+without refitting: the equal-weight CAGR recomputed from saved monthly returns, the
+ANOVA-10 pipeline object, the declared grids and the exact `GridSearchCV` lines
+from `research/tuning.py`. The previous notebook is archived under
+`submission/archives/pre_presentation_20261110/`.
+
+New Section 7 reads `0_7_Feature_Engineering/part8_*` from
+`03_vol_neutral_momentum_ml.ipynb`: AUC ≈ 0.49–0.51 with a volatility-neutral label;
+bucket alpha ≈ 2.2%/yr test (t 1.9), 3.0%/yr walk-forward (t 0.9); ML+momentum
+blend (w = 0.50 chosen on 2005–2009) test Sharpe 1.01 vs equal weight 0.87.
+The test window was already viewed; reported as a check.
+
+Unchanged: declared choice, `release.json`, `project_report.qmd`, `presentation.qmd`
+and rendered HTML. Note: `engineering_20261110T172206_74f70a89` (training-only, made by
+a default `run_feature_engineering.py` run) is now the newest engineering study, so
+Section 6 reads it instead of `engineering_20261110T171255_825ffa99`; its closing
+sentence therefore says no 2010–2018 engineering stage is saved for that study.
+
+Next: decide whether the report/slides adopt the new structure and Section 7; rebuild
+with `python3 build_submission.py`.
+
+
 ## Latest: make the original K-means top-ten cash book recognizable (2026-11-10)
 
 The requested K-means → top-ten positive-volatility → one-month positive-momentum

@@ -8,6 +8,8 @@ from research.models import default_model_registry
 from research.strategies import default_registry
 from research.tuning_holdout import VERSIONS, list_tuning_holdouts, load_tuning_holdout
 from strategy_groups import family_for
+from portfolio_selection import registry_cases
+from portfolio_selection_ui import select_portfolio_case
 
 
 COLORS = {"No ML": "#68716e", "ML, not tuned": "#536da6", "Tuned ML": "#287d68"}
@@ -43,6 +45,10 @@ def render_tuning_holdout(store=None, published=None):
     saved_rules = {key for item in studies for key in item["metadata"]["strategies"]}
     st.caption(f"{len(saved_rules)} basic strategies have saved tuning comparisons. All are available below by default; "
                "the main-portfolio filter on other tabs does not restrict this chooser.")
+    if not studies:
+        st.info('No saved tuning comparison. Fit with labels known through December 2006, then score '
+                'January 2007–December 2009. Viewing this page does not train a model.')
+        return
     with st.expander("What is being tuned? And does equal weight plus ML make sense?"):
         st.write("The grid search chooses classifier settings, such as logistic regularization or tree depth, "
                  "on chronological folds of early training data. Up and down are separate prediction targets. "
@@ -59,24 +65,17 @@ def render_tuning_holdout(store=None, published=None):
     _grouping_tuning_notes()
     names = default_model_registry()
     rules = default_registry()
-    controls = st.columns(3)
-    model_labels = {spec.label: key for key, spec in names.items()}
-    model_key = model_labels[controls[0].selectbox(
-        "1. Model", list(model_labels), key="tuning_holdout_model",
-        help="Compare this model's original settings with its chronological grid-search winner.")]
-    strategies = {spec.label: key for key, spec in rules.items() if key in saved_rules or not saved_rules}
-    if st.session_state.get('tuning_holdout_strategy') not in strategies:
-        st.session_state.pop('tuning_holdout_strategy', None)
-    strategy_label = controls[1].selectbox(
-        "2. Starting strategy", list(strategies), key="tuning_holdout_strategy",
-        help="The trading rule stays fixed. Its weights are adjusted using the chosen model's probabilities.")
-    strategy = strategies[strategy_label]
+    cases=pd.concat([registry_cases(item['metadata']['strategies'], item['metadata']['model_keys'],
+        (item['metadata'].get('prediction_target','loss'),), study_id=str(item['directory']))
+        for item in studies],ignore_index=True)
+    choice=select_portfolio_case(cases,'tuning_selection',keys={
+        'model':'tuning_holdout_model','allocation':'tuning_holdout_strategy','target':'tuning_holdout_target'})
+    if choice.empty:
+        return
+    row=choice.iloc[0]
+    model_key,strategy,target=row.model_key,row.strategy,row.target
+    strategy_label=rules[strategy].label
     st.caption(f"{family_for(strategy).title} · {rules[strategy].description}")
-    target = TARGETS[controls[2].selectbox(
-        "3. Prediction target", list(TARGETS), key="tuning_holdout_target",
-        help="Choose what the model predicts. Settings minimize log loss for this event, "
-             "rather than maximizing portfolio return. Up and down use separately trained models; "
-             "a zero return counts as neither event.")]
     event = "next down" if target == "loss" else "next up"
     st.caption("Tuning objective: minimize prediction log loss on chronological cross-validation folds. "
                "The strategy, feature list and trading thresholds are held fixed.")

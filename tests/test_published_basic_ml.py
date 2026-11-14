@@ -83,13 +83,14 @@ class PublishedBasicMLTests(unittest.TestCase):
                 "research.runner.ExperimentRunner.run", side_effect=AssertionError("no fitting/replay")):
             app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=45).run()
             self.assertFalse(app.exception)
+            app.checkbox(key='basic_compare_more').check().run()
             basic = app.tabs[1]
             for label in ["1. Does the model predict downside?", "2. What changes in the portfolios?", "Change from each original portfolio"]:
                 section = next(item for item in basic.expander if item.label == label)
                 self.assertFalse(section.proto.expanded)
             self.assertFalse(any("compute" in button.label.lower() for button in basic.button))
             self.assertEqual(len(app.multiselect(key="basic_ml_chart_strategies").value), 14)
-            app.selectbox(key="basic_pattern").select("Upside threshold boost").run()
+            app.selectbox(key="basic_pattern").select("Next up").run()
             self.assertFalse(app.exception)
             self.assertTrue(any(x.label == "1. Does the model predict an up move?" for x in app.tabs[1].expander))
             table = next(f.value for f in app.tabs[1].dataframe if "Brier score" in f.value and "Predictor" in f.value)
@@ -114,7 +115,7 @@ class PublishedBasicMLTests(unittest.TestCase):
             selected = next(f.value for f in app.tabs[1].dataframe if "Selected weight" in f.value)
             self.assertTrue(selected["Selected weight"].ge(0).all())
             self.assertFalse(any("probability_of_up" in f.value for f in app.tabs[1].dataframe))
-            app.selectbox(key="basic_pattern").select("Downside protection").run()
+            app.selectbox(key="basic_pattern").select("Next down").run()
             self.assertFalse(app.exception)
             self.assertTrue(any('Training data only' in x.value for x in app.tabs[1].info))
             self.assertTrue(any('Training data only' in x.value for x in app.tabs[0].info))
@@ -130,10 +131,11 @@ class PublishedBasicMLTests(unittest.TestCase):
                 app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=45)
                 app.session_state['basic_result'] = self.sources[self.ids['upside', 'pooled']]
                 app.run()
-                app.selectbox(key="basic_pattern").select("Upside threshold boost").run()
                 self.assertFalse(app.exception)
-                self.assertFalse(app.tabs[1].dataframe)
-                self.assertTrue(any("No published Basic ML" in x.value for x in app.tabs[1].info))
+                self.assertEqual(app.selectbox(key='basic_pattern').options,['Next down'])
+                self.assertTrue(any('Only Next down is saved' in x.value for x in app.tabs[1].caption))
+                # A local upside result must not supply an absent published event.
+                self.assertEqual(app.session_state['basic_loaded_result'][1].config.prediction_target,'loss')
 
     def test_publication_rejects_a_test_run_without_writing_a_partial_release(self):
         source = self.sources[self.ids["loss", "pooled"]]

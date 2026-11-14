@@ -1,0 +1,196 @@
+{
+  "date": "2026-11-10",
+  "study_id": "acceleration_20261110T204704_5c0c838f",
+  "variants": [
+    "Original",
+    "Stock deceleration",
+    "Basket deceleration",
+    "Stock + basket deceleration"
+  ],
+  "strength": 0.5,
+  "training_months": 60,
+  "test_months": 108,
+  "original_parity": [
+    {
+      "window": "training",
+      "method": "kmeans",
+      "months": 60,
+      "exact_original_parity": true
+    },
+    {
+      "window": "training",
+      "method": "ward",
+      "months": 60,
+      "exact_original_parity": true
+    },
+    {
+      "window": "test",
+      "method": "kmeans",
+      "months": 108,
+      "exact_original_parity": true
+    },
+    {
+      "window": "test",
+      "method": "ward",
+      "months": 108,
+      "exact_original_parity": true
+    }
+  ],
+  "source_free_seven_tab_deploy": "passed; CSV/catalog/objects/clustering/runner blocked",
+  "publication": {
+    "parent_sha256": "4df420855fe8e06be10ecf8cf52011fb6eae4e1147d9150fbab2737b04b65e1d",
+    "manifest_sha256": "5dc7835271b868a609798657d4fa043be7dc19623c87ef1356ba6e3f3bef9372",
+    "files": 476,
+    "bytes": 173332889,
+    "preserved_frames": 469,
+    "default": "published/project",
+    "previous_default": "published/project_before_acceleration_20261110"
+  },
+  "test_previously_viewed": true,
+  "new_directional_classifier_fits": 0,
+  "tuning": "none",
+  "training_metrics": [
+    {
+      "method": "kmeans",
+      "variant": "Original",
+      "cagr": 0.24680703649346214,
+      "sharpe": 0.8326377304426942,
+      "max_drawdown": -0.20548668273818582,
+      "avg_cash_weight": 0.5043333333333334
+    },
+    {
+      "method": "kmeans",
+      "variant": "Stock deceleration",
+      "cagr": 0.23438554130101946,
+      "sharpe": 0.8104411057804815,
+      "max_drawdown": -0.1977113864333,
+      "avg_cash_weight": 0.5511061593522342
+    },
+    {
+      "method": "kmeans",
+      "variant": "Basket deceleration",
+      "cagr": 0.23575984145942605,
+      "sharpe": 0.8259973044959242,
+      "max_drawdown": -0.18880167452940233,
+      "avg_cash_weight": 0.5849999999999999
+    },
+    {
+      "method": "kmeans",
+      "variant": "Stock + basket deceleration",
+      "cagr": 0.22801282171637885,
+      "sharpe": 0.8097450504896294,
+      "max_drawdown": -0.18465413867678193,
+      "avg_cash_weight": 0.6151920112927913
+    },
+    {
+      "method": "ward",
+      "variant": "Original",
+      "cagr": 0.2124235514844868,
+      "sharpe": 0.7192170721581528,
+      "max_drawdown": -0.21355581112357414,
+      "avg_cash_weight": 0.505
+    },
+    {
+      "method": "ward",
+      "variant": "Stock deceleration",
+      "cagr": 0.20655284111921565,
+      "sharpe": 0.711340187459536,
+      "max_drawdown": -0.2006061143941763,
+      "avg_cash_weight": 0.5472402174317754
+    },
+    {
+      "method": "ward",
+      "variant": "Basket deceleration",
+      "cagr": 0.21343535095631383,
+      "sharpe": 0.7459214911660147,
+      "max_drawdown": -0.19203929134948006,
+      "avg_cash_weight": 0.5906666666666667
+    },
+    {
+      "method": "ward",
+      "variant": "Stock + basket deceleration",
+      "cagr": 0.20920301382768122,
+      "sharpe": 0.7384411387442616,
+      "max_drawdown": -0.18371832657805875,
+      "avg_cash_weight": 0.6170533182459805
+    }
+  ],
+  "test_metrics": [
+    {
+      "method": "kmeans",
+      "variant": "Original",
+      "cagr": 0.19613336703857717,
+      "sharpe": 0.5907806143614373,
+      "max_drawdown": -0.21328628206221678,
+      "avg_cash_weight": 0.5155555555555555
+    },
+    {
+      "method": "kmeans",
+      "variant": "Stock deceleration",
+      "cagr": 0.18068862103586225,
+      "sharpe": 0.5586634755709493,
+      "max_drawdown": -0.19921029541894741,
+      "avg_cash_weight": 0.5538999404225771
+    },
+    {
+      "method": "kmeans",
+      "variant": "Basket deceleration",
+      "cagr": 0.14357954362246184,
+      "sharpe": 0.6688543838244028,
+      "max_drawdown": -0.14654331700222967,
+      "avg_cash_weight": 0.5887962962962963
+    },
+    {
+      "method": "kmeans",
+      "variant": "Stock + basket deceleration",
+      "cagr": 0.13500659181809818,
+      "sharpe": 0.6406828118416803,
+      "max_drawdown": -0.13933193867566607,
+      "avg_cash_weight": 0.6136464771791722
+    },
+    {
+      "method": "ward",
+      "variant": "Original",
+      "cagr": 0.18151142118609864,
+      "sharpe": 0.5994341695407239,
+      "max_drawdown": -0.19265903343002544,
+      "avg_cash_weight": 0.512037037037037
+    },
+    {
+      "method": "ward",
+      "variant": "Stock deceleration",
+      "cagr": 0.15907511486294285,
+      "sharpe": 0.5488986110674297,
+      "max_drawdown": -0.17983522798214946,
+      "avg_cash_weight": 0.5542827691842297
+    },
+    {
+      "method": "ward",
+      "variant": "Basket deceleration",
+      "cagr": 0.16372726576542507,
+      "sharpe": 0.5620438986518199,
+      "max_drawdown": -0.14654533160318706,
+      "avg_cash_weight": 0.5935185185185186
+    },
+    {
+      "method": "ward",
+      "variant": "Stock + basket deceleration",
+      "cagr": 0.1517327066464247,
+      "sharpe": 0.5329601410612341,
+      "max_drawdown": -0.14002667845863936,
+      "avg_cash_weight": 0.6206893708489558
+    }
+  ],
+  "tests": {
+    "full_suite": 229,
+    "seconds": 215.021,
+    "focused_new_tests": 6,
+    "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -m unittest discover -s tests"
+  },
+  "browser": "Passed: training explanation/metrics; current-member basket return bars; Ward final cumulative log/drawdown/cash",
+  "screenshots": [
+    "momentum_acceleration_training_20261110.png",
+    "momentum_acceleration_baskets_20261110.png",
+    "momentum_acceleration_final_20261110.png"
+  ]
+}

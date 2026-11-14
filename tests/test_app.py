@@ -52,6 +52,8 @@ class AppTests(unittest.TestCase):
         app.session_state["training_result"] = self.result if result is None else result
         app.run()
         self.assertFalse(app.exception)
+        app.checkbox(key='strategies_compare_more').check().run()
+        app.checkbox(key='basic_compare_more').check().run()
         return app
 
     def test_five_tabs_and_first_tab_has_no_prediction_content(self):

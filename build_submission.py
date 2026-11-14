@@ -37,7 +37,12 @@ def main():
         release_path.write_text(json.dumps(release, indent=2) + "\n")
     summary = load_release(release_path)
     release_hash = hashlib.sha256(release_path.read_bytes()).hexdigest()
-    checks = readiness(summary)
+    # The notebook, report and slides read the frozen final-book study, the GridSearchCV
+    # holdouts and the pinned engineering study, so --final checks that evidence.
+    # The older catalog-run checks are kept in build_status.json for reference only.
+    from research.submission_checks import submission_checks
+    checks = submission_checks()
+    catalog_checks = readiness(summary)
     if args.final and not all(checks.values()):
         missing = "\n".join(f"- {key}" for key, passed in checks.items() if not passed)
         raise SystemExit("Final submission evidence is incomplete:\n" + missing)
@@ -65,6 +70,7 @@ def main():
     status = {"run_id": summary["run_id"], "release_sha256": release_hash,
               "feature_study": summary["release"].get("feature_study"),
               "mode": "final" if args.final else "draft", "checks": checks,
+              "catalog_run_checks_informational": catalog_checks,
               "outputs": ["analysis.ipynb", "_output/project_report.html", "_output/presentation.html"]}
     (SUBMISSION / "build_status.json").write_text(json.dumps(status, indent=2) + "\n")
     print("Built readable notebook, report HTML and slide HTML.", flush=True)

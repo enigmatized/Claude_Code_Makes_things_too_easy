@@ -1,0 +1,85 @@
+{
+  "date": "2026-11-10",
+  "scope": "Implement authorized basket/model/allocation/target navigation over existing saved cases",
+  "main_tabs": 7,
+  "new_numerical_experiments": 0,
+  "new_prediction_fits": 0,
+  "new_backtests": 0,
+  "tests": {
+    "full_suite": 240,
+    "seconds": 144.072,
+    "focused_new_tests": 6,
+    "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -m unittest discover -s tests",
+    "post_suite_focused": "6 passed, including consistent case colors across return/drawdown/cash and mismatched-calendar guard"
+  },
+  "source_free_deploy": {
+    "status": "passed",
+    "guards": [
+      "CSV reads",
+      "research catalog",
+      "joblib objects",
+      "runner replay",
+      "KMeans fitting",
+      "engineered-classifier fitting"
+    ],
+    "exercised": [
+      "Basic RF/up then per-stock logistic reset",
+      "Non-ML momentum basket",
+      "Ward top-ten HGB/up/2M",
+      "K-means full-group feature recipes RF/up/2M",
+      "Registry Sharpe-pool NB feature effects",
+      "Sortino-pool NB/up tuning",
+      "Ward RF/up engineering",
+      "Final HGB/up/2M original pair",
+      "Eight saved official-test cases across three protocols"
+    ]
+  },
+  "browser": {
+    "status": "passed",
+    "views": [
+      "Basic ML RF/up/cash",
+      "Ward HGB/up/2M",
+      "Feature effects Gaussian NB",
+      "Final 2M/up"
+    ],
+    "screenshots": [
+      "basket_first_basic_20261110.png",
+      "basket_first_grouping_20261110.png",
+      "basket_first_features_20261110.png",
+      "basket_first_final_20261110.png"
+    ]
+  },
+  "publication": {
+    "unchanged_manifest_sha256": "5dc7835271b868a609798657d4fa043be7dc19623c87ef1356ba6e3f3bef9372",
+    "file_hashes_verified": 475,
+    "files": 476,
+    "bytes": 173332889
+  },
+  "unchanged_computational_sources": [
+    "research/accounting.py",
+    "research/models.py",
+    "research/runner.py",
+    "research/basket_momentum.py",
+    "research/engineering.py",
+    "research/engineering_study.py"
+  ],
+  "formal_release_unchanged_sha256": "3d73f0be9dbb7c8caf6b83bf84241049e5c6785800037449981a89dee78c7d62",
+  "git": {
+    "new_sources_included": [
+      "portfolio_selection.py",
+      "portfolio_selection_ui.py",
+      "final_comparison_ui.py",
+      "tests/test_portfolio_selection.py"
+    ],
+    "ignored_files_already_tracked": false,
+    "commit_or_push_performed": false
+  },
+  "limits": [
+    "Only saved combinations are offered",
+    "Basket selection does not retrain a model on that basket",
+    "Comparison list is session-only",
+    "Different final calendars are not charted as a matched evaluation",
+    "Method and result studies retain separate fit/target provenance",
+    "Formal deliverable content was not rewritten by this UI implementation"
+  ]
+}

@@ -1,5 +1,51 @@
 # Design decisions
 
+## 2026-11-14 — Ignore local assistant state; retain shared instructions
+
+Use targeted `.gitignore` paths for assistant sessions, histories, caches and
+private settings/instructions. Keep tracked `AGENTS.md` and allow shared
+CLAUDE/GEMINI instructions, assistant configuration, skills and rule directories.
+Avoid blanket assistant-directory or Markdown exclusions that would hide shared
+project guidance. See [Git staging scope](DEPLOYMENT.md#github-staging-scope).
+
+## 2026-11-10 — Implement the shared selection flow over saved cases
+
+The subsequent user request authorizes the previously planning-only navigation.
+Keep seven main tabs and use basket, prediction model, allocation strategy and
+up/down target for portfolio views. Use fewer controls for nonpredictive and
+method lessons. Explicitly describe existing bundled strategies instead of
+rebuilding a universal weighting engine. Keep single-case defaults and existing
+Compare more controls. Offer only evaluated tuples and never silently borrow
+another scope/target/recipe. Basket selection does not retrain pooled models on
+only those assets. Final comparisons preserve protocol, source and exact dates;
+their list is session-only and resets across publication/mode changes. Numerical
+results, research APIs and formal deliverable pins stay unchanged by this UI work.
+See [implementation and handoff](BASKET_FIRST_UI_PLAN.md).
+
+## 2026-11-10 — Plan basket-first navigation; keep the running app intact
+
+The user explicitly requests planning, not implementation. Record a tab-by-tab
+proposal for basket, prediction model, allocation strategy and prediction target.
+Use fewer controls for nonpredictive/method views. Recommend a Basic ML pilot
+with adapters over existing saved cases; do not imply unsupported cross-products
+or retrain models on basket membership as part of rearranging the UI. The proposal
+is not an accepted implementation commitment. See
+[plan and LLM handoff](BASKET_FIRST_UI_PLAN.md).
+
+## 2026-11-10 — Test acceleration as an explicit fixed cash rule first
+
+Preserve the original top-ten grouping strategy. Equal weights define its group
+return signal; invested member weights are proportional to positive momentum.
+Acceleration is the change between two already-earned monthly returns. For basket
+acceleration use current selected membership for both months; cluster IDs are not
+persistent identities. Compare original, stock-only, basket-only and combined
+negative-acceleration haircuts (50%, declared before computation). Multiply existing
+positions, retaining cash rather than shorts or renormalization. Keep training and
+the already-viewed test in separate app sections. Save the signal audits for later
+ML research, but do not claim to have retrained classifiers with them. Publish only
+display frames; preserve prior results, independent notebook work and formal pins.
+See [complete protocol](MOMENTUM_ACCELERATION.md).
+
 ## 2026-11-10 — Name the full K-means momentum/cash rule in Final
 
 The original strategy was included but hidden behind abbreviated book and subtab

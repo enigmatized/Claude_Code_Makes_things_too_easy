@@ -1,13 +1,25 @@
 # Project handoff and maintenance
 
+Latest request (2026-11-10): the user subsequently authorized implementing
+basket → prediction model → strategy → up/down navigation. It is implemented;
+read `docs/BASKET_FIRST_UI_PLAN.md` for actual scope and handoff. Reuse saved-case
+adapters and preserve original calculations/IDs; do not add missing backtests or
+basket-specific model retraining implicitly. Final comparisons retain source
+protocols and official-test dates; deploy remains read-only.
+
 All seven main tabs now support the self-contained published-results mode.
 See `docs/DEPLOYMENT.md` before extending another tab. Keep local research
 available, deployment strictly read-only, and the first six tabs training-only.
 Final test separates earlier grouped portfolios and feature-engineered variants;
 legacy test/training/entire-path windows remain separately labeled.
 
-Grouping With ML has K-means, Ward and directional-adjustment subtabs. It clusters
-stocks. The new Feature engineering tab follows Tuned model and clusters/combines
+Grouping With ML has K-means, Ward, directional-adjustment and Momentum
+acceleration subtabs. The acceleration experiment adds separate stock/basket
+deceleration-to-cash multipliers, preserving every original book and ML fit.
+Training is in the grouping tab; its previously viewed test has its own Final
+subtab. Read `docs/MOMENTUM_ACCELERATION.md` before extending these rules.
+Current publication has 476 files; old releases/artifacts stay ignored.
+Grouping clusters stocks. The new Feature engineering tab follows Tuned model and clusters/combines
 factor columns, with methods/results/hyperparameter-tuning subtabs. Its complete
 study `engineering_20261110T171255_825ffa99` includes six recipes, four classifiers,
 up/down and fixed/tuned variants, plus separately frozen final results on both

@@ -111,8 +111,8 @@ class PublishedBasketPresentationTests(unittest.TestCase):
             self.assertFalse(app.exception)
             advanced = app.tabs[2]
             subtabs = [tab for tab in advanced.tabs if tab.label != 'Grouping With ML']
-            self.assertEqual([tab.label for tab in subtabs], ['K-means', 'Hierarchical clustering', 'Adding a direction'])
-            build, hierarchy, overlay = subtabs
+            self.assertEqual([tab.label for tab in subtabs], ['K-means', 'Hierarchical clustering', 'Adding a direction', 'Momentum acceleration'])
+            build, hierarchy, overlay, acceleration = subtabs
             self.assertFalse(any('Brier score' in f.value or 'Predicted loss probability' in f.value for f in build.dataframe))
             self.assertFalse(any('Prediction model' in w.label for w in build.selectbox))
             self.assertTrue(any('non-constant' in text.value for text in build.markdown))
@@ -125,7 +125,7 @@ class PublishedBasketPresentationTests(unittest.TestCase):
             self.assertFalse(app.exception)
             overlay = next(tab for tab in app.tabs if tab.label == 'Adding a direction')
             self.assertTrue(any('Predicted loss probability' in f.value for f in overlay.dataframe))
-            app.selectbox(key='basket_overlay_book').select('Full correlation groups').run()
+            app.selectbox(key='basket_selection_basket').select('K-means full groups').run()
             app.selectbox(key='basket_screen_1').select(BASKET_DOWNSIDE_VERSION).run()
             self.assertFalse(app.exception)
             self.assertTrue(any('Training data only' in info.value for info in app.tabs[2].info))

@@ -1,13 +1,16 @@
 # Published presentation data
 
-`project/` is the current default **seven-tab** publication, about 172.6 MB. It
+`project/` is the current default **seven-tab** publication, about 173.3 MB. It
 includes K-means and Ward hierarchical grouping with the same trading rules;
 adds feature selection (including advanced books), both tuning targets/trials,
 and frozen test/training/entire-path views to the earlier three-tab package.
 No raw data, experiment catalog, fitted estimators or runtime model/backtest
 execution is needed. It also includes the completed feature-engineering training/tuning/final study,
-with six input recipes and all four classifiers. Earlier publications below
-are preserved.
+with six input recipes and all four classifiers. Momentum acceleration adds
+separate stock/basket deceleration-to-cash comparisons for both grouping methods,
+with training and previously viewed test evidence. The 476-file release preserves
+all 469 prior frame hashes. Earlier publications and the pre-acceleration default
+are preserved outside Git; see [acceleration protocol](../docs/MOMENTUM_ACCELERATION.md).
 
 `advanced_ml/` preserves the three-tab publication. It preserves the
 first two tabs and adds saved K-means memberships, grouping-pattern illustrations,

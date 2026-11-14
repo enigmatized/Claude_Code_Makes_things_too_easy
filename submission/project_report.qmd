@@ -1,22 +1,24 @@
 ---
 title: "MLFactor long-only strategy"
-subtitle: "Annual log growth, four factory models, and a feature-engineering check"
+subtitle: "Where the extra return comes from, what machine learning added, and the book I would trade"
 jupyter: python3
 format:
   html:
     theme: cosmo
     toc: true
+    toc-depth: 2
+    number-sections: true
     code-fold: true
-    code-summary: "Show analysis code"
+    code-summary: "Show code"
     embed-resources: true
+    fig-width: 9
 execute:
   warning: false
 ---
 
-The graded return is annual log growth, 12 times the mean monthly portfolio log return, log(1 + r). CAGR is exp(of that growth) minus 1, and it stays beside the log growth. Volatility, Sharpe, and max drawdown use the simple monthly returns. Results are gross of costs. Cash earns nothing.
-
 ```{python}
 #| include: false
+# Read-only: every number below comes from saved results. Nothing is fitted while rendering.
 import os
 import sys
 from pathlib import Path
@@ -26,109 +28,238 @@ for candidate in (here, *here.parents):
     if (candidate / "research" / "notebook_views.py").is_file():
         sys.path.insert(0, str(candidate))
         break
+import matplotlib.pyplot as plt
 from IPython.display import display
-from research.notebook_views import (
-    choice_text, classifier_growth_table, engineering_comparison_table,
-    engineering_holdout_table, engineering_note, equal_weight_benchmark,
-    equal_weight_sentence, feature_cut_table, feature_name_note, grouping_note,
-    non_ml_figure, non_ml_windows_table, path_figure, risk_note, risk_table,
-    source_note, style_table, tuning_note, tuning_portfolio_table, tuning_search_table,
-)
+import research.notebook_views as v
+
+PERCENT = "{:.2%}"
+risk = v.risk_table()
+test = risk[risk.Window.eq("Official test")].set_index("Book")
+train = risk[risk.Window.eq("Training window")].set_index("Book")
+ew, top = test.loc["Equal weight"], test.loc["Top 10 positive-vol"]
+down = test.loc["Top 10 + downside to cash"]
+blend = v.vol_neutral_table("test_2010_2018").set_index("Strategy")
+blend = blend.loc[[s for s in blend.index if s.startswith("Vol-neutral ML + momentum")][0]]
+costs = v.cost_table("test").set_index("Book")
+sig = v.significance_table().set_index("Window").iloc[0]
+tuned = v.tuned_final_table()
+max_tuning_gap = tuned["Tuned − factory CAGR"].abs().max()
+pairs_strong, pairs_all = v.strong_pairs()
+pct = lambda x, d=1: f"{x:.{d}%}"
 ```
 
-## Decision
+# Summary
 
-The book to trade is top-10 positive-vol with no probability overlay. Each month it forms five groups from the trailing 12-month return path, keeps at most ten high positive-vol names in each group, and invests only where one-month momentum is positive. The rest is cash. Its official-test annual log growth is higher than equal weight, and its Sharpe is lower. Factor models, a ten-factor cut, grid search, and the engineered recipes do not produce a forecast that beats a historical base rate. The engineering notebook's higher CAGR lines up with a volatility tilt that a model-free rule already captures.
+**Question.** Using monthly factor snapshots, can machine learning build a long-only, monthly-rebalanced stock portfolio that beats an equal-weighted market over January 2010 – December 2018?
+
+**Answer.**
+
+- **The extra return comes from a portfolio rule, not a forecast.** The book I would trade, *Top 10 positive-vol*, groups stocks by their past return paths, favors names with high upside volatility, holds only positive one-month momentum, and leaves the rest in cash. On the official test it grew at `{python} pct(top.CAGR)` a year against `{python} pct(ew.CAGR)` for equal weight. It also beat equal weight on the 2005–2009 training window (`{python} pct(train.loc["Top 10 positive-vol"].CAGR)` vs `{python} pct(train.loc["Equal weight"].CAGR)`).
+- **The models barely forecast.** Four model types, a ten-factor cut, `GridSearchCV` tuning and engineered features all stay near a coin flip on next month's direction (test AUC about 0.50). Added to the rule, the forecasts act as a cash dial: they lower return and drawdown together and leave Sharpe unchanged.
+- **The most useful ML result is a blend.** A volatility-neutral ML ranking mixed 50/50 with momentum has the best risk-adjusted test result in the project (Sharpe `{python} f"{blend.Sharpe:.2f}"` vs `{python} f"{ew.Sharpe:.2f}"` for equal weight). Its weight was chosen on training years, but the edge is small and the test had already been viewed.
+- **The trade-off.** The chosen book has about `{python} f"{top.Volatility / ew.Volatility:.1f}"` times equal weight's volatility and a lower Sharpe. Its extra return is not statistically significant (p = `{python} f"{sig['p-value']:.2f}"`). It still leads after trading costs.
+
+**Conventions.** Annual log growth is 12 × mean(log(1 + r)) of the monthly portfolio return, and CAGR = exp(annual log growth) − 1. Volatility and Sharpe use simple monthly returns with a zero risk-free rate. Results are gross of costs unless a section says otherwise, and cash earns nothing. The label on a snapshot at month *t* is the return earned in month *t + 1*, so every decision uses only information available at *t*. The full analysis, with the code that produced each saved result, is in `analysis.ipynb`; section numbers below match it.
 
 ```{python}
-print(choice_text())
+#| label: tbl-glance
+#| tbl-cap: "Official test, January 2010 – December 2018. The first four rows are the frozen final books; the last two come from the Section 7 study, which holds the top 20% of a ranking and uses a different protocol."
+display(v.style_table(v.glance_table()))
 ```
 
-## Equal-weight log growth and CAGR
+# Data and the equal-weighted benchmark
 
-Training is January 2000–December 2009. The official test is January 2010–December 2018, 108 months. Combined compounds those monthly simple returns through December 2018. The graded annualized return is the official-test CAGR, shown with its annual log growth.
+Each month holds roughly 1,000–1,200 stocks. Each stock has 20 fundamental and trading factors stored as cross-sectional percentile ranks, plus next month's return. Training covers January 2000 – December 2009 returns (120 months); the official test covers January 2010 – December 2018 (108 months).
+
+The equal-weighted market holds every available stock at the same weight and rebalances monthly. Its annualized return is computed on the *portfolio's* monthly returns. Compounding the gross returns and exponentiating 12 × the mean log return give the same number, which the notebook checks with an assertion. Averaging stock-level log returns, or annualizing the arithmetic mean, gives a different and wrong number.
 
 ```{python}
-print(source_note("benchmark"))
-display(style_table(equal_weight_benchmark()))
-print(equal_weight_sentence())
+#| label: tbl-benchmark
+#| tbl-cap: "Equal-weighted benchmark."
+display(v.style_table(v.equal_weight_benchmark()))
+print(v.equal_weight_sentence())
 ```
 
-## Two non-ML books
+# Two non-ML strategies
 
-All of these books are long-only and gross of costs. Cash earns nothing.
+Equal weight is the benchmark. The second non-ML strategy is my own, in two versions. Each month:
 
-Equal weight gives every stock the same weight and stays fully invested.
+1. Stocks with a complete 12-month return history are split into **five K-means groups** using those past return paths. The groups are refit every month.
+2. **Top 10 positive-vol** keeps, in each group, at most the ten names with the highest *positive volatility*: the root-mean-square of the up months, with down months counted as zero. **Full baskets** keeps every name.
+3. A group whose own last-month return was not positive goes to cash. Inside a group that was up, only members that were up get weight, in proportion to that one-month return.
 
-Top 10 positive-vol and full baskets invest only in positive one-month momentum. One month is the last simple return the stock has already earned. Held names are weighted in proportion to that return. Every other dollar is cash.
-
-Each month, stocks with a complete 12-month return path are split into five K-means groups, fit on those past returns. The groups are fit again the next month. A group whose own one-month return is not positive is left in cash, including members that were up on their own. Inside a group that was up, only members that were up receive weight.
-
-Top 10 positive-vol makes each group smaller first. It keeps at most ten names per group, the ones with the highest positive volatility over the same twelve months. Positive volatility is the root-mean-square of the up months; down months contribute zero. Capital is then scaled to the names that remain, and the one-month rule above is applied.
-
-Full baskets use the same five groups and the same one-month rule, with every name still in the group.
-
-The training window here is January 2005–December 2009, because the groups need twelve months of history. The chart is the official test.
+The groups need twelve months of history, so the training window for these books starts in January 2005.
 
 ```{python}
-print(source_note("final"))
-display(style_table(non_ml_windows_table()))
-display(non_ml_figure("test"))
+#| label: fig-non-ml
+#| fig-cap: "Growth of $1 on the official test for the non-ML books."
+display(v.style_table(v.non_ml_windows_table()))
+display(v.non_ml_figure("test")); plt.close("all")
 ```
 
-## Four model types
+Top 10 positive-vol grows faster than equal weight in both windows, so the result is not a test-period accident. It does so with about half its capital in cash and roughly two and a half times equal weight's test volatility. Full baskets is the low-risk version: small drawdowns, but test growth well below the market.
 
-Logistic regression, Gaussian naive Bayes, random forest, and histogram gradient boosting. The first, third, and fourth have tunable hyperparameters. These official books use factory settings.
+# Feature selection: ten or fewer factors
 
-The models do not choose a new list of stocks. Each overlay starts from top-10 positive-vol or from full baskets and only rescales weights that are already positive.
-
-Downside to cash multiplies each held weight by (1 − 0.5 × P(next month is down)). The reduction goes to cash.
-
-Upside tilt multiplies a held weight by 1.5 when P(next month is up) is at least 0.60, then scales the stock weights back to that book's original stock budget. Cash stays where the momentum rule left it. The two adjustments are separate rows.
+Many of the 20 factors measure the same thing. The training correlation map shows clear family blocks: most of the debt measures move together, the three share-turnover windows are almost the same series, and the cash-flow ratios cluster. `{python} pairs_strong` of `{python} pairs_all` factor pairs have |correlation| ≥ 0.7. With this much redundancy a model can drop half the list and lose very little.
 
 ```{python}
-growth = classifier_growth_table()
-official = growth.loc[growth["Window"].str.startswith("Official test")].drop(columns=["Window"])
-display(style_table(official))
+#| label: fig-corr
+#| fig-cap: "Pearson correlations between the 20 factors on training stock-months, ordered by economic family. Dark red and dark blue blocks are groups of factors carrying the same information."
+display(v.correlation_figure()); plt.close("all")
 ```
 
-## Categories, the ten-factor cut, and grid search
-
-K nearest neighbors is an additional model type. It classifies the within-month quintile of the next return. The portfolio row equal-weights the names placed in the top quintile. A month with none of those names is cash at zero. The search is a training holdout, and the frozen 2010–2018 books stay on the four factory classifiers. The K-means books group past return paths and then apply the positive one-month rule.
-
-The ten-factor question is whether a subset changes the book versus all twenty factors on the training years. GridSearchCV scores log loss on a training holdout. The official books were not refit with the chosen settings.
+I compared three ten-factor cuts against all 20: ANOVA F-score top 10, a correlation-pruned top 10 (skip any factor with |r| ≥ 0.90 to one already chosen), and random-forest importance top 10. Each selector is a step inside the model pipeline, so it is refit on training data in every fold and never sees validation or test labels.
 
 ```{python}
-print(grouping_note())
-display(style_table(feature_cut_table()))
-print(feature_name_note())
-display(tuning_search_table().style.format({"Best score": "{:.4f}"}, na_rep="—").hide(axis="index"))
-books = tuning_portfolio_table()
-percent = {column: "{:.2%}" for column in books.columns if column not in {"Strategy", "Model"}}
-display(books.style.format(percent, na_rep="—").hide(axis="index"))
-print(tuning_note())
+#| label: tbl-cuts
+#| tbl-cap: "Training-window CAGR of each overlay book when its model sees all 20 factors versus each ten-factor cut."
+cuts = v.feature_cut_table()
+display(cuts.style.format({c: PERCENT for c in cuts.columns if c != "Book"}, na_rep="—").hide(axis="index"))
 ```
 
-## Feature engineering
+**Does the cut help?** Not measurably. Every cut moves training CAGR by at most about 0.2 percentage points, in either direction. That follows from Section 4: the forecasts barely move the books, so neither do their inputs. I keep the ANOVA top 10 because it is the simplest cut, meets the limit, and costs nothing.
 
-Two saved pieces sit behind this section. The completed study fits every learned transform inside chronological folds and scores January 2007–December 2009 without loading the test file. The table is the same K-means top-10 book, positive one-month momentum with residual cash, then a logistic downside haircut, for each recipe. The second table is the previously viewed notebook comparison on 2010–2018. Each month it equal-weights the 20% of names with the highest predicted probability and stays fully invested. Annual log growth in that table is log(1 + CAGR).
+# Four model types
+
+Logistic regression, Gaussian naive Bayes, random forest and histogram gradient boosting each predict, for every stock, the probability that next month's return is negative or positive. The forecasts do not pick new stocks; they adjust the Section 2 books:
+
+- **Downside to cash** multiplies each held weight by (1 − 0.5 × P(down)) and moves the reduction to cash.
+- **Upside tilt** multiplies a weight by 1.5 when P(up) ≥ 0.60, then rescales stock weights back to the book's original stock budget.
+
+The official-test models were fitted once on all training data with factory settings and frozen before the test was scored.
 
 ```{python}
-print(source_note("engineering"))
-display(style_table(engineering_holdout_table()))
-comparison = engineering_comparison_table()
-display(style_table(comparison).format({"Test AUC": "{:.3f}"}))
-print(engineering_note())
+#| label: tbl-models
+#| tbl-cap: "Official test CAGR and Sharpe by book and model."
+growth = v.classifier_growth_table()
+part = growth[growth["Window"].str.startswith("Official test")]
+display(part.pivot_table(index="Book", columns="Model", values="CAGR", sort=False).style.format(PERCENT, na_rep="—"))
+display(part.pivot_table(index="Book", columns="Model", values="Sharpe", sort=False).style.format("{:.3f}", na_rep="—"))
 ```
 
-Learned clusters, principal components, and IC weights are fit on training labels or training correlations and then frozen. A ten-column composite can still draw on all twenty source factors. ANOVA-10 is the cut that stays inside ten original factors. Unsupervised construction can overfit the choice of groups even when it does not use the return as a label. IC and Q5−Q1 spreads diagnose a factor. They are not the return of a long-only portfolio.
+Downside to cash lowers return and drawdown together and leaves Sharpe almost unchanged: on the test, Top 10 falls from `{python} pct(top.CAGR)` to `{python} pct(down.CAGR)` CAGR with logistic regression. That is what holding more cash does, whichever stocks are trimmed. Upside tilt barely changes the book; gradient boosting's test gain comes with more volatility and a lower Sharpe. The four models land within about half a percentage point of each other, a sign that none ranks stocks better than the others.
 
-## Risk on the whole path
-
-The path compounds the strategy's training months and then the official-test months. The dotted line is the first official-test month. Equal weight's deeper drawdown on that path comes from the training window.
+**An extra tuned model.** K nearest neighbors and multinomial logistic regression predict next month's return *quintile*. On the 2007–2009 training holdout, accuracy is a little above the 20% of a guess, but K nearest neighbors' log loss is worse than a uniform guess, so its confidence is not earned.
 
 ```{python}
-display(style_table(risk_table()))
-display(path_figure())
-print(risk_note())
+display(v.grouping_class_table().style.format({"Holdout accuracy": "{:.1%}", "Chance accuracy": "{:.1%}",
+        "Holdout log loss": "{:.3f}", "Uniform log loss": "{:.3f}"}, na_rep="—").hide(axis="index"))
 ```
+
+# Hyperparameter tuning with `GridSearchCV`
+
+Each model is searched on a small grid declared before any result was inspected. The score is **log loss**, which rewards well-calibrated probabilities. Cross-validation uses **expanding monthly folds**: each fold trains on earlier months and validates on the next block, and all stocks from one month stay on the same side. Shuffled K-fold would let a model learn from the future. The search uses labels known by December 2006; its chosen settings are scored on the January 2007 – December 2009 holdout.
+
+```{python}
+#| label: tbl-search
+#| tbl-cap: "What GridSearchCV chose on training data."
+display(v.tuning_search_table().style.format({"Best score": "{:.4f}"}, na_rep="—").hide(axis="index"))
+```
+
+To answer the question for the book I actually chose, a separate study refit every overlay once on all training data with the `GridSearchCV` settings and scored it on 2010–2018. The test was not used to tune anything.
+
+```{python}
+#| label: tbl-tuned-final
+#| tbl-cap: "Chosen book on the official test: factory versus tuned overlays."
+display(tuned.style.format({"Factory CAGR": PERCENT, "Tuned CAGR": PERCENT, "Tuned − factory CAGR": "{:+.3%}",
+        "Factory Sharpe": "{:.3f}", "Tuned Sharpe": "{:.3f}"}).hide(axis="index"))
+```
+
+**Does tuning help?** No. The search picks different settings (more regularization for logistic regression, a shallower forest), but the largest change to the chosen book's test CAGR is `{python} f"{max_tuning_gap:.3%}"`. The best cross-validated log losses (0.68–0.70) sit right around a coin-flip forecast (0.693). There is very little signal to tune toward, so a better fit score does not become a better portfolio.
+
+# Extension: feature engineering
+
+Since the factors are redundant, I tried building better inputs, each recipe with at most ten columns: cluster averages and cluster principal components that compress each correlated family, IC-weighted blends, technical features from each stock's own past returns (moving averages, price versus moving average, momentum, volatility), and economic composites. Every learned piece is fitted inside the chronological training folds, and the holdout below never loads the test file.
+
+```{python}
+#| label: tbl-eng
+#| tbl-cap: "Chosen book with a logistic downside overlay built on each recipe, 2007–2009 training holdout."
+display(v.style_table(v.engineering_holdout_table()))
+```
+
+No recipe beats the plain book: each overlay lowers growth by moving money to cash, with the same Sharpe. An earlier exploratory comparison that held the top 20% by predicted probability on 2010–2018 made the engineered set look like the winner. Its test AUC was still about 0.50, though, and its holdings leaned heavily toward volatile stocks. A rule with no model, buying the most volatile fifth, earned about the same. That raised the question in the next section.
+
+# Extension: does ML add anything beyond a volatility tilt?
+
+If a model's gain is just "buy volatile stocks", the model is not adding anything. Two experiments separate the two:
+
+1. **Volatility-neutral target.** Each month stocks are split into five buckets by 6-month volatility, and the label becomes "beats the median of its own bucket". A model can no longer score by recycling the volatility tilt.
+2. **A one-parameter blend.** score = w × rank(ML) + (1 − w) × rank(3-month momentum). The weight w is chosen on 2005–2009 walk-forward results and then frozen.
+
+Skill is measured by **bucket alpha**: the return of the top 20% by score inside each volatility bucket, minus that bucket's average. A pure volatility tilt scores about zero on it. All four model types are tuned with `GridSearchCV` (ROC-AUC, expanding monthly folds) and averaged by within-month rank.
+
+```{python}
+#| label: fig-vol-neutral
+#| fig-cap: "Left: Sharpe of the top-20% ML + momentum book at each blend weight, walk-forward 2005–2009 and official test; the dotted line marks the weight chosen on 2005–2009. Right: bucket alpha per year with a 95% band, which removes the volatility tilt."
+fmt = {"Annual log growth": PERCENT, "CAGR": PERCENT, "Volatility": PERCENT, "Max drawdown": PERCENT,
+       "Sharpe": "{:.3f}", "Bucket alpha / yr": PERCENT, "Alpha t": "{:.2f}"}
+display(v.vol_neutral_table("test_2010_2018").style.format(fmt, na_rep="—").hide(axis="index"))
+display(v.vol_neutral_figure()); plt.close("all")
+```
+
+Neutralizing volatility does not create a forecasting model: AUC stays between about 0.49 and 0.51. The ML ensembles beat their volatility bucket in both windows, but the 95% bands include zero. The ML + momentum blend is the best risk-adjusted book in the study, with a higher Sharpe and a shallower drawdown than equal weight at similar volatility. Its weight was chosen on training years, and the test curve peaks at the same weight, but the differences between weights are small, so I report it as promising, not proven.
+
+# Risk and reward
+
+```{python}
+#| label: fig-path
+#| fig-cap: "Growth of $1, compounding the training window into the official test. The dotted line is the first test month."
+display(v.style_table(risk.loc[risk.Window.ne("Entire path") & ~risk.Book.str.contains("upside tilt")]))
+display(v.path_figure()); plt.close("all")
+print(v.risk_note())
+```
+
+```{python}
+#| label: fig-risk-return
+#| fig-cap: "Official test: annualized volatility against CAGR. Points above the dashed line earn more return per unit of volatility than equal weight."
+display(v.risk_return_figure()); plt.close("all")
+```
+
+The chosen book has the highest growth in the chart but sits *below* the dashed line: it pays for its return with much more volatility. Its drawdown is similar to equal weight's on the test and far smaller through 2008, because it moves to cash in falling markets. The ML + momentum blend is the candidate above the line.
+
+**Trading costs.** The momentum books change names and move in and out of cash every month. Charging 0, 10 and 25 basis points per dollar traded, on each book's saved turnover:
+
+```{python}
+#| label: fig-costs
+#| fig-cap: "Official-test CAGR after trading costs."
+display(v.cost_figure("test")); plt.close("all")
+print(v.cost_note("test"))
+```
+
+The chosen book trades about half its value each month, so costs take several points, but at 25 bps it still grows faster than equal weight (`{python} pct(costs.loc["Top 10 positive-vol", "CAGR @ 25 bps"])` vs `{python} pct(costs.loc["Equal weight", "CAGR @ 25 bps"])`). Its Sharpe gap to equal weight widens. Full baskets loses almost all of its test growth.
+
+**Is the extra return reliable?** A paired t-test on the monthly return difference, and a block bootstrap that resamples 6-month blocks 10,000 times:
+
+```{python}
+#| label: tbl-sig
+#| tbl-cap: "Top 10 positive-vol minus equal weight."
+display(v.significance_table().style.format({"Extra return / yr": "{:+.2%}", "t-stat": "{:.2f}", "p-value": "{:.2f}",
+        "95% CI low": "{:+.1%}", "95% CI high": "{:+.1%}", "Share of months ahead": "{:.0%}",
+        "Sharpe difference": "{:+.2f}", "Sharpe diff CI low": "{:+.2f}", "Sharpe diff CI high": "{:+.2f}"}
+        ).hide(axis="index"))
+```
+
+The extra return is not statistically significant in any window, and every interval includes zero. The book is ahead of equal weight in only `{python} pct(sig["Share of months ahead"], 0)` of test months, so its gains come from a smaller number of large months, typical of a high-volatility book that sits partly in cash. The advantage showed up in both windows, but with this much volatility, 5 to 14 years of data cannot prove it.
+
+# Final choice
+
+**The book I would trade is Top 10 positive-vol, with no ML overlay.**
+
+- **Highest growth in both windows.** Among the non-ML books it grows fastest on the official test and on 2005–2009, so the choice does not rest on the test alone. The only frozen book with more test growth is gradient boosting's upside tilt, which gets there with more volatility and a lower Sharpe.
+- **The ML overlays do not improve it.** Downside to cash trims return at the same Sharpe, upside tilt does nothing, and tuning and feature cuts do not change that. Leaving the forecast out keeps the strategy simple and honest about where its return comes from.
+- **It holds up in bad markets.** It moves to cash in falling markets, so its worst drawdown is similar to equal weight's on the test and much smaller through 2008.
+
+**The trade-off.** About 2.5 times equal weight's volatility, a lower Sharpe ratio, heavy turnover, and an edge that is not statistically significant. An investor who cares about risk-adjusted return rather than growth should prefer equal weight or the ML + momentum blend, keeping in mind that the blend's weight was chosen on a short window and the test period had already been viewed.
+
+```{python}
+print(v.choice_text())
+```
+
+## Limitations
+
+- **The test period was viewed more than once** across the project's studies. The frozen final books were scored once, after the comparison was written down; later studies that read 2010–2018 are labeled as checks.
+- **Costs and cash.** Headline numbers are gross; the cost check uses a simple per-dollar charge. Cash earns 0%, which slightly understates books that hold cash.
+- **One market path.** 108 test months are one sample, and many strategies were compared, so small differences are not significant.
+- **The ten-feature limit.** Engineered recipes use at most ten inputs, but some combine all twenty source factors. ANOVA-10 is the cut that strictly uses ten original factors.
+- **Different protocols.** The Section 7 study uses a top-20%, fully invested rule, so its rows compare cleanly with each other but only roughly with the frozen books.

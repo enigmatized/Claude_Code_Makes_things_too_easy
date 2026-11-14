@@ -204,7 +204,7 @@ class DirectionRunnerAndAppTests(unittest.TestCase):
             app.run()
             self.assertFalse(app.exception)
             source_id = app.session_state['training_result'].cache_info['run_id']
-            app.selectbox(key='basic_pattern').select('Upside threshold boost').run()
+            app.selectbox(key='basic_pattern').select('Next up').run()
             self.assertFalse(app.exception)
             self.assertTrue(any('Observed up rate' in f.value for f in app.tabs[1].dataframe))
             app.selectbox(key='basic_scope').select('Separate model per stock').run()

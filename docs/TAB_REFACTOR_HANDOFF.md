@@ -1,5 +1,13 @@
 # App tab refactor — implementation plan and LLM handoff
 
+Latest request (2026-11-10): the subsequent “Okay, can you implement please”
+authorized the basket/model/strategy/target flow. It is now implemented over
+saved cases, with exceptions for nonpredictive/method views. See
+[BASKET_FIRST_UI_PLAN.md](BASKET_FIRST_UI_PLAN.md) for actual scope, coverage
+constraints, verification and next steps. The older planning-only instruction
+is superseded. Seven main tabs remain; numerical results and the publication
+are unchanged by this navigation update.
+
 Feature-engineering addition authorized 2026-11-10: seven main stages, with
 **Feature engineering** between Tuned model and Final test. Its methods, model/
 portfolio comparisons and hyperparameter tuning are subtabs; it clusters factor

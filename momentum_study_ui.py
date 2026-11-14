@@ -50,6 +50,15 @@ def _load_allocations(store, runs, key_prefix, include_ml):
     target = "basic" if include_ml else "strategies"
     st.session_state[f"{target}_show_allocations"] = True
     st.session_state[f"{target}_allocations_strategy"] = "Annual consistency + positive momentum + cash"
+    # The explicit allocation link should open the corresponding saved basket,
+    # rather than preserve a previously selected portfolio or a different run.
+    selection = 'basic_selection' if include_ml else 'strategies_selection'
+    st.session_state[selection+'_basket'] = 'Frozen annual-consistency pool'
+    if include_ml:
+        st.session_state.pop('basic_saved_experiment', None)
+        st.session_state['basic_compare_more'] = False
+        st.session_state['basic_pattern'] = 'Next up' if result.config.prediction_target == 'upside' else 'Next down'
+        st.session_state['basic_selection_model'] = default_model_registry()[result.config.models[0]].label
 
 
 def render_momentum_studies(include_ml=True, key_prefix="momentum", published=None):

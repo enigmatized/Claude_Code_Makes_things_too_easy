@@ -8,7 +8,8 @@ from research.store import ExperimentStore
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--extend-publication", type=Path, help="Existing publication to extend with --ward-study")
+    parser.add_argument("--extend-publication", type=Path, help="Existing publication to extend with one completed study")
+    parser.add_argument("--acceleration-study", type=Path, help="Completed grouped-momentum acceleration study")
     parser.add_argument("--engineering-study", type=Path, help="Completed feature-engineering study, including final stage")
     parser.add_argument("--ward-study", type=Path, help="Saved Ward study with identical trading protocol")
     parser.add_argument("--run", help="Explicit saved training experiment ID")
@@ -22,6 +23,13 @@ def main():
     parser.add_argument("--tuning-study", type=Path, nargs="+", default=[], help="Saved training holdout directories")
     parser.add_argument("--final-study", type=Path, help="Saved frozen official-test study directory")
     args = parser.parse_args()
+    if args.acceleration_study and (not args.extend_publication or args.ward_study or args.engineering_study):
+        parser.error('--acceleration-study requires --extend-publication and cannot be mixed with other study extensions')
+    if args.extend_publication and args.acceleration_study:
+        if not args.output: parser.error('Choose a new --output publication')
+        from acceleration_publication import export_acceleration
+        print(export_acceleration(args.extend_publication, args.acceleration_study, args.output))
+        return
     if args.extend_publication:
         if not args.output or bool(args.ward_study) == bool(args.engineering_study):
             parser.error("--extend-publication requires one of --ward-study/--engineering-study, and a new --output")

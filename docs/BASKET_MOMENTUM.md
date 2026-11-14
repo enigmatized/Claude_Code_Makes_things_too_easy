@@ -1,5 +1,21 @@
 # Correlation-basket momentum
 
+## Current: acceleration and actual allocation mechanics (2026-11-10)
+
+The basket's return signal is an equal-weight mean of the up-to-ten selected names
+per group. Actual positions invest P/N of total capital for a positive group with
+P positive members among N total selected names, in proportion to those members'
+positive momentum. Other slots are cash. Group capital and stock weights are not
+equal. Grouping and positive-volatility screening use twelve earned months; this
+book's momentum uses one.
+
+A fourth grouping subtab, Momentum acceleration, compares unchanged originals
+with stock-only, basket-only and combined deceleration-to-cash rules for K-means
+and Ward. Training and final results are separately displayed. The same current
+members define both basket observations. See [full formulas, evidence and
+handoff](MOMENTUM_ACCELERATION.md); no original books or classifiers changed.
+Older navigation/coverage descriptions below are historical.
+
 ## Finding the original strategy in Final test (2026-11-10)
 
 Open **Final test → K-means strategies**. The original is named

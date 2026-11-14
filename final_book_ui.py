@@ -13,6 +13,9 @@ from research.final_books import list_final_books, load_final_books, matching_tr
 from research.models import default_model_registry
 from portfolio_focus import main_portfolio_focus
 from app_charts import RETURN_MEASURES, return_curve
+from portfolio_selection import grouped_cases
+from portfolio_selection_ui import select_portfolio_case
+from final_comparison_ui import offer_final_comparison
 
 
 FOCUS = (
@@ -91,14 +94,23 @@ def render_final_books(store=None, published=None):
     st.subheader(_window_title(window, monthly))
     st.caption(_window_caption(window, monthly, meta, training_meta))
     st.caption(meta["recipe"][-1])
-    registry = default_model_registry()
-    present = set(metrics.model_key)
-    model_labels = {registry[key].label: key for key in registry if key in present}
-    model_key = model_labels[st.selectbox("Prediction model for the four books", list(model_labels), key="final_books_model")]
-    if main_only:
-        st.session_state['final_books_show_all'] = False
-    show_all = st.checkbox("Show every model and horizon", key="final_books_show_all", disabled=main_only)
-    table = _table(metrics, model_key, show_all)
+    cases=grouped_cases(metrics)
+    choice=select_portfolio_case(cases,'final_selection',keys={'model':'final_books_model','target':'final_books_direction'},
+                                preferred_basket='K-means top 10 positive-vol per group')
+    if choice.empty:
+        return True
+    row=choice.iloc[0]
+    model_key=row.model_key
+    direction='Upside tilt' if row.target=='upside' else 'Downside to cash'
+    horizon=int(row.momentum_months)
+    show_all=st.checkbox('Compare more saved models, baskets and horizons',key='final_books_show_all')
+    if not show_all:
+        same=cases.basket.eq(row.basket)&cases.allocation.eq(row.allocation)
+        exact=same & ((cases.model_key.eq(model_key)&cases.target.eq(row.target))|cases.model_key.eq('none'))
+        metrics=cases.loc[exact].copy()
+        keys=metrics[['version','model_key','momentum_months']].drop_duplicates()
+        monthly=monthly.merge(keys,on=['version','model_key','momentum_months'],validate='many_to_one')
+    table = _table(metrics, model_key, True)
     formats = {column: "{:.3f}" if column == "Sharpe" else "{:.1f}" if column == "Names held" else "{:.2%}"
                for column in table.columns if column not in {"Book", "Model", "Momentum"}}
     st.dataframe(table.style.format(formats), use_container_width=True, hide_index=True)
@@ -110,20 +122,24 @@ def render_final_books(store=None, published=None):
         st.caption("Each adjustment is paired with its own full-group or top-ten original at the same momentum window. "
                    "pp = percentage points. Positive drawdown change means a less negative drawdown. "
                    "These are observed differences, not proof of an improvement.")
-    direction = st.selectbox("Overlay direction on the chart", list(DIRECTIONS), key="final_books_direction")
     measure = st.selectbox("Return measure", list(RETURN_MEASURES), key="final_books_return_measure")
     st.plotly_chart(
-        _figure(monthly, model_key, direction, window, study["monthly"].return_month.min(), measure),
+        _figure(monthly, model_key, direction, window, study["monthly"].return_month.min(), measure, months=horizon if horizon else 1),
         use_container_width=True, key=f"final_books_chart_{window}")
+    offer_final_comparison(metrics,monthly,protocol='K-means fixed-model study',source=cache_key,
+        case_fields=['version','model_key','momentum_months'],prefix='final_books',window=window)
     st.caption("Log returns are calculated from the saved portfolio simple returns, after stock weights and cash have been accounted for. "
                "Cumulative log returns add across earned months; CAGR compounds the same path.")
     with st.expander("Official-test features kept by the frozen fit"):
         st.caption("This list describes the frozen official-test model, even when viewing training or the joined path. "
                    "The training overlays use all 20 inputs instead. Loss and upside are separate events, "
                    "so the columns can differ; both test lists were chosen at the freeze date.")
-        for target, label in (("loss", "Loss"), ("upside", "Upside")):
-            columns = meta.get("fitted_features", {}).get(model_key, {}).get(target, [])
-            st.write(f"{label}: {', '.join(columns) if columns else 'not recorded'}")
+        if model_key == 'none':
+            st.caption('This original portfolio uses no directional classifier or selected model inputs.')
+        else:
+            for target, label in (("loss", "Loss"), ("upside", "Upside")):
+                columns = meta.get("fitted_features", {}).get(model_key, {}).get(target, [])
+                st.write(f"{label}: {', '.join(columns) if columns else 'not recorded'}")
     return True
 
 
@@ -220,17 +236,19 @@ def _curve(figure, rows, name, color, measure="Growth of $1"):
     figure.add_trace(go.Scatter(x=series.index, y=series, name=name, line=dict(color=color)))
 
 
-def _figure(monthly, model_key, direction, window, test_start, measure="Growth of $1"):
+def _figure(monthly, model_key, direction, window, test_start, measure="Growth of $1", months=1):
     top_version, basket_version, color = DIRECTIONS[direction]
     figure = go.Figure()
     _curve(figure, monthly.loc[monthly.version.eq("Equal weight")], "Equal weight", "#68716e", measure)
-    _curve(figure, monthly.loc[monthly.version.eq(TOP_VOL_VERSION) & monthly.momentum_months.eq(1) & monthly.model_key.eq("none")],
-           "K-means top 10 · 1M momentum + cash (original)", "#b36a2e", measure)
-    _curve(figure, monthly.loc[monthly.version.eq(top_version) & monthly.momentum_months.eq(1) & monthly.model_key.eq(model_key)],
+    _curve(figure, monthly.loc[monthly.version.eq("Momentum + cash") & monthly.momentum_months.eq(months)],
+           f"{months}M momentum + cash (original)", "#899594", measure)
+    _curve(figure, monthly.loc[monthly.version.eq(TOP_VOL_VERSION) & monthly.momentum_months.eq(months) & monthly.model_key.eq("none")],
+           f"K-means top 10 · {months}M momentum + cash (original)", "#b36a2e", measure)
+    _curve(figure, monthly.loc[monthly.version.eq(top_version) & monthly.momentum_months.eq(months) & monthly.model_key.eq(model_key)],
            f"K-means top 10 + {direction.lower()}", color, measure)
-    _curve(figure, monthly.loc[monthly.version.eq(BASKET_VERSION) & monthly.momentum_months.eq(1) & monthly.model_key.eq("none")],
-           "K-means full groups · 1M momentum + cash", "#287d68", measure)
-    _curve(figure, monthly.loc[monthly.version.eq(basket_version) & monthly.momentum_months.eq(1) & monthly.model_key.eq(model_key)],
+    _curve(figure, monthly.loc[monthly.version.eq(BASKET_VERSION) & monthly.momentum_months.eq(months) & monthly.model_key.eq("none")],
+           f"K-means full groups · {months}M momentum + cash", "#287d68", measure)
+    _curve(figure, monthly.loc[monthly.version.eq(basket_version) & monthly.momentum_months.eq(months) & monthly.model_key.eq(model_key)],
            f"Baskets + {direction.lower()}", "#536da6", measure)
     start, end, _ = _span(monthly)
     titles = {

@@ -1,5 +1,104 @@
 # Change log
 
+## 2026-11-14 — Ignore local LLM assistant files
+
+- Add targeted assistant history, session, cache, local-settings and private
+  instruction rules; retain shared instructions, skills and project rules.
+- Verify ignored/retained paths with Git and confirm no tracked files match.
+  Update the state, staging guide and decision record; no research computation.
+
+## 2026-11-10 — Report and slides rewritten to match the graded notebook
+
+- Rewrite `submission/project_report.qmd` around the notebook's nine sections, with key
+  numbers inlined from saved results (no hard-coded values), tuned-on-test, cost and
+  significance sections, final choice and limitations.
+- Rewrite `submission/presentation.qmd` as 16 code-free slides with a reading guide under
+  each chart and speaker notes; checked for overflow with headless-Chrome screenshots.
+- Add `context/notebook_cells/12_presentation.py` (glance table, correlation map,
+  risk/return scatter, cost chart) exported via `research/notebook_views.py`; one new test.
+- Old QMD/HTML archived in `submission/archives/pre_presentation_20261110/`.
+  `build_submission.py --final` passes 10/10. No fitting, no `release.json` change.
+
+## 2026-11-10 — Remove app header subtitle
+
+- Remove the long arrow-separated project-stage subtitle from the app header.
+  Verified its removal and Python syntax; no model/data changes or new tests.
+
+## 2026-11-10 — Implement basket/model/allocation/target navigation
+
+- Add pure saved-case descriptions and shared compatible selectors across the
+  seven tabs; preserve original IDs, recipes, fitting scope and cash policies.
+- Default Strategies/Basic ML to one configuration, keeping expanded comparisons
+  and select-all charts. Collapse advanced source filters/saved runs.
+- Preserve grouping/method lessons; move grouped feature results into the feature-
+  effects subtab, with actual model/target/horizon choices.
+- Reorder tuning/engineering/final controls; filter earlier final plots to the
+  chosen pair and actual momentum horizon. Missing tuples do not trigger fits.
+- Add a source/protocol-aware session final comparison with growth/log/drawdown/
+  cash paths and a guard against mismatched windows. Fix the momentum allocation
+  link to select the matching basket/run.
+- Verify 240 tests, source-free seven-tab interactions and browser views. No new
+  backtests/fits, export/data/dependency change or formal submission rewrite.
+  Updated implementation handoff and evidence; no commit or push performed.
+
+## 2026-11-10 — Basket-first navigation plan only
+
+- Locate the existing fourth Momentum acceleration grouping subtab and distinguish
+  local changes from the still-unpushed hosted update.
+- Document the proposed basket/model/strategy/up-down flow for all seven tabs,
+  with exceptions, saved-case coverage, protocol matching and staged rollout.
+- Recommend a Basic ML pilot; separate presentation changes from new basket-
+  specific fitting or arbitrary weighting combinations. No app/experiment/release
+  changes and no new tests or fits. See `docs/BASKET_FIRST_UI_PLAN.md`.
+
+## 2026-11-10 — Submission robustness: pinned study, tuned test, costs, significance, --final
+
+- Pin the engineering study (`notebook_views.ENGINEERING_STUDY` =
+  `engineering_20261110T171255_825ffa99`) instead of "newest"; training metrics are
+  identical to `…172206` (max |CAGR diff| 0.0), and the pinned study has the 2010–2018 stage.
+- New read-only `context/notebook_cells/11_robustness.py`: tuned-vs-factory overlays on the
+  chosen book for 2010–2018 (largest change −0.027% CAGR), cost check at 0/10/25 bps on
+  saved turnover (chosen book 19.6% → 15.8% test CAGR at 25 bps; equal weight 13.1% → 12.8%),
+  and paired t-test + 6-month block bootstrap vs equal weight (test +9.6%/yr, p = 0.48).
+- New `research/submission_checks.py`; `build_submission.py --final` now checks the evidence
+  the notebook reads (10/10 pass) and keeps the old catalog-run checks as informational.
+- Notebook: Sections 5b, 8b, 8c added (46 cells). `python3 build_submission.py --final` exit 0.
+  New `tests/test_robustness_view.py`; 30 focused tests pass.
+
+
+## 2026-11-10 — Momentum acceleration rules on grouped top-ten portfolios
+
+- Explain equal-weight group signals versus actual momentum-proportional holdings.
+- Add a shared causal stock/fixed-current-basket acceleration experiment with four
+  original/stock/basket/combined rules; halved allocations move to cash, never shorts.
+- Save K-means and Ward training and separately labeled previously viewed final
+  evidence; original monthly books match all four existing references exactly.
+- Add training/final app sections, metrics and log/growth/drawdown/cash charts,
+  current-member basket bars and stock-level signal/allocation audits.
+- Publish six small Parquet files; current release 476 files / 173,332,889 bytes,
+  preserving 469 earlier frame hashes and the ignored previous default backup.
+- Verify 229 tests, saved-only seven-tab AppTest, and real-browser views. No new
+  dependencies, classifier fits, tuning or formal report/release change from this
+  experiment. Document handoff in `docs/MOMENTUM_ACCELERATION.md`.
+
+## 2026-11-10 — Presentation rewrite of the graded notebook + volatility-neutral ML study
+
+- New `0_7_Feature_Engineering/03_vol_neutral_momentum_ml.ipynb`: volatility-neutral
+  label, four GridSearchCV-tuned models, 2005–2009 walk-forward choice of an
+  ML/momentum blend weight (0.50), frozen 2010–2018 check (previously viewed).
+  Saves `part8_*.csv/json`.
+- New read-only reader `context/notebook_cells/10_vol_neutral.py`, registered in
+  `research/notebook_views.py`; new `tests/test_vol_neutral_view.py`.
+- Rewrite `submission/analysis.ipynb` for presentation (20 → 37 cells): summary and
+  rubric map, at-a-glance table, visible equal-weight recomputation, factor-correlation
+  heatmap, displayed ANOVA-10 pipeline, declared grids and the exact GridSearchCV
+  source lines, compact model pivots, Section 7 study, risk/return scatter, explicit
+  choice trade-off and limitations. Still read-only; no fits, no course CSV opened.
+- Earlier notebook preserved at `submission/archives/pre_presentation_20261110/`.
+  Declared choice (Top 10 positive-vol, no overlay), `release.json`, QMD/HTML unchanged.
+  18 focused tests pass.
+
+
 ## 2026-11-10 — Recognizable K-means top-ten strategy in Final test
 
 - Rename the earlier-final subtab to K-means strategies; spell out grouping,

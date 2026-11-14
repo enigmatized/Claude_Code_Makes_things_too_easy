@@ -197,6 +197,9 @@ class PublishedStrategies:
     def analysis_section(self, name):
         if name not in self.metadata['tabs']:
             return None
+        if name == 'acceleration':
+            from acceleration_publication import PublishedAcceleration
+            return PublishedAcceleration(self)
         if name == 'engineering':
             from engineering_publication import PublishedEngineering
             return PublishedEngineering(self)

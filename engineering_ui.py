@@ -8,6 +8,9 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from scipy.cluster.hierarchy import dendrogram
 import streamlit as st
+from portfolio_selection import book_cases
+from portfolio_selection_ui import select_portfolio_case
+from final_comparison_ui import offer_final_comparison
 
 from app_charts import RETURN_MEASURES, return_curve
 from research.engineering import RECIPES, TECH_RAW, ECONOMIC
@@ -130,16 +133,15 @@ def _methods(study):
 
 
 def _controls(study,prefix):
-    registry=default_model_registry();cols=st.columns(3)
-    models={registry[k].label:k for k in study['metadata']['models']}
-    model=models[cols[0].selectbox('Prediction model',list(models),key=prefix+'_model')]
-    target={'Next down':'loss','Next up':'upside'}[cols[1].selectbox('Prediction target',['Next down','Next up'],key=prefix+'_target')]
-    books=study['metadata']['books']
-    default=books.index('K-means top 10') if prefix=='engineering_final' and 'K-means top 10' in books else 0
-    book=cols[2].selectbox('Starting portfolio',books,index=default,key=prefix+'_book')
-    if book in {'K-means top 10','Ward top 10'}:
-        st.caption(f"{book}: five stock groups → top 10 by trailing 12-month positive volatility in each group → "
-                   "1-month positive-momentum weights, leaving unused capital in cash. The Original row/curve is this strategy before any directional adjustment.")
+    cases=book_cases(study['metrics'].loc[study['metrics'].recipe.ne('original')])
+    choice=select_portfolio_case(cases,prefix,keys={'basket':prefix+'_book'},
+        preferred_basket='K-means top 10 positive-vol per group' if prefix=='engineering_final' else None)
+    if choice.empty:
+        return None,None,None,'Fixed',[]
+    row=choice.iloc[0]
+    model,target,book=row.model_key,row.target,row.book
+    st.caption('The selected model retains its saved training universe and feature-fitting protocol. '
+               'Basket selection changes the portfolio comparison, not its fitted training rows.')
     status=st.radio('Estimator settings',['Fixed','Tuned','Both'],horizontal=True,key=prefix+'_settings')
     labels={RECIPES[k]:k for k in study['metadata']['recipes']}
     selected=st.multiselect('Feature recipes to compare',list(labels),default=list(labels),key=prefix+'_recipes')
@@ -162,6 +164,9 @@ def _results(study,prefix):
     counts=study['audits'].loc[lambda f:f.model_key.eq(model)&f.target.eq(target)].set_index(['recipe','status']).n_features
     show['Model inputs']=[int(counts.loc[(row.recipe,row.status)]) if row.recipe!='original' else 0 for row in metrics.itertuples()]
     st.dataframe(show.style.format({c:'{:.3f}' if c=='Sharpe' else '{:.2%}' for c in show.columns[2:] if c!='Model inputs'}),hide_index=True,use_container_width=True)
+    offer_final_comparison(metrics,frames['monthly'],protocol='Feature engineering frozen study',
+        source=study['metadata'].get('created_utc','engineering'),
+        case_fields=['book','recipe','model_key','target','status'],prefix=prefix,window=study['scope']['window'])
     st.caption('Original = unchanged starting rule. Every recipe uses the same stocks/months and portfolio rule. '
                'Downside reductions remain in cash for cash-capable books; the equal-weight overlay renormalizes to 100% stocks. '
                'Upside boosts held names at probability ≥60% and preserves the original stock budget.')

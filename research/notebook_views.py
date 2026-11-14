@@ -43,6 +43,11 @@ CHOICE = {
     ),
 }
 
+# The engineering study the write-up cites. Pinned rather than "newest", because a later
+# default training-only run would otherwise silently replace the study that also holds
+# the frozen 2010–2018 stage. Change it deliberately, like CHOICE.
+ENGINEERING_STUDY = "engineering_20261110T171255_825ffa99"
+
 BOOK_COLORS = {
     "Equal weight": "#68716e",
     "Top 10 positive-vol": "#b36a2e",
@@ -114,6 +119,14 @@ def latest_feature_scores():
     if not found:
         raise FileNotFoundError("No saved feature-score study.")
     return load_feature_book_scores(found[0]["directory"])
+
+
+def pinned_engineering() -> Path:
+    """The engineering study named by ENGINEERING_STUDY; it must have a completed training stage."""
+    directory = artifact_root() / "engineering_studies" / ENGINEERING_STUDY
+    if not (directory / "training" / "complete.json").is_file():
+        raise FileNotFoundError(f"Pinned engineering study {ENGINEERING_STUDY} has no completed training stage.")
+    return directory
 
 
 def latest_holdout():
@@ -238,12 +251,9 @@ def source_note(kind) -> str:
             f"Search score {meta.get('scoring')}. Prediction target {target}."
         )
     if kind == "engineering":
-        from research.engineering_study import latest_engineering
-        directory = latest_engineering(artifact_root())
-        if directory is None:
-            raise FileNotFoundError("No completed engineering training study.")
+        directory = pinned_engineering()
         return (
-            f"Newest completed engineering training study {directory.name}. "
+            f"Pinned engineering study {directory.name}. "
             "January 2007–December 2009 holdout. The test file is not part of this study's training scope. "
             "The 0_7 comparison file is a separate, previously viewed 2010–2018 notebook result."
         )
@@ -299,6 +309,11 @@ _CELL_EXPORTS = (
     ("07_choice.py", ("choice_text",)),
     ("08_grouping.py", ("grouping_search_table", "grouping_class_table", "grouping_book_table", "grouping_note")),
     ("09_engineering.py", ("engineering_holdout_table", "engineering_comparison_table", "engineering_note")),
+    ("10_vol_neutral.py", ("vol_neutral_table", "vol_neutral_model_table", "vol_neutral_figure", "vol_neutral_note")),
+    ("11_robustness.py", ("tuned_final_table", "tuned_final_note", "cost_table", "cost_note",
+                          "significance_table", "significance_note")),
+    ("12_presentation.py", ("glance_table", "correlation_figure", "strong_pairs", "risk_return_figure",
+                            "cost_figure")),
 )
 for _filename, _names in _CELL_EXPORTS:
     _export_cell(_filename, _names)

@@ -61,6 +61,41 @@ def vol_neutral_model_table() -> pd.DataFrame:
     return show.reset_index(drop=True)
 
 
+def vol_neutral_figure():
+    """Left: the saved blend-weight curve. Right: bucket alpha with a 95% band, both windows."""
+    import matplotlib.pyplot as plt
+
+    meta, results = _meta(), _results()
+    curve = pd.read_csv(FOLDER / "part8_blend_curve.csv").loc[lambda d: d.other.eq("momentum")]
+    figure, (left, right) = plt.subplots(1, 2, figsize=(11.5, 4.2))
+    left.plot(curve.w_ml, curve.oos_sharpe, "o-", color="#1d6a6a", label="Walk-forward 2005–2009 (chooses w)")
+    left.plot(curve.w_ml, curve.test_sharpe, "s--", color="#b36a2e", label="Official test 2010–2018 (display only)")
+    left.axvline(meta["chosen_weights"]["momentum"], color="#68716e", linestyle=":", linewidth=1)
+    left.set_xlabel("Weight on the ML rank (1 − weight on momentum)")
+    left.set_ylabel("Sharpe, top-20% book")
+    left.set_title("Blending ML with 3-month momentum", loc="left", fontsize=10)
+    left.legend(fontsize=8, frameon=False)
+    picks = results.dropna(subset=["alpha_ann"])
+    picks = picks.loc[~picks.strategy.str.contains("volatility \\(w=", regex=True)]
+    names = list(dict.fromkeys(picks.strategy))
+    for offset, (window, color) in zip((-0.18, 0.18), (("oos_2005_2009", "#1d6a6a"), ("test_2010_2018", "#b36a2e"))):
+        part = picks.loc[picks.window.eq(window)].set_index("strategy").reindex(names)
+        band = 1.96 * part.alpha_ann / part.alpha_t.replace(0, np.nan)
+        right.barh(np.arange(len(names)) + offset, part.alpha_ann, height=0.34, xerr=band.abs(),
+                   color=color, alpha=0.85, label=WINDOWS[window], error_kw={"elinewidth": 0.8})
+    right.set_yticks(np.arange(len(names)), names, fontsize=8)
+    right.axvline(0, color="black", linewidth=0.8)
+    right.xaxis.set_major_formatter(plt.FuncFormatter(lambda value, _: f"{value:.0%}"))
+    right.set_xlabel("Bucket alpha per year (log return), 95% band")
+    right.set_title("Stock-picking skill inside volatility buckets", loc="left", fontsize=10)
+    right.legend(fontsize=8, frameon=True, framealpha=0.9, edgecolor="none", loc="lower left")
+    for axis in (left, right):
+        axis.grid(alpha=0.18)
+        axis.spines[["top", "right"]].set_visible(False)
+    figure.tight_layout()
+    return figure
+
+
 def vol_neutral_note() -> str:
     """Plain-language summary built from the saved numbers, so the text cannot drift from them."""
     meta, results = _meta(), _results()
